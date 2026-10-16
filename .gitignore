@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+*.db
+*.sqlite
+*.sqlite3
+eshop-sut/backend/*.db
+eshop-sut/backend/*.sqlite*
+.DS_Store
+Thumbs.db
