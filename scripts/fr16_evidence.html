@@ -1,0 +1,39 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>FR-16 API Evidence (measured 16/10/2026)</title>
+<style>body{font-family:Consolas,monospace;background:#fff;color:#111;margin:24px}h1{font-size:20px}h2{font-size:15px;margin-top:26px;background:#f2f2f2;padding:6px 10px}.bug{border:1px solid #ccc;padding:10px 14px;margin:10px 0}pre{background:#0b0b0b;color:#7dff9a;padding:12px;overflow-x:auto;font-size:12.5px}.k{color:#ffd479}.note{font-size:12px;color:#333}.foot{font-size:11px;color:#666;margin-top:20px}</style></head><body>
+<h1>FR-16 CSV import — API execution evidence (backend localhost:3000, measured 16/10/2026)</h1>
+<p class="note">Raw transcript: <b>scripts/exec_fr16_results.json</b> (45 steps). Contract is JSON <code>{products:[...]}</code> — no file parsing server-side. DB recounted per TC (600ms settle). Cleanup removed T16 rows; one whitespace-name leftover (id 17) removed manually, count verified back to 5 seeds.</p>
+
+<h2>FR16-BUG-01 [Critical] — NO atomicity: half-commit on any bad row</h2>
+<div class="bug"><pre>D17 first-bad {"inserted":<span class="k">2</span>,"errors":["Hàng 2: Thiếu tên sản phẩm"],"delta":2}
+D18 last-bad  {"inserted":<span class="k">2</span>,"errors":["Hàng 4: Thiếu tên sản phẩm"],"delta":2}   // index+2 numbering
+B06..B09 err@1/2/4/5 {"inserted":4,"delta":4} each   // D19 all-valid +5 exact (commit path OK)</pre></div>
+
+<h2>FR16-BUG-02 [High] — validation = name-only (price/FK unchecked)</h2>
+<div class="bug"><pre>D12 zero {"inserted":2}  D13 neg {"inserted":2}  D14 abc {"inserted":2}  D15 cat9999 {"inserted":2}
+D14b stored {"price":"abc","t":"text"}   // TEXT in INTEGER column
+D07 missing price {"inserted":2,"stored":{"price":null}}   // NULL price accepted
+D11b whitespace name {"inserted":2,"errors":[]}           // leftover id 17 proof</pre></div>
+
+<h2>FR16-BUG-03 [High] — no role check: customer JWT imports (FR-12)</h2>
+<div class="bug"><pre>D04-customer {"status":<span class="k">200</span>}   vs   D05-guest {"status":401}  // auth yes, roles no</pre></div>
+
+<h2>FR16-BUG-04 [High] — naive split(",") parser, no RFC4180 (UI layer)</h2>
+<div class="bug"><pre>D09 '"Áo, thun"' parsed -&gt; {"name":'"Áo',"price":'thun"',...} -&gt; inserted 1 (garbage row)
+D10 escaped quotes -&gt; inserted 1 (misaligned)</pre></div>
+
+<h2>FR16-BUG-05/06 [Medium] — no file-type gate; silent || defaults</h2>
+<div class="bug"><pre>No extension check in UI (any file parsed); backend never sees files.
+price||0, category parseInt→null→1, description/imageUrl||"" — bad data masked (D07/D15).</pre></div>
+
+<h2>FR16-BUG-08/09/10 [Low] — [null]→500; duplicates; 256+ char names</h2>
+<div class="bug"><pre>G08 [null] {"status":<span class="k">500</span>,"body":"TypeError: Canno..."}   // must be 400
+D16 duplicate 'iPhone 15 Pro Max' {"inserted":1}   // new row, no UNIQUE
+B19a/B19b 256/1000-char names {"inserted":1} each   // vs FR-15 max 255</pre></div>
+
+<h2>Held behaviors (PASS)</h2>
+<div class="bug"><pre>D01 3/3 UTF-8 rows (+3)  |  D05 guest 401  |  D06 bad header -&gt; 0 imported + per-row errors
+D20/D21 UI trim drops trailing blank + spaces  |  B01/B02 empty preview -&gt; Import disabled, nothing sent
+B03/B04/B05 +1/+5/+100 exact (100 rows in 1684ms)  |  B12/B13/B17/B18 1₫/huge/1-char/255-char accepted
+B20 stock key ignored, inserted, no stock column (PRAGMA)  |  D16 duplicate recorded</pre></div>
+<p class="foot">Rendered from genuine measured output for issue attachments. UI flow evidenced by FR16_UI_ADMIN.png + App.jsx:341-434 (import section), :364-418 (parser).</p>
+</body></html>

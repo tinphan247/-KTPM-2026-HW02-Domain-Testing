@@ -538,27 +538,27 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 
 | TC_ID | Partition / combination | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| TC-FR16-DOM-01 | All-VP happy path + UTF-8 | `products.csv`: 3 valid rows incl. Vietnamese names, exact header, admin JWT | Baseline product count C recorded | Upload → read report → recount | 3 imported (C+3), report 3 success / 0 errors, diacritics intact | — | Pending Execution |
-| TC-FR16-DOM-02 | IP2.1 no file | Empty upload body, admin | — | Submit import | Rejected (file required) | — | Pending Execution |
-| TC-FR16-DOM-03 | IP2.2 wrong type | `products.txt` (CSV content) + `.xlsx` binary, admin | — | Upload each | Both rejected (`.csv` only) | — | Pending Execution |
-| TC-FR16-DOM-04 | IP1.1 customer role | Valid CSV + customer JWT (`test@eshop.com`) | — | Upload | Rejected 403 (admin-only, FR-12) | — | Pending Execution |
-| TC-FR16-DOM-05 | IP1.2 guest | Valid CSV, no token | — | Upload | Rejected 401 | — | Pending Execution |
-| TC-FR16-DOM-06 | IP4.1 bad header | `title,price,desc,img,cat` + 2 valid rows, admin | Count C | Upload | Rejected (header mismatch), 0 imported | — | Pending Execution |
-| TC-FR16-DOM-07 | IP5.1 short row | Row with 4 fields among valid rows, admin | Count C | Upload | Row error → FULL rollback (C unchanged) + reason cites row | — | Pending Execution |
-| TC-FR16-DOM-08 | IP5.2 long row | Row with 6 fields among valid rows, admin | Count C | Upload | Row error → FULL rollback + reason | — | Pending Execution |
-| TC-FR16-DOM-09 | VP6.1 quoted comma | `"Áo, thun",100000,mô tả đẹp,http://x/a.png,1`, admin | Count C | Upload | 1 imported, name = `Áo, thun` (single field) | — | Pending Execution |
-| TC-FR16-DOM-10 | VP6.2 escaped quote | `"Áo ""đẹp""",100000,mô tả,http://x/b.png,1`, admin | Count C | Upload | 1 imported, quotes preserved correctly | — | Pending Execution |
-| TC-FR16-DOM-11 | IP7.1 empty name | Row `,100000,mô tả,http://x/c.png,1` + 2 valid rows, admin | Count C | Upload | Rollback (C unchanged), reason = empty name + row number | — | Pending Execution |
-| TC-FR16-DOM-12 | IP8.1 zero price | Row price `0` + valid rows, admin | Count C | Upload | Rollback, reason cites price row | — | Pending Execution |
-| TC-FR16-DOM-13 | IP8.2 negative price | Row price `-5000` + valid rows, admin | Count C | Upload | Rollback, reason cites price row | — | Pending Execution |
-| TC-FR16-DOM-14 | IP8.3 non-numeric price | Row price `abc` + valid rows, admin | Count C | Upload | Rollback (no NaN/coercion import), reason cites row | — | Pending Execution |
-| TC-FR16-DOM-15 | IP9.1 bad category | Row `category_id = 9999` + valid rows, admin | Count C | Upload | Rollback (FK), reason cites row | — | Pending Execution |
-| TC-FR16-DOM-16 | SP duplicate name | Row reusing an existing DB product name, all else valid, admin | Count C, name N exists | Upload | Record: new row (duplicate allowed) / overwrite / reject | — | Pending Execution |
-| TC-FR16-DOM-17 | ★ IP11.1 first-row-bad | Row1 invalid (empty name) + rows2-3 valid, admin | Count C | Upload | **0 imported** (atomic; C unchanged) + 1 error cited | — | Pending Execution |
-| TC-FR16-DOM-18 | ★ IP11.2 last-row-bad | Rows1-2 valid + row3 invalid (price `abc`), admin | Count C | Upload | **0 imported** — proves rollback of the 2 prior valid rows (C unchanged) + 1 error cited | — | Pending Execution |
-| TC-FR16-DOM-19 | ★ VP11.1 commit exactness | 5 valid rows, admin | Count C | Upload → recount + spot-check fields | Exactly C+5, all fields match CSV | — | Pending Execution |
-| TC-FR16-DOM-20 | SP11.1 trailing newline | Valid 2-row file + trailing blank line(s), admin | Count C | Upload | Student standard (16/10): trailing blank line ignored → 2 imported; treating it as error-row (full rollback) or inserting an empty product = CSV-handling bug | — | Pending Execution |
-| TC-FR16-DOM-21 | SP11.2 spaced commas | `Áo , 100000 , mô tả , http://x/d.png , 1`, admin | Count C | Upload | Student standard (16/10): trim surrounding spaces → accept; importing untrimmed values = minor defect | — | Pending Execution |
+| TC-FR16-DOM-01 | All-VP happy path + UTF-8 | `products.csv`: 3 valid rows incl. Vietnamese names, exact header, admin JWT | Baseline product count C recorded | Upload → read report → recount | 3 imported (C+3), report 3 success / 0 errors, diacritics intact | 200, inserted 3, errors [] (D01) | PASSED |
+| TC-FR16-DOM-02 | IP2.1 no file | Empty upload body, admin | — | Submit import | Rejected (file required) | UI blocks: empty preview disables Import (App.jsx:387,418), nothing sent (B01) | PASSED |
+| TC-FR16-DOM-03 | IP2.2 wrong type | `products.txt` (CSV content) + `.xlsx` binary, admin | — | Upload each | Both rejected (`.csv` only) | No extension check anywhere — `.txt` with CSV content parses fine and would import → FR16-BUG-05 | FAILED |
+| TC-FR16-DOM-04 | IP1.1 customer role | Valid CSV + customer JWT (`test@eshop.com`) | — | Upload | Rejected 403 (admin-only, FR-12) | **200**, imported (D04) — no role check → FR16-BUG-03 | FAILED |
+| TC-FR16-DOM-05 | IP1.2 guest | Valid CSV, no token | — | Upload | Rejected 401 | 401 (D05) | PASSED |
+| TC-FR16-DOM-06 | IP4.1 bad header | `title,price,desc,img,cat` + 2 valid rows, admin | Count C | Upload | Rejected (header mismatch), 0 imported | 0 imported + per-row missing-name errors (D06) — holds in effect, mechanism differs (no file-level reject) | PASSED |
+| TC-FR16-DOM-07 | IP5.1 short row | Row with 4 fields among valid rows, admin | Count C | Upload | Row error → FULL rollback (C unchanged) + reason cites row | Missing price → **NULL stored, 0 errors** (D07) → FR16-BUG-02/06 | FAILED |
+| TC-FR16-DOM-08 | IP5.2 long row | Row with 6 fields among valid rows, admin | Count C | Upload | Row error → FULL rollback + reason | Extra `stock` silently dropped, row imported (D08) → FR16-BUG-02 | FAILED |
+| TC-FR16-DOM-09 | VP6.1 quoted comma | `"Áo, thun",100000,mô tả đẹp,http://x/a.png,1`, admin | Count C | Upload | 1 imported, name = `Áo, thun` (single field) | UI-equivalent parse → garbage `{name:'"Áo', price:'thun"'}` → **inserted as garbage row** (D09) → FR16-BUG-04 | FAILED |
+| TC-FR16-DOM-10 | VP6.2 escaped quote | `"Áo ""đẹp""",100000,mô tả,http://x/b.png,1`, admin | Count C | Upload | 1 imported, quotes preserved correctly | Misaligned, inserted (D10) → FR16-BUG-04 | FAILED |
+| TC-FR16-DOM-11 | IP7.1 empty name | Row `,100000,mô tả,http://x/c.png,1` + 2 valid rows, admin | Count C | Upload | Rollback (C unchanged), reason = empty name + row number | Partial: valid row inserted + 1 error (D11); whitespace-only name **accepted with 0 errors** (D11b, leftover id 17) → FR16-BUG-01/02 | FAILED |
+| TC-FR16-DOM-12 | IP8.1 zero price | Row price `0` + valid rows, admin | Count C | Upload | Rollback, reason cites price row | Both inserted, 0 errors (D12) → FR16-BUG-02 | FAILED |
+| TC-FR16-DOM-13 | IP8.2 negative price | Row price `-5000` + valid rows, admin | Count C | Upload | Rollback, reason cites price row | Both inserted (D13) → FR16-BUG-02 | FAILED |
+| TC-FR16-DOM-14 | IP8.3 non-numeric price | Row price `abc` + valid rows, admin | Count C | Upload | Rollback (no NaN/coercion import), reason cites row | Both inserted; `"abc"` stored as TEXT (D14/D14b) → FR16-BUG-02 | FAILED |
+| TC-FR16-DOM-15 | IP9.1 bad category | Row `category_id = 9999` + valid rows, admin | Count C | Upload | Rollback (FK), reason cites row | Both inserted, 9999 stored raw (D15) → FR16-BUG-02 | FAILED |
+| TC-FR16-DOM-16 | SP duplicate name | Row reusing an existing DB product name, all else valid, admin | Count C, name N exists | Upload | Record: new row (duplicate allowed) / overwrite / reject | New row inserted, no UNIQUE (D16) — recorded as tolerant-duplicate | PASSED |
+| TC-FR16-DOM-17 | ★ IP11.1 first-row-bad | Row1 invalid (empty name) + rows2-3 valid, admin | Count C | Upload | **0 imported** (atomic; C unchanged) + 1 error cited | **2 imported** + 1 error (D17) → FR16-BUG-01 | FAILED |
+| TC-FR16-DOM-18 | ★ IP11.2 last-row-bad | Rows1-2 valid + row3 invalid (price `abc`), admin | Count C | Upload | **0 imported** — proves rollback of the 2 prior valid rows (C unchanged) + 1 error cited | **2 imported** + `Hàng 4` error (D18) → FR16-BUG-01 | FAILED |
+| TC-FR16-DOM-19 | ★ VP11.1 commit exactness | 5 valid rows, admin | Count C | Upload → recount + spot-check fields | Exactly C+5, all fields match CSV | C+5 exact, fields match (D19) | PASSED |
+| TC-FR16-DOM-20 | SP11.1 trailing newline | Valid 2-row file + trailing blank line(s), admin | Count C | Upload | Student standard (16/10): trailing blank line ignored → 2 imported; treating it as error-row (full rollback) or inserting an empty product = CSV-handling bug | UI `trim()` drops trailing blanks → 2 rows parsed (D20) | PASSED |
+| TC-FR16-DOM-21 | SP11.2 spaced commas | `Áo , 100000 , mô tả , http://x/d.png , 1`, admin | Count C | Upload | Student standard (16/10): trim surrounding spaces → accept; importing untrimmed values = minor defect | UI trims all values → clean row (D21) | PASSED |
 
 FR-16 total so far: **21 TCs** (count/size edges + stock-template verification in §4.3 BVA / Step 3).
 
@@ -597,26 +597,26 @@ FR-16 total so far: **21 TCs** (count/size edges + stock-template verification i
 
 | TC_ID | Boundary / point | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| TC-FR16-BVA-01 | B1 0-byte file | Empty (0 byte) upload, admin | — | Upload | Graceful reject (no file content), no 500/crash | — | Pending Execution |
-| TC-FR16-BVA-02 | B1 header-only | Header line only, 0 data rows, admin | Count C | Upload | 0 imported + clear "no data" message (not a crash, not a silent success hiding an error) | — | Pending Execution |
-| TC-FR16-BVA-03 | B1 min+ (1 row) | 1 valid row, admin | Count C | Upload → recount | Exactly C+1 | — | Pending Execution |
-| TC-FR16-BVA-04 | B1 nominal (5 rows) | 5 valid rows, admin | Count C | Upload → recount | Exactly C+5 | — | Pending Execution |
-| TC-FR16-BVA-05 | B1 large (100 rows) | 100 valid rows, admin | Count C, timer on | Upload → recount + elapsed | Exactly C+100; note time; no timeout/truncation | — | Pending Execution |
-| TC-FR16-BVA-06 | B2 err@1 (min) | N = 5: row1 bad (empty name) + rows2-5 valid, admin | Count C | Upload | 0 imported (C unchanged) + 1 cited error | — | Pending Execution |
-| TC-FR16-BVA-07 | B2 err@2 (min+) | N = 5: row2 bad (price `abc`), rest valid, admin | Count C | Upload | Row-1 rolled back: C unchanged + 1 cited error | — | Pending Execution |
-| TC-FR16-BVA-08 | B2 err@4 (max−) | N = 5: row4 bad (price `-1`), rest valid, admin | Count C | Upload | 3 valid predecessors rolled back: C unchanged | — | Pending Execution |
-| TC-FR16-BVA-09 | B2 err@5 (max) ★ | N = 5: rows1-4 valid + row5 bad (`category_id = 9999`), admin | Count C | Upload | **Harshest point:** all 4 predecessors rolled back, DB exactly C + 1 cited error | — | Pending Execution |
-| TC-FR16-BVA-10 | B3 −1 | Row price `-1` + 2 valid rows, admin | Count C | Upload | Rollback (C unchanged) | — | Pending Execution |
-| TC-FR16-BVA-11 | B3 0 ★ | Row price `0` + 2 valid rows, admin | Count C | Upload | Probe: record accept (`>= 0`) vs rollback (`> 0`) | — | Pending Execution |
-| TC-FR16-BVA-12 | B3 min+ (1 ₫) | Row price `1` + 2 valid rows, admin | Count C | Upload | Accept (C+3 if batch otherwise valid) | — | Pending Execution |
-| TC-FR16-BVA-13 | B3 huge | Row price `999999999` + valid rows, admin | Count C | Upload | Accept with exact value (no overflow/coercion); else cited reason | — | Pending Execution |
-| TC-FR16-BVA-14 | B4 blank mid-file | Valid rows with an empty line between row2/row3, admin | Count C | Upload | Blank skipped per ignore-blank standard; valid rows imported | — | Pending Execution |
-| TC-FR16-BVA-15 | B4 K−1 cols | Row with 4 fields among valid rows, admin | Count C | Upload | Rollback (C unchanged) + cited row | — | Pending Execution |
-| TC-FR16-BVA-16 | B4 K+1 cols | Row with 6 fields among valid rows, admin | Count C | Upload | Rollback (C unchanged) + cited row | — | Pending Execution |
-| TC-FR16-BVA-17 | B5 1 char | Name `A`, rest valid, admin | Count C | Upload | Accept | — | Pending Execution |
-| TC-FR16-BVA-18 | B5 255 chars | 255-char name, rest valid, admin | Count C | Upload | Accept (FR-15 max = 255) | — | Pending Execution |
-| TC-FR16-BVA-19 | B5 256/1000 chars | 256-char then 1000-char names, rest valid, admin | Count C | Upload each | Reject + rollback (FR-15 consistency); if accepted, log inconsistency defect | — | Pending Execution |
-| TC-FR16-BVA-20 | B6 stock column ★ | Header `name,price,description,imageUrl,category_id,stock` + 2 valid rows with stock values, admin | Count C | Upload → inspect created rows | Record: strict-header reject vs tolerant-accept; if accepted, record stored stock (and stock of no-stock imports = default?) | — | Pending Execution |
+| TC-FR16-BVA-01 | B1 0-byte file | Empty (0 byte) upload, admin | — | Upload | Graceful reject (no file content), no 500/crash | UI: preview empty → Import disabled, nothing sent (B01) | PASSED |
+| TC-FR16-BVA-02 | B1 header-only | Header line only, 0 data rows, admin | Count C | Upload | 0 imported + clear "no data" message (not a crash, not a silent success hiding an error) | UI: preview empty → nothing sent, no crash (B02; no explicit message — minor UX note) | PASSED |
+| TC-FR16-BVA-03 | B1 min+ (1 row) | 1 valid row, admin | Count C | Upload → recount | Exactly C+1 | C+1 (B03) | PASSED |
+| TC-FR16-BVA-04 | B1 nominal (5 rows) | 5 valid rows, admin | Count C | Upload → recount | Exactly C+5 | C+5 (B04) | PASSED |
+| TC-FR16-BVA-05 | B1 large (100 rows) | 100 valid rows, admin | Count C, timer on | Upload → recount + elapsed | Exactly C+100; note time; no timeout/truncation | C+100 in 1684ms (B05) | PASSED |
+| TC-FR16-BVA-06 | B2 err@1 (min) | N = 5: row1 bad (empty name) + rows2-5 valid, admin | Count C | Upload | 0 imported (C unchanged) + 1 cited error | **4 imported** + 1 error (B06) → FR16-BUG-01 | FAILED |
+| TC-FR16-BVA-07 | B2 err@2 (min+) | N = 5: row2 bad (price `abc`), rest valid, admin | Count C | Upload | Row-1 rolled back: C unchanged + 1 cited error | **4 imported** (B07) → FR16-BUG-01 | FAILED |
+| TC-FR16-BVA-08 | B2 err@4 (max−) | N = 5: row4 bad (price `-1`), rest valid, admin | Count C | Upload | 3 valid predecessors rolled back: C unchanged | **4 imported** (B08) → FR16-BUG-01 | FAILED |
+| TC-FR16-BVA-09 | B2 err@5 (max) ★ | N = 5: rows1-4 valid + row5 bad (`category_id = 9999`), admin | Count C | Upload | **Harshest point:** all 4 predecessors rolled back, DB exactly C + 1 cited error | **4 imported** (B09) → FR16-BUG-01 | FAILED |
+| TC-FR16-BVA-10 | B3 −1 | Row price `-1` + 2 valid rows, admin | Count C | Upload | Rollback (C unchanged) | Inserted, 0 errors (B10) → FR16-BUG-02 | FAILED |
+| TC-FR16-BVA-11 | B3 0 ★ | Row price `0` + 2 valid rows, admin | Count C | Upload | Probe: record accept (`>= 0`) vs rollback (`> 0`) | Inserted — no operator at all, spec `> 0` violated (B11) → FR16-BUG-02 | FAILED |
+| TC-FR16-BVA-12 | B3 min+ (1 ₫) | Row price `1` + 2 valid rows, admin | Count C | Upload | Accept (C+3 if batch otherwise valid) | Inserted (B12) | PASSED |
+| TC-FR16-BVA-13 | B3 huge | Row price `999999999` + valid rows, admin | Count C | Upload | Accept with exact value (no overflow/coercion); else cited reason | Inserted exact (B13) | PASSED |
+| TC-FR16-BVA-14 | B4 blank mid-file | Valid rows with an empty line between row2/row3, admin | Count C | Upload | Blank skipped per ignore-blank standard; valid rows imported | UI-parse → all-`""` row → missing-name error + **partial import** (B14) → FR16-BUG-07 | FAILED |
+| TC-FR16-BVA-15 | B4 K−1 cols | Row with 4 fields among valid rows, admin | Count C | Upload | Rollback (C unchanged) + cited row | Missing price → NULL, 0 errors (B15) → FR16-BUG-02/06 | FAILED |
+| TC-FR16-BVA-16 | B4 K+1 cols | Row with 6 fields among valid rows, admin | Count C | Upload | Rollback (C unchanged) + cited row | Extra key dropped, row imported (B16) → FR16-BUG-02 | FAILED |
+| TC-FR16-BVA-17 | B5 1 char | Name `A`, rest valid, admin | Count C | Upload | Accept | Inserted (B17) | PASSED |
+| TC-FR16-BVA-18 | B5 255 chars | 255-char name, rest valid, admin | Count C | Upload | Accept (FR-15 max = 255) | Inserted (B18) | PASSED |
+| TC-FR16-BVA-19 | B5 256/1000 chars | 256-char then 1000-char names, rest valid, admin | Count C | Upload each | Reject + rollback (FR-15 consistency); if accepted, log inconsistency defect | Both inserted (B19a/b) → FR16-BUG-10 | FAILED |
+| TC-FR16-BVA-20 | B6 stock column ★ | Header `name,price,description,imageUrl,category_id,stock` + 2 valid rows with stock values, admin | Count C | Upload → inspect created rows | Record: strict-header reject vs tolerant-accept; if accepted, record stored stock (and stock of no-stock imports = default?) | Tolerant-accept, `stock` dropped; no `stock` column (PRAGMA) (B20) — SP resolved | PASSED |
 
 FR-16 total: 21 DOM + 20 BVA + 11 GAP = **52 TCs**.
 
@@ -658,23 +658,39 @@ FR-16 total: 21 DOM + 20 BVA + 11 GAP = **52 TCs**.
 
 #### 4.4.3 Supplementary white-box test cases
 
-| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) |
-| :--- | :--- | :--- | :--- |
-| TC-FR16-GAP-01 | ★ Half-commit (M2) | API: 2 valid + 1 empty-name row (fresh admin) | **0 imported** (atomic), 1 cited error |
-| TC-FR16-GAP-02 | Text price stored (M3) | API row with `price: "abc"` | Rejected (no TEXT in INTEGER price) |
-| TC-FR16-GAP-03 | Zero/negative price (M3) | API rows `price: 0` / `-5` | Both rejected (`price > 0`) |
-| TC-FR16-GAP-04 | Ghost category (M3) | API row `category_id: 9999` | Rejected (FK); never silently `→ 1` or raw |
-| TC-FR16-GAP-05 | Blank-name accepted (M3) | API row `name: "␣␣"` | Rejected (whitespace = empty) |
-| TC-FR16-GAP-06 | Customer import (M4) | Valid payload + customer JWT | 403 (admin-only, FR-12) |
-| TC-FR16-GAP-07 | Ragged/short rows (M5) | API rows missing `price` (= NULL) / extra `stock` key | Rejected (strict schema); `stock` never silently dropped |
-| TC-FR16-GAP-08 | Null row crash (robustness) | API `products: [null]` | 400 (never 500) |
-| TC-FR16-GAP-09 | Duplicates (observational) | API row reusing live product name | Record vs FR-15: new row / overwrite / reject |
-| TC-FR16-GAP-10 | 256-char name (FR-15) | API 256-char name, rest valid | Reject + rollback (FR-15 max 255) |
-| TC-FR16-GAP-11 | UI quote-misparse (M1/M6) | UI-equivalent parse of `"Áo, thun",100000,…` → post produced JSON | Name = `Áo, thun` (RFC4180); misaligned garbage = parser bug |
+| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR16-GAP-01 | ★ Half-commit (M2) | API: 2 valid + 1 empty-name row (fresh admin) | **0 imported** (atomic), 1 cited error | 2 imported + 1 error (D17) → FR16-BUG-01 | FAILED |
+| TC-FR16-GAP-02 | Text price stored (M3) | API row with `price: "abc"` | Rejected (no TEXT in INTEGER price) | Stored `"abc"` as TEXT (D14b) → FR16-BUG-02 | FAILED |
+| TC-FR16-GAP-03 | Zero/negative price (M3) | API rows `price: 0` / `-5` | Both rejected (`price > 0`) | Both inserted (D12/D13) → FR16-BUG-02 | FAILED |
+| TC-FR16-GAP-04 | Ghost category (M3) | API row `category_id: 9999` | Rejected (FK); never silently `→ 1` or raw | Inserted raw 9999 (D15) → FR16-BUG-02 | FAILED |
+| TC-FR16-GAP-05 | Blank-name accepted (M3) | API row `name: "␣␣"` | Rejected (whitespace = empty) | Inserted, 0 errors — leftover id 17 (D11b) → FR16-BUG-02 | FAILED |
+| TC-FR16-GAP-06 | Customer import (M4) | Valid payload + customer JWT | 403 (admin-only, FR-12) | 200 (D04) → FR16-BUG-03 | FAILED |
+| TC-FR16-GAP-07 | Ragged/short rows (M5) | API rows missing `price` (= NULL) / extra `stock` key | Rejected (strict schema); `stock` never silently dropped | NULL price accepted (D07); stock dropped (D08/B20) → FR16-BUG-02/06 | FAILED |
+| TC-FR16-GAP-08 | Null row crash (robustness) | API `products: [null]` | 400 (never 500) | **500** TypeError HTML (G08) → FR16-BUG-08 | FAILED |
+| TC-FR16-GAP-09 | Duplicates (observational) | API row reusing live product name | Record vs FR-15: new row / overwrite / reject | New row, no UNIQUE (D16) — recorded | PASSED |
+| TC-FR16-GAP-10 | 256-char name (FR-15) | API 256-char name, rest valid | Reject + rollback (FR-15 max 255) | Inserted (B19a) → FR16-BUG-10 | FAILED |
+| TC-FR16-GAP-11 | UI quote-misparse (M1/M6) | UI-equivalent parse of `"Áo, thun",100000,…` → post produced JSON | Name = `Áo, thun` (RFC4180); misaligned garbage = parser bug | Garbage row inserted (D09) → FR16-BUG-04 | FAILED |
 
 ### 4.5 Execution & Bugs
 
-> TODO.
+> Executed 16/10/2026, 52/52 TCs. **19 PASSED, 33 FAILED → 10 bugs** (details: `Bug_Reports.md` §FR-16; screenshots: `screenshots/FR16_UI_ADMIN.png`, `screenshots/FR16_API_EVIDENCE.png`; raw transcript: `scripts/exec_fr16_results.json`; runner: `scripts/exec_fr16.js` with UI-parser replication).
+> All `T16*` rows removed afterwards; one whitespace-name leftover (id 17) removed manually; product count verified back to 5 seeds.
+
+| Bug ID | Title | Severity | Evidence | Related TCs |
+| :--- | :--- | :--- | :--- | :--- |
+| FR16-BUG-01 | No atomicity: any bad row → half-commit (valid prefix stays) | Critical | API evidence PNG (D17/D18/B06…B09) + server.js:206-241 | DOM-11/17/18, BVA-06…09/14, GAP-01 |
+| FR16-BUG-02 | Validation = name-only: price 0/negative/`"abc"`/NULL, ghost FK, blank names all stored | High | API evidence PNG (D07/D11b/D12…D15) + server.js:214-224 | DOM-07/11…15, BVA-10/11/15, GAP-02…05/07 |
+| FR16-BUG-03 | No role check: customer JWT can bulk-import (FR-12) | High | API evidence PNG (D04) + server.js:199 | DOM-04, GAP-06 |
+| FR16-BUG-04 | Naive `split(",")` parser: no RFC4180 — quoted commas misparse into garbage rows | High | API evidence PNG (D09/D10) + App.jsx:367-377 | DOM-09/10, GAP-11 |
+| FR16-BUG-05 | No file-type gate: any file parsed as CSV (binary → garbage rows) | Medium | App.jsx:356-384 (no accept/check) | DOM-03 |
+| FR16-BUG-06 | Silent `\|\|` defaults mask bad data (`price→0`, `category→1`, `""`) | Medium | App.jsx:390-403 + server.js:221-223 | DOM-07/15, GAP-07 |
+| FR16-BUG-07 | Mid-file blank lines become error rows (+ partial commit) instead of skipped | Medium | API evidence PNG (B14) + App.jsx:370-377 | BVA-14 |
+| FR16-BUG-08 | `products: [null]` → 500 TypeError HTML (must be 400) | Low | API evidence PNG (G08) + server.js:213-214 | GAP-08 |
+| FR16-BUG-09 | Duplicate product names allowed (observational vs FR-15) | Low | API evidence PNG (D16) + schema (no UNIQUE) | DOM-16, GAP-09 |
+| FR16-BUG-10 | 256–1000-char names accepted (FR-15 max 255 inconsistency) | Low | API evidence PNG (B19a/b) + schema (no cap) | BVA-19, GAP-10 |
+
+GitHub Issues: to be filed on the group repo with the PNGs attached (links added here after filing).
 
 ---
 
@@ -711,9 +727,9 @@ FR-16 total: 21 DOM + 20 BVA + 11 GAP = **52 TCs**.
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
 | FR-09 | 48 | 48 | 28 | 20 | 0 | 10 |
-| FR-16 | 52 | 0 | 0 | 0 | 52 | 0 |
+| FR-16 | 52 | 52 | 19 | 33 | 0 | 10 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **137** | **85** | **41** | **44** | **52** | **20** |
+| **Total** | **137** | **137** | **60** | **77** | **0** | **30** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 

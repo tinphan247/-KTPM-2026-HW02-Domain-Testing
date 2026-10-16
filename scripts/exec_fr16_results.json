@@ -1,0 +1,361 @@
+[
+  {
+    "step": "C0-baseline",
+    "products": 5,
+    "adminOk": true
+  },
+  {
+    "step": "D01-happy3",
+    "status": 200,
+    "inserted": 3,
+    "errors": [],
+    "delta": 3
+  },
+  {
+    "step": "D04-customer",
+    "status": 200
+  },
+  {
+    "step": "D05-guest",
+    "status": 401
+  },
+  {
+    "step": "D06-badheader",
+    "sent": [
+      {
+        "name": "",
+        "price": "100000",
+        "description": "",
+        "imageUrl": "",
+        "category_id": 1
+      },
+      {
+        "name": "",
+        "price": "200000",
+        "description": "",
+        "imageUrl": "",
+        "category_id": 1
+      }
+    ],
+    "status": 200,
+    "inserted": 0,
+    "errors": [
+      "Hàng 2: Thiếu tên sản phẩm",
+      "Hàng 3: Thiếu tên sản phẩm"
+    ],
+    "delta": 0
+  },
+  {
+    "step": "D07-shortrow",
+    "status": 200,
+    "inserted": 2,
+    "errors": [],
+    "stored": {
+      "price": null,
+      "t": "null"
+    },
+    "delta": 2
+  },
+  {
+    "step": "D08-extracol",
+    "status": 200,
+    "inserted": 1,
+    "delta": 1
+  },
+  {
+    "step": "D09-qcomma",
+    "parsed": [
+      {
+        "name": "\"Áo",
+        "price": "thun\"",
+        "description": "100000",
+        "imageUrl": "mô tả",
+        "category_id": null
+      }
+    ],
+    "status": 200,
+    "inserted": 1,
+    "stored": [],
+    "delta": 1
+  },
+  {
+    "step": "D10-qquote",
+    "parsed": [
+      {
+        "name": "\"Áo \"\"đẹp\"\"\"",
+        "price": "100000",
+        "description": "mô tả",
+        "imageUrl": "http://x/y.png",
+        "category_id": 1
+      }
+    ],
+    "status": 200,
+    "inserted": 1,
+    "stored": [],
+    "delta": 1
+  },
+  {
+    "step": "D11-emptyname",
+    "status": 200,
+    "inserted": 1,
+    "errors": [
+      "Hàng 3: Thiếu tên sản phẩm"
+    ],
+    "delta": 1
+  },
+  {
+    "step": "D11b-spacename",
+    "status": 200,
+    "inserted": 2,
+    "errors": [],
+    "delta": 2
+  },
+  {
+    "step": "D12-zero",
+    "status": 200,
+    "inserted": 2,
+    "errors": [],
+    "delta": 2
+  },
+  {
+    "step": "D13-neg",
+    "status": 200,
+    "inserted": 2,
+    "errors": [],
+    "delta": 2
+  },
+  {
+    "step": "D14-abc",
+    "status": 200,
+    "inserted": 2,
+    "errors": [],
+    "delta": 2
+  },
+  {
+    "step": "D15-badcat",
+    "status": 200,
+    "inserted": 2,
+    "errors": [],
+    "delta": 2
+  },
+  {
+    "step": "D14b-abctype",
+    "stored": {
+      "price": "abc",
+      "t": "text"
+    }
+  },
+  {
+    "step": "D16-dupe",
+    "status": 200,
+    "inserted": 1,
+    "delta": 1
+  },
+  {
+    "step": "D17-firstbad",
+    "inserted": 2,
+    "errors": [
+      "Hàng 2: Thiếu tên sản phẩm"
+    ],
+    "delta": 2
+  },
+  {
+    "step": "D18-lastbad",
+    "inserted": 2,
+    "errors": [
+      "Hàng 4: Thiếu tên sản phẩm"
+    ],
+    "delta": 2
+  },
+  {
+    "step": "D19-allvalid5",
+    "inserted": 5,
+    "delta": 5,
+    "spot": {
+      "name": "T16 P17",
+      "price": 100000
+    }
+  },
+  {
+    "step": "D20-trailblank",
+    "parsed": [
+      {
+        "name": "T16 T1",
+        "price": "100000",
+        "description": "d",
+        "imageUrl": "http://x/y.png",
+        "category_id": 1
+      },
+      {
+        "name": "T16 T2",
+        "price": "200000",
+        "description": "d",
+        "imageUrl": "http://x/y.png",
+        "category_id": 1
+      }
+    ]
+  },
+  {
+    "step": "D21-spaced",
+    "parsed": [
+      {
+        "name": "Áo",
+        "price": "100000",
+        "description": "mô tả",
+        "imageUrl": "http://x/y.png",
+        "category_id": 1
+      }
+    ]
+  },
+  {
+    "step": "B01-0byte",
+    "parsed": [],
+    "note": "preview empty -> Import button disabled, no request (App.jsx:387,418)"
+  },
+  {
+    "step": "B02-headeronly",
+    "parsed": [],
+    "note": "preview empty -> nothing sent"
+  },
+  {
+    "step": "B03-one",
+    "inserted": 1,
+    "errors": 0,
+    "delta": 1,
+    "ms": 827
+  },
+  {
+    "step": "B04-five",
+    "inserted": 5,
+    "errors": 0,
+    "delta": 5,
+    "ms": 859
+  },
+  {
+    "step": "B05-hundred",
+    "inserted": 100,
+    "errors": 0,
+    "delta": 100,
+    "ms": 1684
+  },
+  {
+    "step": "B06-err1",
+    "inserted": 4,
+    "errors": [
+      "Hàng 2: Thiếu tên sản phẩm"
+    ],
+    "delta": 4
+  },
+  {
+    "step": "B07-err2",
+    "inserted": 4,
+    "errors": [
+      "Hàng 3: Thiếu tên sản phẩm"
+    ],
+    "delta": 4
+  },
+  {
+    "step": "B08-err4",
+    "inserted": 4,
+    "errors": [
+      "Hàng 5: Thiếu tên sản phẩm"
+    ],
+    "delta": 4
+  },
+  {
+    "step": "B09-err5",
+    "inserted": 4,
+    "errors": [
+      "Hàng 6: Thiếu tên sản phẩm"
+    ],
+    "delta": 4
+  },
+  {
+    "step": "B10-neg1",
+    "inserted": 1,
+    "errors": [],
+    "delta": 1
+  },
+  {
+    "step": "B11-zero",
+    "inserted": 1,
+    "errors": [],
+    "delta": 1
+  },
+  {
+    "step": "B12-one",
+    "inserted": 1,
+    "errors": [],
+    "delta": 1
+  },
+  {
+    "step": "B13-huge",
+    "inserted": 1,
+    "errors": [],
+    "delta": 1
+  },
+  {
+    "step": "B14-midblank",
+    "parsedNames": [
+      "T16 M1",
+      "",
+      "T16 M2"
+    ],
+    "inserted": 2,
+    "errors": [
+      "Hàng 3: Thiếu tên sản phẩm"
+    ],
+    "delta": 2
+  },
+  {
+    "step": "B15-kminus1",
+    "inserted": 1,
+    "errors": [],
+    "delta": 1
+  },
+  {
+    "step": "B16-kplus1",
+    "inserted": 1,
+    "delta": 1
+  },
+  {
+    "step": "B17-one",
+    "namelen": 1,
+    "inserted": 1,
+    "delta": 1
+  },
+  {
+    "step": "B18-255",
+    "namelen": 255,
+    "inserted": 1,
+    "delta": 1
+  },
+  {
+    "step": "B19a-256",
+    "namelen": 256,
+    "inserted": 1,
+    "delta": 1
+  },
+  {
+    "step": "B19b-1000",
+    "namelen": 1000,
+    "inserted": 1,
+    "delta": 1
+  },
+  {
+    "step": "B20-stockcol",
+    "inserted": 1,
+    "delta": 1,
+    "hasStockCol": false
+  },
+  {
+    "step": "G08-nullrow",
+    "status": 500,
+    "body": "{\"_raw\":\"<!DOCTYPE html>\\n<html lang=\\\"en\\\">\\n<head>\\n<meta charset=\\\"utf-8\\\">\\n<title>Error</title>\\n</head>\\n<body>\\n<pre>TypeError: Canno\"}"
+  },
+  {
+    "step": "F9-cleanup",
+    "finalCount": 6,
+    "restoredToBaseline": false
+  }
+]

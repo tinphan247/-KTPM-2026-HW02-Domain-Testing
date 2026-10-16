@@ -165,13 +165,75 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** check-then-act race; overspend possible. Root: `server.js:386-395` (no transaction).
 - **Severity:** Medium. **Related TCs:** GAP-10.
 
-## FR-16 — CSV Import
+## FR-16 — CSV Import (executed 16/10/2026, 52 TCs: 19 passed / 33 failed → 10 bugs)
 
-> TODO.
+Runner: `scripts/exec_fr16.js` → transcript `scripts/exec_fr16_results.json` (45 steps, incl. UI-parser replication per App.jsx:367-403).
+Screenshots: `screenshots/FR16_UI_ADMIN.png` (admin login gate — fresh browser, no session; import section evidenced via code refs), `screenshots/FR16_API_EVIDENCE.png` (rendered from measured output — method disclosed).
+Cleanup: `T16*` rows + `"Áo*` + iPhone-duplicate removed; whitespace-name leftover (id 17) removed manually; count verified back to 5 seeds.
+GitHub Issue links: TODO — file on group repo with PNGs attached.
 
-| Issue | Title | Severity | Status | Link |
-| :--- | :--- | :--- | :--- | :--- |
-| — | — | — | — | — |
+### FR16-BUG-01 — [Critical] No atomicity: any bad row → half-commit (valid prefix stays)
+- **Environment:** backend localhost:3000, admin JWT, `scripts/exec_fr16.js`
+- **Pre-conditions:** product count C recorded per TC
+- **Steps:** POST /api/admin/import-products with 2 valid + 1 empty-name row → 200 `{inserted: 2, errors: ["Hàng 2: …"]}`, recount C+2 (D17). Repeat with bad row last (D18) and err@1/2/4/5 in N = 5 (B06…B09) → 4 imported each time.
+- **Expected:** 0 imported (all-or-nothing), DB exactly C.
+- **Actual:** valid prefixes persist. Root: per-row INSERTs, no transaction (`server.js:206-241`).
+- **Severity/Priority:** Critical / P1 (spec's core guarantee broken; silent data pollution).
+- **Attachments:** `screenshots/FR16_API_EVIDENCE.png`. **Related TCs:** DOM-11/17/18, BVA-06…09/14, GAP-01.
+
+### FR16-BUG-02 — [High] Validation = name-only (price 0/negative/text/NULL, ghost FK, blank names all stored)
+- **Steps:** rows with price `0` / `-5000` / `"abc"` / missing (= NULL), `category_id = 9999`, name `"␣␣"` → all 200, inserted, 0 errors (D07/D11b/D12…D15, B10/B11). DB shows `"abc"` stored as TEXT, NULL price, whitespace name (leftover id 17).
+- **Expected:** `price > 0` numeric, existing FK, non-blank names; violations → rollback + cited reasons.
+- **Actual:** only `!row.name` checked. Root: `server.js:214-224`.
+- **Severity:** High. **Related TCs:** DOM-07/11…15, BVA-10/11/15, GAP-02…05/07.
+
+### FR16-BUG-03 — [High] No role check: customer JWT can bulk-import (FR-12)
+- **Steps:** valid payload + `test@eshop.com` (role user) JWT → 200, imported (D04). Guest (no token) → 401 (D05 holds).
+- **Expected:** 403 admin-only.
+- **Actual:** any login imports. Root: `authenticateToken` only (`server.js:199`; same pattern on all admin/product/category mutations).
+- **Severity:** High (Security). **Related TCs:** DOM-04, GAP-06.
+
+### FR16-BUG-04 — [High] Naive `split(",")` parser: no RFC4180 (quoted commas → garbage rows)
+- **Steps:** replicate UI parse of `"Áo, thun",100000,…` → `{name:'"Áo', price:'thun"',…}` → POST → 200, garbage row stored (D09); escaped quotes likewise (D10).
+- **Expected:** single-field parse per RFC4180.
+- **Actual:** misaligned inserts. Root: `App.jsx:367-377` (no CSV library).
+- **Severity:** High (data corruption on real-world Vietnamese catalogs). **Related TCs:** DOM-09/10, GAP-11.
+
+### FR16-BUG-05 — [Medium] No file-type gate: any file parsed as CSV
+- **Steps:** code inspection — `<input type="file">` with no `accept`/validation; FileReader parses whatever bytes arrive (`App.jsx:356-384`); backend never sees a file.
+- **Expected:** `.csv`-only gate.
+- **Actual:** `.txt`/binary accepted into the pipeline (binary → garbage rows → partial import).
+- **Severity:** Medium. **Related TCs:** DOM-03.
+
+### FR16-BUG-06 — [Medium] Silent `||` defaults mask bad data (`price→0`, `category→1`, `""`)
+- **Steps:** UI maps missing price → `0`, bad category (`parseInt→NaN→null`) → backend `|| 1`, missing texts → `""` (`App.jsx:390-403`, `server.js:221-223`); all accepted without warnings (D07/D15).
+- **Expected:** missing/invalid fields → cited errors.
+- **Actual:** silently coerced and stored.
+- **Severity:** Medium. **Related TCs:** DOM-07/15, GAP-07.
+
+### FR16-BUG-07 — [Medium] Mid-file blank lines become error rows (+ partial commit)
+- **Steps:** UI-equivalent parse of file with blank line between rows → all-`""` row → missing-name error + valid rows still imported (B14).
+- **Expected (student standard):** blank lines skipped.
+- **Actual:** error row + half-commit (compounds BUG-01).
+- **Severity:** Medium. **Related TCs:** BVA-14.
+
+### FR16-BUG-08 — [Low] `products: [null]` → 500 TypeError HTML (must be 400)
+- **Steps:** POST `{products: [null]}` → 500 `TypeError: Canno…` HTML page (G08).
+- **Expected:** 400 JSON error.
+- **Actual:** unhandled throw (`server.js:213-214`).
+- **Severity:** Low (robustness). **Related TCs:** GAP-08.
+
+### FR16-BUG-09 — [Low] Duplicate product names allowed (observational vs FR-15)
+- **Steps:** second `iPhone 15 Pro Max` row → 200, new row (D16).
+- **Expected:** record-only (spec silent) — noted vs FR-15 consistency.
+- **Actual:** duplicates allowed (no UNIQUE).
+- **Severity:** Low. **Related TCs:** DOM-16, GAP-09.
+
+### FR16-BUG-10 — [Low] 256–1000-char names accepted (FR-15 max-255 inconsistency)
+- **Steps:** 256- and 1000-char names → 200, inserted (B19a/b); 1- and 255-char → 200 (B17/18 hold).
+- **Expected:** reject + rollback beyond 255 (FR-15 consistency).
+- **Actual:** no length cap (schema has none).
+- **Severity:** Low. **Related TCs:** BVA-19, GAP-10.
 
 ## FR-20 — Mobile
 

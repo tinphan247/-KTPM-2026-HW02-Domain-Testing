@@ -346,7 +346,7 @@ Per ISTQB CTFL v4.0 §4.2 (boundaries on every ordered dimension, including stru
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before execution).** Every claim cites exact file:line; the core reframing (no-file, no-transaction, name-only validation) is evidenced from three independent sources (route code, schema, deps); GAP TCs map 1:1 to misses M1–M8.
+**VALID — reviewed and confirmed by execution, 16/10/2026.** All 8 misses M1–M8 reproduced at runtime (no-file/no-transaction architecture, name-only validation, missing roles, tolerant garbage-in, layer misattribution resolved, stock-column dropped, partial-report semantics); commit-exactness TCs (D19/B03–B05) confirm the insert path itself is exact — bounding every bug to validation/atomicity/auth, never to counting.
 
 #### (4) Reasoning
 
@@ -355,6 +355,36 @@ Per ISTQB CTFL v4.0 §4.3 and the Gap-Analysis rubric: the analysis separates th
 #### (5) Student Fix
 
 - Student to review at next gate: confirm GAP TC wording and cross-FR deferrals, then approve Chặng 3B (execution).
+- Execution confirms Artifact 11 in full (16/10/2026): 10 bugs FR16-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §4.5. Runtime extras beyond white-box reading: (a) NULL-price acceptance (missing key → NULL, not just unvalidated values); (b) whitespace-name leftover id 17 (cleanup gap closed manually, script hardened with `TRIM(name) = ''`); (c) 100-row batch in 1684ms (no perf issue — scale TC passes).
+
+---
+
+### Artifact 12: FR-16 execution + screenshots + bug reports (G9.3 Analyse)
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~14:30 16/10/2026 (UTC+07)
+- **Full Prompt (user):** Chặng 3B — execute all FR-16 TCs on live SUT (localhost:3000/5174) via `scripts/exec_fr16.js` (CSV payloads per TC: 0-byte/header-only/blanks/arity/UTF-8/err@1…5/100 rows); DB recounts per TC for rollback/half-commit verdicts; clean test products afterwards; fill Actual/Status + summaries; UI (`FR16_UI_*.png`) + DB/API (`FR16_API_EVIDENCE.png`) screenshots; bugs into `Bug_Reports.md` + §4.5; log Artifact 12; commit `test(FR-16): execute test cases, capture screenshots, and document bug reports`.
+
+#### (2) AI Output
+
+- `scripts/exec_fr16.js` (45 steps; admin + customer + guest tokens; UI-parser replication per App.jsx:367-403 for file-layer TCs; per-TC DB recounts with 600–800ms settle; `T16*` cleanup + manual whitespace-leftover removal, count verified back to 5 seeds) → `scripts/exec_fr16_results.json`; `scripts/fr16_evidence.html` → `screenshots/FR16_API_EVIDENCE.png`; real capture `screenshots/FR16_UI_ADMIN.png` (admin login gate — fresh browser; import section evidenced via code refs, disclosed).
+- `Main_Report.md` §4.2.3/§4.3.3/§4.4.3: all 52 TCs filled — **19 PASSED, 33 FAILED**; §4.5: 10 bugs FR16-BUG-01…10; summaries (Main + README): Designed 137 / Executed 137 / Passed 60 / Failed 77 / Bugs 30.
+- `Bug_Reports.md`: 10 issues (env, pre-conditions, repro, expected/actual, severity, evidence, TC links). GitHub Issue links left TODO (group repo unknown — student files with PNGs).
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before FR-20).** Statuses derive from measured transcript values and DB recounts (quoted verbatim); every FAILED maps to a filed bug; file-layer TCs without an API equivalent are proven via byte-identical UI-parser replication (code-cited), never assumed; cleanup verified (5 seeds), leftovers disclosed.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §5 and HW02 bug-reporting rules: atomicity verdicts rest on DB counts, not response messages (the response correctly reports partial counts — the defect is that partial commits exist at all); the split between UI-flow evidence (replication + code refs) and API-flow evidence (live transcript) is labeled per TC so no UI claim rests on API data or vice versa.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm severity set (esp. BUG-05/06/07 Medium calls, BUG-08/09/10 Low calls), file the 10 issues on the group repo and paste links, then approve Pool D (FR-20 Mobile).
+- Execution confirms Artifact 11 in full (16/10/2026): 10 bugs FR16-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §4.5. Runtime extras beyond white-box reading: (a) NULL-price acceptance (missing key → NULL, not just unvalidated values); (b) whitespace-name leftover id 17 (cleanup gap closed manually, script hardened with `TRIM(name) = ''`); (c) 100-row batch in 1684ms (no perf issue — scale TC passes).
 
 ---
 
