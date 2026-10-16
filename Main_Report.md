@@ -813,11 +813,58 @@ FR-20 total so far: **18 TCs** (timing/double-tap edges + status-text exactness 
 | TC-FR20-BVA-09 | B6 many (15) | User with 15 orders | 15 orders seeded | Open history, scroll | All 15 listed, newest-first, no dupes/truncation | — | Pending Execution |
 | TC-FR20-BVA-10 | B7 bad token | Own `pending` order + expired/invalid token | — | Cancel with bad token | 401; order unchanged | — | Pending Execution |
 
-FR-20 total: 18 DOM + 10 BVA = **28 TCs**.
+FR-20 total: 18 DOM + 10 BVA + 10 GAP = **38 TCs**.
 
 ### 5.4 AI Gap Analysis & Human Review
 
-> TODO.
+> White-box sources: `eshop-sut/backend/server.js:297-349` (checkout / my-orders / cancel / order-read), `:525-568` (admin status transitions), `frontend-mobile/App.js:312-340` (cancelOrder + statusLabel), `:940-971` (history UI), `:14-26` (API_URL/formatMoney — currency bytes verified `e2 82 ab` = U+20AB ₫, NO mojibake).
+> Artifact 14 review decisions applied (16/10): race/timing, ownership sweep, list edges, hybrid no-phone execution — all approved.
+
+#### 5.4.1 How the code actually implements order cancel (mobile + backend)
+
+| Spec question | Code answer | File:line |
+| :--- | :--- | :--- |
+| Cancel gate | Blocks ONLY `delivered`/`canceled` → cancel from **`shipping` ALLOWED** (comment admits should-be pending/confirmed-only) | server.js:328-331 |
+| Ownership | `WHERE id AND user_id` → чужой order = 404 `"Order not found"` (reject by masking, not 403) | server.js:321-326 |
+| Side effects | **None**: single `UPDATE status=canceled`; no stock moves (no stock system exists), no `coupon_usage` refund, no transaction | server.js:333-340 |
+| Double/garbage/bad-token | 2nd cancel → 400; `0/-1/999999/"abc"` → 404 (no 500); bad token → 401 | server.js:321-342 |
+| Race cancel ∥ ship | Two single-statement UPDATEs, no txn/lock → last-writer-wins | server.js:333-340,559-566 |
+| Admin setup path | Status transitions enforced server-side (incl. `canceled → delivered` hole — noted, FR-10 phase) | server.js:534-557 |
+| Mobile confirm | **None** — `onPress → PUT` directly; no dialog, no debounce/disable, no loading indicator | App.js:312-329,961-968 |
+| Mobile button visibility | Rendered only when `pending`/`confirmed` (UI-side guard correct) | App.js:961 |
+| Mobile labels | Vietnamese status map ✓ (`Chờ xác nhận/Đã xác nhận/Đang giao/Đã giao/Đã hủy`) | App.js:331-340 |
+| Mobile status colors | **None** — plain `<Text>` (FR-11 requires color distinction) | App.js:960,1240-1248 |
+| Mobile empty history | Plain text `"Bạn chưa có đơn hàng nào."` — **no illustration** (FR-24 partial) | App.js:947-949 |
+| Mobile logout label | `"Thoát"` (FR-23 requires `"Đăng xuất"`) | App.js:940-942 |
+| Mobile API base | Hardcoded LAN IP `http://192.168.10.13:3000/api` (env portability) | App.js:16 |
+
+#### 5.4.2 What the 28 black-box TCs missed or assumed differently
+
+| # | Miss / clash | Root cause |
+| :--- | :--- | :--- |
+| M1 | Assumed shipping-cancel rejected (DOM-04/BVA-02) — API allows it | **Dev bug** (comment admits); LLM trusted the state diagram over the (unseen) code |
+| M2 | Assumed stock restore + coupon refund (DOM-15/16 normative) — zero side-effect logic | **Dev bug** (missing compensation); LLM assumed lifecycle completeness |
+| M3 | Assumed confirm dialog (DOM-09) — mobile fires PUT on tap | **Dev/UX bug**; LLM assumed destructive-action guard per FR-24 |
+| M4 | Assumed debounce needed for safety (DOM-17/BVA-04) — absent client-side, but server state makes 2nd tap a clean 400 | **Partial**: standard half-met (no debounce) yet no double-effects possible; LLM over-feared the race, under-credited the state guard |
+| M5 | Assumed status colors (DOM-03/13) — plain text on mobile | **Dev bug** (FR-11); LLM assumed spec compliance |
+| M6 | Assumed illustrated empty state (DOM-12) — text only | **Dev bug** (FR-24 partial); message text holds |
+| M7 | Expected 403 for cross-user (DOM-07) — actual 404-masking | **Semantics note**: reject holds; masking is arguably safer (no existence oracle) |
+| M8 | Never considered env/label details (`Thoát`, hardcoded LAN IP) | **LLM blind spot**: config/i18n edges outside state-machine focus |
+
+#### 5.4.3 Supplementary white-box test cases
+
+| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) |
+| :--- | :--- | :--- | :--- |
+| TC-FR20-GAP-01 | Shipping cancel (M1) | Own `shipping` order → user cancel via API | Rejected, stays `shipping` |
+| TC-FR20-GAP-02 | Coupon not refunded (M2) | Order with VIP100 (used = 1) → cancel → recount usage | `used` 1 → 0 (refund) |
+| TC-FR20-GAP-03 | Stock absence (M2) | Inspect schema + cancel flow for stock moves | Stock system exists AND restores — else record verified absence |
+| TC-FR20-GAP-04 | No confirm (M3) | Mobile order history → tap Cancel | Confirmation dialog before PUT |
+| TC-FR20-GAP-05 | Double-tap safe-ish (M4) | Two parallel cancels, same order | 1× success + 1× clean 400; side effects exactly once |
+| TC-FR20-GAP-06 | Race outcome (M4) | Parallel user-cancel ∥ admin-ship on `confirmed` order | Exactly one winner; valid end-state; no 500 |
+| TC-FR20-GAP-07 | 404-masking (M7) | User A cancels user B's order | Rejected (403 or 404); B unchanged — record masking |
+| TC-FR20-GAP-08 | No colors (M5) | Mobile history screenshot | Color-coded statuses (FR-11) |
+| TC-FR20-GAP-09 | No illustration (M6) | Fresh-user mobile history screenshot | Icon/illustration + message (FR-24) |
+| TC-FR20-GAP-10 | Label + base URL (M8) | Mobile profile screen; env check | `"Đăng xuất"`; configurable API base |
 
 ### 5.5 Execution & Bugs
 
@@ -834,8 +881,8 @@ FR-20 total: 18 DOM + 10 BVA = **28 TCs**.
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
 | FR-09 | 48 | 48 | 28 | 20 | 0 | 10 |
 | FR-16 | 52 | 52 | 19 | 33 | 0 | 10 |
-| FR-20 | 28 | 0 | 0 | 0 | 28 | 0 |
-| **Total** | **165** | **137** | **60** | **77** | **28** | **30** |
+| FR-20 | 38 | 0 | 0 | 0 | 38 | 0 |
+| **Total** | **175** | **137** | **60** | **77** | **38** | **30** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 

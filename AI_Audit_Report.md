@@ -436,7 +436,7 @@ Per ISTQB CTFL v4.0 §4.3 (state-transition testing: valid transitions + invalid
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before Gap Analysis).** Race/double-tap TCs demand ms-precision timing (the only way to test TOCTOU at black-box level); ownership edges sweep adjacent and garbage ids (IDOR + robustness in one family); list edges cover 0/1/many without re-testing DOM-held cells.
+**VALID — reviewed and approved by student, 16/10/2026.** Race/double-tap TCs demand ms-precision timing; ownership sweep covers adjacent + garbage ids; list edges avoid DOM-held cells. Review: all timing/ownership/list options approved, hybrid no-phone execution approved; design TCs unchanged.
 
 #### (4) Reasoning
 
@@ -445,6 +445,35 @@ Per ISTQB CTFL v4.0 §4.2–4.3 (boundary + state-transition techniques compose:
 #### (5) Student Fix
 
 - Student to review at next gate: confirm race/double-tap timing demands, ownership sweep, list edges, then approve opening mobile/order source for Step 3 (Gap Analysis).
+- Review done 16/10 (all approved, hybrid plan confirmed); Artifact 14 verdict confirmed VALID.
+
+---
+
+### Artifact 15: FR-20 white-box inspection + AI Gap Analysis (G9.3 Analyse)
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~15:40 16/10/2026 (UTC+07)
+- **Full Prompt (user):** Chặng 3A — open order/mobile source (cancel + history endpoints, ownership checks, real transition matrix; OrderHistory/Detail screens, Cancel handler debounce/dialog/feedback); diff allowed-cancel states (`confirmed`? `shipping`? `delivered`?), integrity on cancel (stock? coupon `used_count`? transaction?), IDOR, mobile double-tap/dialog; blind spots → `TC-FR20-GAP-*`; write §5.4; finalize Artifact 14; log Artifact 15; commit `docs(FR-20): complete white-box inspection and AI gap analysis`.
+
+#### (2) AI Output
+
+- `Main_Report.md` §5.4: implementation table (13 rows with file:line refs), 8 misses M1–M8 with root causes, 10 supplementary TCs `TC-FR20-GAP-01…10`.
+- Headline findings: shipping-cancel ALLOWED (comment admits should-be pending/confirmed — server.js:328-331); zero cancel side effects (no stock system, no coupon refund, no txn); mobile fires PUT with no confirm/debounce/loading (App.js:312-329); button hidden unless pending/confirmed (UI guard correct); Vietnamese labels ✓ but no colors, no empty-state illustration, `"Thoát"` label, hardcoded LAN API base; currency bytes verified clean UTF-8 ₫ (hypothesis retracted by evidence).
+- No execution performed yet; no Actual/Status filled.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before execution).** Every claim cites exact file:line; the byte-level currency check models evidence-before-synthesis (a plausible bug was disproven, not asserted); GAP TCs map 1:1 to misses M1–M8.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.3 and the Gap-Analysis rubric: mobile and backend are analyzed as two layers of one feature (API-truth vs UI-truth table in §5.4.1 lets execution mark layer-divergent verdicts like DOM-04/UI-vs-API); the retracted mojibake hypothesis is kept in the audit trail as proof that white-box claims require byte-level grounding.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm GAP TC wording, then approve Chặng 3B (execution: API script + Expo-web/viewport screenshots).
 - Execution confirms Artifact 11 in full (16/10/2026): 10 bugs FR16-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §4.5. Runtime extras beyond white-box reading: (a) NULL-price acceptance (missing key → NULL, not just unvalidated values); (b) whitespace-name leftover id 17 (cleanup gap closed manually, script hardened with `TRIM(name) = ''`); (c) 100-row batch in 1684ms (no perf issue — scale TC passes).
 
 ---
