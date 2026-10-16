@@ -236,6 +236,7 @@ Per ISTQB CTFL v4.0 §4.3 (structural perspective complements black-box) and the
 #### (5) Student Fix
 
 - Student to review at next gate: confirm GAP TC wording and cross-FR deferrals, then approve Chặng 3B (execution).
+- Execution confirms Artifact 7 in full (16/10/2026): 10 bugs FR09-BUG-01…10 filed; runtime nuance (E2 skew) recorded; quota gate bounded (works iff `user_id` supplied).
 - Execution confirms Artifact 7 in full (16/10/2026): 10 bugs FR09-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §3.5. Runtime nuance beyond white-box reading: E2 hit T+17ms (HTTP skew) — exact-T operator stays code-determined (`expiry < now` = accept at T); quota gate verified working when `user_id` IS supplied (Q1–Q3/Q6), which bounds BUG-03/04/06 to their exact bypass shapes.
 
 ---
@@ -256,7 +257,7 @@ Per ISTQB CTFL v4.0 §4.3 (structural perspective complements black-box) and the
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before FR-16).** Statuses derive from measured transcript values (quoted verbatim); every FAILED maps to a filed bug; ±1s/±1₫ tolerances honored (expiry skew logged per probe); fixture lifecycle (create → verify → delete → seeds = 4) evidenced in-transcript (F0/F9).
+**VALID — reviewed and approved by student, 16/10/2026.** Statuses derive from measured transcript values (quoted verbatim); every FAILED maps to a filed bug; ±1s/±1₫ tolerances honored (expiry skew logged per probe); fixture lifecycle evidenced in-transcript (F0/F9). Review decisions: BUG-07/09 → High (financial integrity / in-browser tampering surface); BUG-01/05 stay Critical; BUG-08/10 stay Medium.
 
 #### (4) Reasoning
 
@@ -264,7 +265,37 @@ Per ISTQB CTFL v4.0 §5 (execution compares actual vs expected with reproducible
 
 #### (5) Student Fix
 
-- Student to review at next gate: confirm severity set (esp. BUG-07/08/09/10 Medium calls, BUG-01/05 Critical calls), file the 10 issues on the group repo and paste links, then approve Pool C (FR-16 CSV import).
+- Student to review at next gate: confirm severity set (esp. BUG-07/08/09/10 Medium calls, BUG-01/05 Critical calls), file the 10 issues on the group repo and paste links, then approve Pool C (FR-16 CSV import). *(Review done 16/10: BUG-07/09 → High applied above; GitHub links pending; FR-16 Step 1 approved — import source stays closed.)*
+
+---
+
+### Artifact 9: FR-16 Domain Testing black-box (G9.2 Apply) — via domain-bva-tester Step 1
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~13:20 16/10/2026 (UTC+07)
+- **Full Prompt (user):** severity tune (BUG-07/09→High) + run skill Step 1 Domain black-box for FR-16: spec + admin-access rules only, no import source; 3-layer variables (file/request, CSV structure/RFC4180, row fields incl. name/price/stock/category, batch composition + atomic rollback); EP with VP/IP/SP (duplicate names? trailing `\n`? spaces around commas?); 21 TCs `TC-FR16-DOM-*` with atomic-rollback focus; update summaries; finalize Artifacts 7–8; log Artifact 9; commit `feat(FR-16): add black-box Domain Testing partitions and test cases`.
+
+#### (2) AI Output
+
+- Severity updates applied in `Bug_Reports.md` + `Main_Report.md` §3.5 (counts unchanged, still 10 bugs).
+- `Main_Report.md` §4.2: 11 variables across 3 layers (V1–V11, FR-12 roles + FR-15 field rules), EP table (VP/IP + 4 SP), 21 TCs `TC-FR16-DOM-01…21` — happy path with UTF-8 Vietnamese fixture, file/role/header/arity/quoting partitions, per-field invalid rows each asserting FULL rollback with cited reasons, ★ atomicity trio (first-bad / last-bad / commit-exactness with DB recounts), 3 SP record-as-is TCs (duplicates, trailing newline, spaced commas).
+- **Header discrepancy handled:** SRS header has NO `stock` column — kept as SP10.1 (verify template at white-box/execution) instead of asserting it.
+- Summaries: FR-16 Designed = 21; Total 106 / Executed 85 / Passed 41 / Failed 44 / Bugs 20.
+- No import source inspected; all Status = Pending Execution.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before BVA).** Atomicity is tested positionally (bad row first vs last vs none) with DB-count assertions, which is the only black-box way to distinguish "validate-then-insert" from "insert-then-rollback-on-error"; every invalid-row TC asserts both the rollback AND the error report (spec demands both); setup-free TCs use only seeds, fixture-dependent ones declare preconditions.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.2 (state-aware partitioning: batch composition is a domain input, not just row values) and the all-or-nothing requirement: DOM-17/18/19 form a minimal atomicity proof triple — first-bad detects fail-fast validation, last-bad detects missing rollback of committed prefixes, and the all-valid recount detects silent drops; any two alone leave one implementation shape untested.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm atomicity triple, SP record-as-is stance (duplicates/trailing newline/spaces), stock-column verification plan, then approve BVA step (count/size edges).
 
 ---
 

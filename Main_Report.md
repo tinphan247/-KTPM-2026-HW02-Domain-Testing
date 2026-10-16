@@ -462,9 +462,9 @@ FR-09 total: 17 DOM + 20 BVA + 11 GAP = **48 TCs**.
 | FR09-BUG-04 | Usage check skipped when `user_id` omitted (`if (user_id)`) | High | API evidence PNG (Q7) + server.js:386 | GAP-04 |
 | FR09-BUG-05 | Checkout trusts any client `total_amount`, ignores coupon (1 ₫ order stored) | Critical | API evidence PNG (T1, order #4) + server.js:297-309 | GAP-06 |
 | FR09-BUG-06 | Quota = voluntary post-checkout client call: unlimited reuse, double-count, no linkage | High | API evidence PNG (Q4/Q5/N1) + server.js:443-454 | BVA-14, GAP-07/08 |
-| FR09-BUG-07 | No zero floor: fixed > subtotal → negative `final_amount` (−1 ₫) | Medium | API evidence PNG (Z1) + server.js:406 | BVA-18 |
+| FR09-BUG-07 | No zero floor: fixed > subtotal → negative `final_amount` (−1 ₫) | High | API evidence PNG (Z1) + server.js:406 | BVA-18 |
 | FR09-BUG-08 | No server-side single-code rule: stacking + repeat apply via API | Medium | API evidence PNG (K1/K2) + server.js:363-441 | DOM-15/16, GAP-11 |
-| FR09-BUG-09 | Checkout total is an editable input (FR-08 UI violation) | Medium | UI screenshot + Checkout.jsx:14,91-103 | GAP-09 |
+| FR09-BUG-09 | Checkout total is an editable input (FR-08 UI violation) | High | UI screenshot + Checkout.jsx:14,91-103 | GAP-09 |
 | FR09-BUG-10 | Last-quota race: parallel applies both pass (no transaction) | Medium | API evidence PNG (R1) + server.js:386-395 | GAP-10 |
 
 GitHub Issues: to be filed on the group repo with the PNGs attached (links added here after filing).
@@ -479,9 +479,88 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 - Pre-validation: `name` non-empty; `price` positive number.
 - Any row error → full rollback (all-or-nothing); clear success/error count report.
 
-### 4.2 Domain Testing
+### 4.2 Domain Testing (skill Step 1 — black-box, spec-only)
 
-> TODO: `FR16-DT-*`.
+> Method: `skills/domain-bva-tester/SKILL.md` Step 1. Sources: SRS v2.0 §FR-16 + FR-12 (admin-only data APIs) + FR-15 (product field rules).
+> Import code (backend + frontend-admin) was NOT inspected (preserved for Gap Analysis).
+> **Header caveat (verified against SRS):** spec header is `name,price,description,imageUrl,category_id` — **no `stock` column**. `stock` below is kept per brief as **SP (verify at white-box/execution whether the real template accepts it)**.
+> Exact count/size edges (0/1/N rows, price 0/0.01/−1, max file size) are deferred to §4.3 BVA.
+
+#### 4.2.1 Domain variables (3 layers)
+
+| Layer | # | Variable | Type | Spec constraint (FR-16 / FR-12) |
+| :--- | :--- | :--- | :--- | :--- |
+| File/Request | V1 | `auth_role` | enum | Admin-only (`role='admin'` + valid JWT); customer → forbidden; guest → 401 |
+| | V2 | `file_presence_format` | file | `.csv` required; missing file / `.txt`/`.json`/`.xlsx`/binary → rejected |
+| | V3 | `encoding` | bytes | Must handle UTF-8 Vietnamese diacritics (Áo thun, Bàn phím…) |
+| CSV structure | V4 | `header_row` | string | First line exactly `name,price,description,imageUrl,category_id` |
+| | V5 | `column_count` | int | Data rows must match header arity (5 fields) |
+| | V6 | `rfc4180_quoting` | string | Comma/quote fields wrapped in `"..."` must parse as one field |
+| Row data | V7 | `name` | string | Non-empty (whitespace-only = empty) |
+| | V8 | `price` | number | Positive number (`> 0`); `0`/negative/non-numeric rejected |
+| | V9 | `category_id` | FK int | Must reference an existing category |
+| | V10 | `stock` | SP int | **Spec-silent** — verify real template; if accepted: integer `>= 0` |
+| Batch | V11 | `batch_composition` | state | All-valid → commit N; ANY row invalid → rollback ALL (atomic, count unchanged) + per-row error report |
+
+#### 4.2.2 Equivalence partitions
+
+| Variable | ID | Class | Partition description | Representative value |
+| :--- | :--- | :--- | :--- | :--- |
+| V1 role | VP1.1 | Valid | Admin JWT | `admin@eshop.com` session |
+| | IP1.1 | Invalid | Customer JWT | `test@eshop.com` session |
+| | IP1.2 | Invalid | No token | guest request |
+| V2 file | VP2.1 | Valid | `.csv` attached | `products.csv` |
+| | IP2.1 | Invalid | No file | empty multipart body |
+| | IP2.2 | Invalid | Wrong extension/type | `products.txt` (CSV content), `.xlsx` binary |
+| V3 encoding | VP3.1 | Valid | UTF-8 Vietnamese | `Áo thun cotton,100000,…` |
+| V4 header | VP4.1 | Valid | Exact header | `name,price,description,imageUrl,category_id` |
+| | IP4.1 | Invalid | Wrong/missing column names | `title,price,desc,img,cat` |
+| V5 arity | VP5.1 | Valid | 5 fields per row | `Áo,100000,mô tả,http://x/y.png,1` |
+| | IP5.1 | Invalid | 4 fields (missing) | `Áo,100000,mô tả,http://x/y.png` |
+| | IP5.2 | Invalid | 6 fields (extra) | `…,1,EXTRA` |
+| V6 quoting | VP6.1 | Valid | RFC4180 quoted comma | `"Áo, thun",100000,…` → one field |
+| | VP6.2 | Valid | RFC4180 escaped quote | `"Áo ""đẹp""",100000,…` → one field |
+| V7 name | VP7.1 | Valid | Non-empty | `Bàn phím cơ` |
+| | IP7.1 | Invalid | Empty / whitespace-only | `` / `␣␣` |
+| V8 price | VP8.1 | Valid | Positive | `100000` |
+| | IP8.1 | Invalid | Zero | `0` |
+| | IP8.2 | Invalid | Negative | `-5000` |
+| | IP8.3 | Invalid | Non-numeric | `abc` |
+| V9 category | VP9.1 | Valid | Existing id | `1` (seeded) |
+| | IP9.1 | Invalid | Nonexistent id | `9999` |
+| V10 stock | SP10.1 | Spec-silent | Column present/absent; negative/float if accepted | verify template first |
+| V11 batch | VP11.1 | Valid | All N rows valid → commit N, report N/0 | 3 valid rows |
+| | IP11.1 | Invalid | First row bad, rest valid → 0 imported | row1 bad + rows2-3 valid |
+| | IP11.2 | Invalid | Last (Nth) row bad → prior N−1 rolled back, DB count unchanged | rows1-2 valid + row3 bad |
+| EOF/spacing | SP11.1/11.2 | Spec-silent | Trailing blank line; spaces around commas (`a , b`) — ignored vs error vs trimmed | `…\n\n`, `Áo , 100000 , …` |
+
+#### 4.2.3 Domain test cases
+
+| TC_ID | Partition / combination | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR16-DOM-01 | All-VP happy path + UTF-8 | `products.csv`: 3 valid rows incl. Vietnamese names, exact header, admin JWT | Baseline product count C recorded | Upload → read report → recount | 3 imported (C+3), report 3 success / 0 errors, diacritics intact | — | Pending Execution |
+| TC-FR16-DOM-02 | IP2.1 no file | Empty upload body, admin | — | Submit import | Rejected (file required) | — | Pending Execution |
+| TC-FR16-DOM-03 | IP2.2 wrong type | `products.txt` (CSV content) + `.xlsx` binary, admin | — | Upload each | Both rejected (`.csv` only) | — | Pending Execution |
+| TC-FR16-DOM-04 | IP1.1 customer role | Valid CSV + customer JWT (`test@eshop.com`) | — | Upload | Rejected 403 (admin-only, FR-12) | — | Pending Execution |
+| TC-FR16-DOM-05 | IP1.2 guest | Valid CSV, no token | — | Upload | Rejected 401 | — | Pending Execution |
+| TC-FR16-DOM-06 | IP4.1 bad header | `title,price,desc,img,cat` + 2 valid rows, admin | Count C | Upload | Rejected (header mismatch), 0 imported | — | Pending Execution |
+| TC-FR16-DOM-07 | IP5.1 short row | Row with 4 fields among valid rows, admin | Count C | Upload | Row error → FULL rollback (C unchanged) + reason cites row | — | Pending Execution |
+| TC-FR16-DOM-08 | IP5.2 long row | Row with 6 fields among valid rows, admin | Count C | Upload | Row error → FULL rollback + reason | — | Pending Execution |
+| TC-FR16-DOM-09 | VP6.1 quoted comma | `"Áo, thun",100000,mô tả đẹp,http://x/a.png,1`, admin | Count C | Upload | 1 imported, name = `Áo, thun` (single field) | — | Pending Execution |
+| TC-FR16-DOM-10 | VP6.2 escaped quote | `"Áo ""đẹp""",100000,mô tả,http://x/b.png,1`, admin | Count C | Upload | 1 imported, quotes preserved correctly | — | Pending Execution |
+| TC-FR16-DOM-11 | IP7.1 empty name | Row `,100000,mô tả,http://x/c.png,1` + 2 valid rows, admin | Count C | Upload | Rollback (C unchanged), reason = empty name + row number | — | Pending Execution |
+| TC-FR16-DOM-12 | IP8.1 zero price | Row price `0` + valid rows, admin | Count C | Upload | Rollback, reason cites price row | — | Pending Execution |
+| TC-FR16-DOM-13 | IP8.2 negative price | Row price `-5000` + valid rows, admin | Count C | Upload | Rollback, reason cites price row | — | Pending Execution |
+| TC-FR16-DOM-14 | IP8.3 non-numeric price | Row price `abc` + valid rows, admin | Count C | Upload | Rollback (no NaN/coercion import), reason cites row | — | Pending Execution |
+| TC-FR16-DOM-15 | IP9.1 bad category | Row `category_id = 9999` + valid rows, admin | Count C | Upload | Rollback (FK), reason cites row | — | Pending Execution |
+| TC-FR16-DOM-16 | SP duplicate name | Row reusing an existing DB product name, all else valid, admin | Count C, name N exists | Upload | Record: new row (duplicate allowed) / overwrite / reject | — | Pending Execution |
+| TC-FR16-DOM-17 | ★ IP11.1 first-row-bad | Row1 invalid (empty name) + rows2-3 valid, admin | Count C | Upload | **0 imported** (atomic; C unchanged) + 1 error cited | — | Pending Execution |
+| TC-FR16-DOM-18 | ★ IP11.2 last-row-bad | Rows1-2 valid + row3 invalid (price `abc`), admin | Count C | Upload | **0 imported** — proves rollback of the 2 prior valid rows (C unchanged) + 1 error cited | — | Pending Execution |
+| TC-FR16-DOM-19 | ★ VP11.1 commit exactness | 5 valid rows, admin | Count C | Upload → recount + spot-check fields | Exactly C+5, all fields match CSV | — | Pending Execution |
+| TC-FR16-DOM-20 | SP11.1 trailing newline | Valid 2-row file + trailing blank line(s), admin | Count C | Upload | Record: blank ignored (2 imported) vs error-row rollback (0) | — | Pending Execution |
+| TC-FR16-DOM-21 | SP11.2 spaced commas | `Áo , 100000 , mô tả , http://x/d.png , 1`, admin | Count C | Upload | Record: trimmed-accept vs kept-spaces vs reject | — | Pending Execution |
+
+FR-16 total so far: **21 TCs** (count/size edges + stock-template verification in §4.3 BVA / Step 3).
 
 ### 4.3 Boundary Value Analysis
 
@@ -530,9 +609,9 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
 | FR-09 | 48 | 48 | 28 | 20 | 0 | 10 |
-| FR-16 | 0 | 0 | 0 | 0 | 0 | 0 |
+| FR-16 | 21 | 0 | 0 | 0 | 21 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **85** | **85** | **41** | **44** | **0** | **20** |
+| **Total** | **106** | **85** | **41** | **44** | **21** | **20** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 

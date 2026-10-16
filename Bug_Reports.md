@@ -141,11 +141,11 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** no linkage between order and usage; quota purely honor-system. Root: `server.js:443-454` + Checkout.jsx:53-59.
 - **Severity:** High. **Related TCs:** BVA-14, GAP-07/08.
 
-### FR09-BUG-07 — [Medium] No zero floor: fixed discount > subtotal → negative final
+### FR09-BUG-07 — [High] No zero floor: fixed discount > subtotal → negative final
 - **Steps:** FIX200 (fixed 200 000, min 0) @199 999 → 200, `final = -1` (Z1); @200 000 → 0 (Z2); @200 001 → 1 (Z3).
 - **Expected:** floor at 0, never negative.
 - **Actual:** negative totals possible. Root: `server.js:406` (no `Math.max(0, …)`).
-- **Severity:** Medium. **Related TCs:** BVA-18.
+- **Severity:** High (financial data integrity — negative order totals must never persist). **Related TCs:** BVA-18.
 
 ### FR09-BUG-08 — [Medium] No server-side single-code rule (stacking + repeat via API)
 - **Steps:** SAVE10 then BIGBUY → 200 + 200 (K1); SAVE10 twice → 200 + 200 (K2).
@@ -153,11 +153,11 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** unlimited applies (UI single-slot only by accident of `couponResult` state).
 - **Severity:** Medium. **Related TCs:** DOM-15/16, GAP-11.
 
-### FR09-BUG-09 — [Medium] Checkout total is a user-editable input (FR-08 UI)
+### FR09-BUG-09 — [High] Checkout total is a user-editable input (FR-08 UI)
 - **Steps:** open `/checkout` → "Tổng tiền thanh toán (VND)" is a free number input.
 - **Expected:** auto-computed, non-editable total.
 - **Actual:** editable (`Checkout.jsx:14,91-103`); edits only reset coupon state, and server accepts any value (see BUG-05).
-- **Severity:** Medium. **Attachments:** `screenshots/FR09_UI_CHECKOUT.png`. **Related TCs:** GAP-09.
+- **Severity:** High (direct in-browser price-tampering surface feeding BUG-05). **Attachments:** `screenshots/FR09_UI_CHECKOUT.png`. **Related TCs:** GAP-09.
 
 ### FR09-BUG-10 — [Medium] Last-quota race: parallel applies both pass
 - **Steps:** VIP100 at `used = 1` (max 2) → two parallel applies → 200 + 200 (R1), no transaction/lock.
