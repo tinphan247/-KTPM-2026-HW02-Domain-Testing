@@ -1,13 +1,27 @@
-commit ef2661ac301bd8d0c4a6d936b6723acb586e36bc
+commit de833dcdce0fab1f402370cbaeac7534c49d75f4
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 11:53:33 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 11:53:33 2026 +0700
+
+    docs(hw02): export PDF reports and remove template remnants
+
+ AI_Audit_Report.md    |  30 ------------------
+ AI_Audit_Report.pdf   | Bin 0 -> 422896 bytes
+ Main_Report.pdf       | Bin 0 -> 1638541 bytes
+ scripts/export_pdf.js |  84 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 84 insertions(+), 30 deletions(-)
+
+commit 4fc05d312d53a251901dd2250ad344932e5b9c6c
 Author:     23120372 <23120372@student.hcmus.edu.vn>
 AuthorDate: Fri Oct 16 11:49:23 2026 +0700
 Commit:     23120372 <23120372@student.hcmus.edu.vn>
-CommitDate: Fri Oct 16 11:49:23 2026 +0700
+CommitDate: Fri Oct 16 11:49:54 2026 +0700
 
     docs(hw02): attach git commit log
 
- git_commit_log.txt | Bin 88 -> 23706 bytes
- 1 file changed, 0 insertions(+), 0 deletions(-)
+ git_commit_log.txt | 279 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 278 insertions(+), 1 deletion(-)
 
 commit 9754c44fbf9adf94ff9350ba26dc92dae7c66936
 Author:     23120372 <23120372@student.hcmus.edu.vn>
