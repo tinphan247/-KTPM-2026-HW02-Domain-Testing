@@ -317,7 +317,7 @@ Per ISTQB CTFL v4.0 §4.2 (state-aware partitioning: batch composition is a doma
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before Gap Analysis).** The err@1/2/4/5 sweep covers every rollback-prefix shape (0/1/3/4 committed prefixes); price-0 and stock-column probes are determination probes, not pass/fail traps; length edges cross-check FR-15 consistency instead of inventing new limits; scale TC (100 rows) watches timeout/truncation rather than just counting.
+**VALID — reviewed and approved by student, 16/10/2026.** The err@1/2/4/5 sweep covers every rollback-prefix shape; price-0/stock probes stay determination probes; length edges cross-check FR-15; scale TC watches timeout/truncation. Review: sweep, probes and scale TC confirmed; import source opening authorized; design TCs unchanged by review.
 
 #### (4) Reasoning
 
@@ -326,6 +326,35 @@ Per ISTQB CTFL v4.0 §4.2 (boundaries on every ordered dimension, including stru
 #### (5) Student Fix
 
 - Student to review at next gate: confirm index sweep, price-0/stock probes, 100-row scale TC, then approve opening import source for Step 3 (Gap Analysis).
+- Review done 16/10 (decisions above); Artifact 10 verdict confirmed VALID.
+
+---
+
+### Artifact 11: FR-16 white-box inspection + AI Gap Analysis (G9.3 Analyse)
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~14:00 16/10/2026 (UTC+07)
+- **Full Prompt (user):** Chặng 3A — open import/product source (backend endpoint + upload middleware + CSV→SQLite logic, frontend-admin component); diff transaction/rollback, CSV parser (RFC4180 lib vs hand-split, CRLF/LF, trailing blanks), per-column validation (incl. `stock`, `price <= 0`/empty, `category_id` FK), JWT + `role === 'admin'` on import; new blind spots → `TC-FR16-GAP-*`; write §4.4; finalize Artifact 10; log Artifact 11; commit `docs(FR-16): complete white-box inspection and AI gap analysis`.
+
+#### (2) AI Output
+
+- `Main_Report.md` §4.4: implementation table (13 rows with file:line refs), 8 misses M1–M8 with root causes, 11 supplementary TCs `TC-FR16-GAP-01…11`.
+- Headline findings: NO server file handling (JSON `{products}` contract, server.js:198-199; no csv/multer deps); NO transaction — partial-success commits (server.js:206-241); validation = only `!row.name` (price/category/stock unchecked, `|| 1`/`|| ""` defaults); no FK/UNIQUE/length caps, no `stock` column; no role check on any admin route (FR-12 systemic); UI naive `split(",")` parser with aliases, `price || 0`, `parseInt→1`, no extension check (App.jsx:364-418). Cross-FR notes queued (search-SQLi, even-id price string, cancel-from-shipping, unauth order read, canceled→delivered, missing roles).
+- No execution performed yet; no Actual/Status filled.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before execution).** Every claim cites exact file:line; the core reframing (no-file, no-transaction, name-only validation) is evidenced from three independent sources (route code, schema, deps); GAP TCs map 1:1 to misses M1–M8.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.3 and the Gap-Analysis rubric: the analysis separates the architectural reframing (§4.4.1 — the endpoint is JSON-in, not CSV-in) from technique critique (§4.4.2), because most black-box TCs don't fail on values but on a wrong architectural assumption — the highest-value lesson of this feature for the AI Critique.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm GAP TC wording and cross-FR deferrals, then approve Chặng 3B (execution).
 
 ---
 

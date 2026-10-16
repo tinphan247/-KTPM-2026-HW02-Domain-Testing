@@ -618,11 +618,59 @@ FR-16 total so far: **21 TCs** (count/size edges + stock-template verification i
 | TC-FR16-BVA-19 | B5 256/1000 chars | 256-char then 1000-char names, rest valid, admin | Count C | Upload each | Reject + rollback (FR-15 consistency); if accepted, log inconsistency defect | — | Pending Execution |
 | TC-FR16-BVA-20 | B6 stock column ★ | Header `name,price,description,imageUrl,category_id,stock` + 2 valid rows with stock values, admin | Count C | Upload → inspect created rows | Record: strict-header reject vs tolerant-accept; if accepted, record stored stock (and stock of no-stock imports = default?) | — | Pending Execution |
 
-FR-16 total: 21 DOM + 20 BVA = **41 TCs**.
+FR-16 total: 21 DOM + 20 BVA + 11 GAP = **52 TCs**.
 
 ### 4.4 AI Gap Analysis & Human Review
 
-> TODO.
+> White-box sources: `eshop-sut/backend/server.js:141-241` (product CRUD + import endpoint), `backend/database.js:50-81` (schema: no FK, no UNIQUE, no stock column), `backend/package.json` (no csv/multer libs), `frontend-admin/src/App.jsx:1-59` (auth), `:341-434` (CSV section).
+> Artifact 10 review decisions applied (16/10): index sweep, price-0/stock probes, 100-row scale TC all confirmed.
+
+#### 4.4.1 How the code actually implements CSV import
+
+| Spec question | Code answer | File:line |
+| :--- | :--- | :--- |
+| Upload contract | **No file upload at all** — endpoint takes JSON `{products:[...]}`; "parsed on frontend, sent as JSON array". No multer/CSV lib in backend deps | server.js:198-199; backend package.json |
+| Transaction/rollback | **None** — per-row prepared INSERTs, errors collected, **partial success** response (`inserted` + `errors[]`) | server.js:206-241 |
+| Field validation | **Only `!row.name`**. Price (0/negative/`"abc"`), category, stock: unchecked. `category_id \|\| 1` silently defaults; `description/imageUrl` default `""` | server.js:214-224 |
+| Types/FK | SQLite affinity (text `"abc"` stored into INTEGER price); schema has no FOREIGN KEY / UNIQUE / length cap; no `stock` column exists | database.js:63-71 |
+| Whitespace name | `"␣␣"` is truthy → accepted (no trim) | server.js:214 |
+| Null row | `row.name` on `null` throws → uncaught → 500 (robustness hole) | server.js:213-214 |
+| Auth/roles | `authenticateToken` **only — no role check** (same pattern on all `/api/admin/*` + product/category mutations) → any customer JWT can import | server.js:199 (pattern: 249-277, 457-504) |
+| Empty payload | `[]` / non-array → 400 `"Không có dữ liệu để import"` | server.js:202-204 |
+| Error numbering | `Hàng ${index+2}` (header = row 1) | server.js:215,226 |
+| Duplicates/length | No UNIQUE, no 255-cap → duplicates + 1000-char names accepted | database.js:63-71 |
+| Frontend parser | `trim().split("\n")`, naive `split(",")`, trim values — **no RFC4180**; header aliases (`ten/Name`, `gia/Price`, `mo_ta/Description`, `image/danh_muc`); `price \|\| 0`; `category_id: parseInt(...)` (`NaN` → `null` → backend `1`); `stock` never mapped; **no extension check**; empty preview disables the button (nothing sent) | App.jsx:364-418 |
+| Layer effects | Trailing blanks removed by `trim()` (DOM-20 holds at UI); spaces trimmed (DOM-21 holds at UI); quoted commas MISPARSE into garbage (DOM-09/10 fail at UI); mid-file blank → all-`""` row → backend missing-name error + partial import (BVA-14 fails); wrong header → all-`""`/0/1 rows → per-row errors, 0 imported (DOM-06 holds in effect) | App.jsx:367-402 |
+| Cross-FR notes (later phases) | SQL injection in `GET /api/products?search=` (string interpolation); even-id products return price as STRING (FR-05/06); user-cancel from `shipping` allowed (FR-10); `GET /api/orders/:id` unauthenticated (FR-11); `canceled → delivered` accepted (FR-10); no role checks anywhere (FR-12) | server.js:141-165,321-349,525-551 |
+
+#### 4.4.2 What the 41 black-box TCs missed or assumed differently
+
+| # | Miss / clash | Root cause |
+| :--- | :--- | :--- |
+| M1 | Assumed server-side file parsing (extension/header/RFC4180 gates) — server never sees a file; all parsing is naive UI JS | **Architecture blind spot**: LLM assumed classic upload design, never considered parse-on-client |
+| M2 | Assumed atomic transaction (DOM-17/18, BVA-06…09) — code commits partial successes, zero rollback | **Dev bug** (spec's core all-or-nothing violated); LLM assumed spec-faithful transaction |
+| M3 | Assumed price/category validation (DOM-12…15, BVA-10/11) — only `name` checked; `0`/negative/`"abc"` stored; bad FK → `1` or raw | **Dev bug** (near-absent validation); LLM assumed symmetric field rules |
+| M4 | Assumed 403 for customer (DOM-04) — no role check on any admin route | **Dev bug** (FR-12 unenforced); LLM assumed middleware matches spec |
+| M5 | Assumed strict arity/header (DOM-06…08, BVA-15/16) — aliases + `\|\|` defaults + ignored extras = tolerant garbage-in | **Dev bug** (no strictness); LLM assumed strict contract |
+| M6 | Attributed blank/space handling to server (DOM-20/21, BVA-14) — decided by UI `trim()`; raw API has no lines | **Layer misattribution**; SP hedging right, layer wrong |
+| M7 | Kept `stock` as maybe-column (SP10/BVA-20) — column doesn't exist anywhere; silently dropped | **Spec-gap resolved**: tolerant-accept + drop; LLM correctly refused to assert |
+| M8 | Assumed report + rollback together — code reports counts but commits partial; `index+2` numbering unpredicted | **Dev bug** (partial-success semantics); numbering detail missed |
+
+#### 4.4.3 Supplementary white-box test cases
+
+| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) |
+| :--- | :--- | :--- | :--- |
+| TC-FR16-GAP-01 | ★ Half-commit (M2) | API: 2 valid + 1 empty-name row (fresh admin) | **0 imported** (atomic), 1 cited error |
+| TC-FR16-GAP-02 | Text price stored (M3) | API row with `price: "abc"` | Rejected (no TEXT in INTEGER price) |
+| TC-FR16-GAP-03 | Zero/negative price (M3) | API rows `price: 0` / `-5` | Both rejected (`price > 0`) |
+| TC-FR16-GAP-04 | Ghost category (M3) | API row `category_id: 9999` | Rejected (FK); never silently `→ 1` or raw |
+| TC-FR16-GAP-05 | Blank-name accepted (M3) | API row `name: "␣␣"` | Rejected (whitespace = empty) |
+| TC-FR16-GAP-06 | Customer import (M4) | Valid payload + customer JWT | 403 (admin-only, FR-12) |
+| TC-FR16-GAP-07 | Ragged/short rows (M5) | API rows missing `price` (= NULL) / extra `stock` key | Rejected (strict schema); `stock` never silently dropped |
+| TC-FR16-GAP-08 | Null row crash (robustness) | API `products: [null]` | 400 (never 500) |
+| TC-FR16-GAP-09 | Duplicates (observational) | API row reusing live product name | Record vs FR-15: new row / overwrite / reject |
+| TC-FR16-GAP-10 | 256-char name (FR-15) | API 256-char name, rest valid | Reject + rollback (FR-15 max 255) |
+| TC-FR16-GAP-11 | UI quote-misparse (M1/M6) | UI-equivalent parse of `"Áo, thun",100000,…` → post produced JSON | Name = `Áo, thun` (RFC4180); misaligned garbage = parser bug |
 
 ### 4.5 Execution & Bugs
 
@@ -663,9 +711,9 @@ FR-16 total: 21 DOM + 20 BVA = **41 TCs**.
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
 | FR-09 | 48 | 48 | 28 | 20 | 0 | 10 |
-| FR-16 | 41 | 0 | 0 | 0 | 41 | 0 |
+| FR-16 | 52 | 0 | 0 | 0 | 52 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **126** | **85** | **41** | **44** | **41** | **20** |
+| **Total** | **137** | **85** | **41** | **44** | **52** | **20** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 
