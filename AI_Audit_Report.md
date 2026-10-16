@@ -207,6 +207,35 @@ Per ISTQB CTFL v4.0 §4.2 (each invalid partition exercised at least once; valid
 #### (5) Student Fix
 
 - Student review decisions (16/10/2026): VND figures confirmed; u = 1 ₫ for BVA money edges; fixtures approved (DOM-05/07/17 + BVA setup, restore after run); DOM-15/16 upgraded to normative single-code expectation. Applied in §3.2 + §3.3.
+- Student authorized white-box inspection (16/10); Artifact 6 verdict confirmed VALID above.
+
+---
+
+### Artifact 7: FR-09 white-box inspection + AI Gap Analysis (G9.3 Analyse)
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~12:40 16/10/2026 (UTC+07)
+- **Full Prompt (user):** Chặng 3A — open coupon/checkout source (backend + frontend-web); diff check order C1→C5, operators (min/max/expiry, string-vs-timestamp), `used_count` increment point + transaction/race, checkout trust (coupon_code/discounted total bypassing Apply → revalidation?), shipping-before/after-percent, fixed > subtotal floor; new misses → `TC-FR09-GAP-*`; write §3.4; finalize Artifact 6; log Artifact 7; commit `docs(FR-09): complete white-box inspection and AI gap analysis`.
+
+#### (2) AI Output
+
+- `Main_Report.md` §3.4: implementation table (13 rows with file:line refs), 8 misses M1–M8 with root causes, 11 supplementary TCs `TC-FR09-GAP-01…11`.
+- Headline findings: percent formula `total×(1−value)` → negative discount / 10× final (server.js:398-421); C3 strict `>` (server.js:379); no auth on apply + client `user_id` (server.js:363-391); usage as voluntary post-checkout call, never enforced (server.js:297-309,443-454); checkout trusts any client total, ignores coupon (FR-08); UI `editableTotal` + trim/upper normalization (Checkout.jsx:14,29,91-103); no over-discount floor; no server-side single-code rule. Cross-FR notes queued for FR-10/11/12 phases.
+- No execution performed yet; no Actual/Status filled.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before execution).** Every claim cites exact file:line; misses split into dev-bug / architecture-flaw / layer-divergence buckets; GAP TCs map 1:1 to misses M1–M8.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.3 (structural perspective complements black-box) and the Gap-Analysis rubric: separating implementation facts (§3.4.1) from technique critique (§3.4.2) exposes the LLM's characteristic blind spots on this feature — formula-implementation errors, endpoint wiring/auth assumptions, and client↔server trust boundaries — as reusable process lessons.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm GAP TC wording and cross-FR deferrals, then approve Chặng 3B (execution).
 
 ---
 
@@ -228,7 +257,7 @@ Per ISTQB CTFL v4.0 §4.2 (each invalid partition exercised at least once; valid
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before Gap Analysis).** Every ordered variable carries an explicit step unit; min-points assert exact money math (not just accept/reject), making `>=` vs `>` failures self-evidencing; the two ★ probes (increment timing, expiry operator) are designed as determination probes per the skill; seed-impossible edges use declared fixtures instead of being skipped.
+**VALID — reviewed and approved by student, 16/10/2026.** Every ordered variable carries an explicit step unit; min-points assert exact money math (not just accept/reject), making `>=` vs `>` failures self-evidencing; the two ★ probes are determination probes per the skill; seed-impossible edges use declared fixtures. Review decisions: spec-min banner kept as verification evidence; B3/B4 fixtures approved with restore; BVA-14/16 kept; source opening authorized.
 
 #### (4) Reasoning
 

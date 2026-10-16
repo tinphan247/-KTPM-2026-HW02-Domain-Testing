@@ -395,11 +395,59 @@ FR-09 total so far: **17 TCs** (BVA edges to be added in §3.3).
 | TC-FR09-BVA-19 | B4 discount=subtotal | Same fixture, subtotal 200 000 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 0 exactly | — | Pending Execution |
 | TC-FR09-BVA-20 | B4 discount+1 | Same fixture, subtotal 200 001 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 1 ₫ | — | Pending Execution |
 
-FR-09 total: 17 DOM + 20 BVA = **37 TCs**.
+FR-09 total: 17 DOM + 20 BVA + 11 GAP = **48 TCs**.
 
 ### 3.4 AI Gap Analysis & Human Review
 
-> TODO.
+> White-box sources: `eshop-sut/backend/server.js:297-309` (checkout), `:363-441` (apply-coupon), `:444-454` (coupon-usage), `:457-488` (admin coupon CRUD), `frontend-web/src/pages/Checkout.jsx`.
+> Artifact 6 review decisions applied (16/10): spec-min banner kept; fixtures approved; BVA-14/16 probes kept.
+
+#### 3.4.1 How the code actually implements coupons
+
+| Spec question | Code answer | File:line |
+| :--- | :--- | :--- |
+| Check order C1→C5 | C1 (exists+active, one query) → **C3 min** → C2 expiry → C5 usage (only if `user_id` supplied). C4 (JWT) **never checked** at apply | server.js:369-391 |
+| C3 operator | `total_amount > min_order_amount` — **strict `>`, spec says `>=`**; equality rejected | server.js:379 |
+| C2 operator | `expiry < now` → reject; exactly at `expired_at` = still valid (`<=` semantics) | server.js:380-384 |
+| C5 operator | `usage_count >= max` → reject (correct); but skipped entirely when `user_id` omitted | server.js:386-395 |
+| Percent math | `Math.floor(total × (1 − value))` — for SAVE10 (10): `4M × −9 = −36M` discount → final = **10× total**. Catastrophic | server.js:398-401,418-421 |
+| Fixed math | `discount = value`; **no floor** — fixed > subtotal → negative final | server.js:403,425 |
+| `used_count` increment | **Not** in apply, **not** in checkout — separate voluntary client call `POST /api/coupon-usage` *after* order creation; no transaction, no linkage | server.js:297-309,443-454; Checkout.jsx:53-59 |
+| Checkout validation | **None**: accepts any client `total_amount`, ignores `coupon_id`; no C1–C5 revalidation, no recompute (FR-08 violation) | server.js:297-309 |
+| Checkout total source | UI total is an **editable number input** (`editableTotal`); edits reset coupon state | Checkout.jsx:14,91-103 |
+| Code normalization | Backend exact match (no trim/lower); **UI** sends `trim().toUpperCase()` — layers diverge | server.js:370; Checkout.jsx:29 |
+| Single-code rule | Backend: none (unlimited applies per cart). UI: single `couponResult` slot (overwrite by design) | server.js:363-441; Checkout.jsx:18,98 |
+| Shipping in min_order | No shipping fee exists anywhere — SP moot | cart/checkout code |
+| Cross-FR notes (later phases) | No role check on admin coupon CRUD (any login creates coupons — FR-12); user-cancel allowed from `shipping` (FR-10, comment admits it); `GET /api/orders/:id` unauthenticated (FR-11); `canceled → delivered` accepted (FR-10) | server.js:321-342,344-349,457-488,525-551 |
+
+#### 3.4.2 What the 37 black-box TCs missed or assumed differently
+
+| # | Miss / clash | Root cause |
+| :--- | :--- | :--- |
+| M1 | Assumed `>=` for min (BVA-03/06/09) — code uses `>` | **Dev bug** (wrong operator); LLM assumed spec-faithful operator |
+| M2 | Assumed spec percent formula — code computes `total×(1−value)` (negative discount, 10× final) | **Dev bug** (catastrophic); LLM probed thresholds, never the formula implementation |
+| M3 | Assumed C4 enforced at apply (DOM-08) — endpoint has no auth, `user_id` is client-supplied | **Dev bug** (missing auth); LLM assumed endpoint wiring matches spec |
+| M4 | Assumed quota enforced atomically at checkout (BVA-11…14) — usage is a voluntary post-checkout client call | **Dev/architecture bug**; LLM assumed transactional integrity |
+| M5 | Assumed checkout revalidates + recomputes (FR-08) — trusts any client total, ignores coupon | **Dev bug** (missing trust boundary); LLM didn't probe client→server trust |
+| M6 | Assumed raw code pass-through (SP8) — UI normalizes trim+upper, backend doesn't | **Layer divergence**; SP hedging was right but layer-specific expectations needed |
+| M7 | Assumed C5 always evaluated — skipped when `user_id` omitted (`if (user_id)`) | **Dev bug**; LLM assumed unconditional evaluation |
+| M8 | Assumed floor-at-0/reject for over-discount (B4) — no floor, negatives possible | **Dev bug**; BVA-18…20 probes correctly placed |
+
+#### 3.4.3 Supplementary white-box test cases
+
+| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) |
+| :--- | :--- | :--- | :--- |
+| TC-FR09-GAP-01 | Equality `>` bug (M1) | SAVE10 on exactly 300 000 ₫ | Accept, −30 000 (proves `>=`) |
+| TC-FR09-GAP-02 | Percent math (M2) | SAVE10 on 4 000 000 ₫, inspect math | Discount 400 000, final 3 600 000 |
+| TC-FR09-GAP-03 | Guest apply (M3) | No token, no `user_id`, valid code + total | Rejected (C4 login required) |
+| TC-FR09-GAP-04 | Omitted `user_id` (M7) | Exhausted user, apply WITHOUT `user_id` | Still rejected (C5 must hold regardless) |
+| TC-FR09-GAP-05 | Foreign `user_id` (M3) | Exhausted user, apply with ANOTHER fresh user's id | Rejected (quota is per-caller, server-known) |
+| TC-FR09-GAP-06 | Tampered total via API (M5) | Auth'd `POST /api/checkout` with `total_amount = 1` | Rejected/recomputed — never a 1 ₫ order |
+| TC-FR09-GAP-07 | Usage never recorded (M4) | Checkout with SAVE10, skip `/api/coupon-usage`, reuse SAVE10 | 2nd use rejected (server-side quota) |
+| TC-FR09-GAP-08 | Double usage record (M4) | One order → call `/api/coupon-usage` twice | 2nd record rejected (idempotent, 1 use per order) |
+| TC-FR09-GAP-09 | UI editable total (M5) | Set checkout total input to 1 ₫ → checkout | Total not user-editable; server recomputes |
+| TC-FR09-GAP-10 | Last-quota race (M4) | VIP100 at used = 1 → two PARALLEL applies | At most one succeeds (atomic check-and-reserve) |
+| TC-FR09-GAP-11 | API stacking (single-code std) | SAVE10 then BIGBUY via API, same cart | 2nd apply overwrites or errors (max 1 code/order) |
 
 ### 3.5 Execution & Bugs
 
@@ -465,10 +513,10 @@ FR-09 total: 17 DOM + 20 BVA = **37 TCs**.
 | Feature | Designed | Executed | Passed | Failed | Not executed | Bugs |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
-| FR-09 | 37 | 0 | 0 | 0 | 37 | 0 |
+| FR-09 | 48 | 0 | 0 | 0 | 48 | 0 |
 | FR-16 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **74** | **37** | **13** | **24** | **37** | **10** |
+| **Total** | **85** | **37** | **13** | **24** | **48** | **10** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 
