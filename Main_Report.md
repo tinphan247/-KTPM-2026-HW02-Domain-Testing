@@ -743,24 +743,24 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 
 | TC_ID | Partition / combination | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| TC-FR20-DOM-01 | Valid: pending→cancel | Own `pending` order, logged in | Order exists, status `pending` | Cancel → confirm dialog → Confirm | `canceled`; success toast; history updated | — | Pending Execution |
-| TC-FR20-DOM-02 | Valid: confirmed→cancel | Own `confirmed` order, logged in | Status `confirmed` | Cancel → Confirm | `canceled` (spec-valid transition) | — | Pending Execution |
-| TC-FR20-DOM-03 | Own-history listing | Logged in, ≥2 own orders mixed states | Orders seeded | Open Order History | Only own orders; code/date/total/status in Vietnamese + colors | — | Pending Execution |
-| TC-FR20-DOM-04 | Invalid: shipping→cancel | Own `shipping` order, logged in (user, not admin) | Status `shipping` | Attempt Cancel | Rejected with message; status stays `shipping` | — | Pending Execution |
-| TC-FR20-DOM-05 | Invalid: delivered→cancel | Own `delivered` order | Status `delivered` | Attempt Cancel | Rejected (terminal); unchanged | — | Pending Execution |
-| TC-FR20-DOM-06 | Invalid: canceled→cancel | Own `canceled` order | Status `canceled` | Attempt Cancel again | Rejected/idempotent; unchanged, clear message | — | Pending Execution |
-| TC-FR20-DOM-07 | Cross-user cancel ★ | User B's `pending` order id, acting as user A | Two users; B's order `pending` | A attempts cancel of B's order | Rejected (403/404); B's order unchanged | — | Pending Execution |
-| TC-FR20-DOM-08 | Guest history/cancel | No session | — | Open history / call cancel | Login required | — | Pending Execution |
-| TC-FR20-DOM-09 | Confirm dialog gate | Own `pending` order | — | Tap Cancel | Confirmation dialog appears BEFORE any state change | — | Pending Execution |
-| TC-FR20-DOM-10 | Dismiss dialog | Own `pending` order | Dialog open | Dismiss/Back | No state change; still `pending` | — | Pending Execution |
-| TC-FR20-DOM-11 | Loading feedback | Own `pending` order, normal network | — | Confirm cancel | Loading indicator during request; then success/error toast | — | Pending Execution |
-| TC-FR20-DOM-12 | Empty history | Fresh user, 0 orders | No orders | Open Order History | Illustration + friendly empty message (FR-24) | — | Pending Execution |
-| TC-FR20-DOM-13 | Detail view | Own order (any state) | — | Open order detail | Items, totals, Vietnamese status shown correctly | — | Pending Execution |
-| TC-FR20-DOM-14 | SP restore/re-order | Own `canceled` order | Status `canceled` | Look for restore / Re-order action | Record: restore offered? re-order creates NEW order? nothing? | — | Pending Execution |
-| TC-FR20-DOM-15 | SP coupon refund | Canceled order placed WITH coupon | Order used `VIP100`, used = 1 | Cancel the order | Student standard (16/10): successful cancel MUST refund the coupon (`used − 1`); consuming quota on a canceled order = business bug | — | Pending Execution |
-| TC-FR20-DOM-16 | SP stock restore | Canceled order (any items) | — | Cancel | Student standard (16/10): MUST restore stock (+quantity); no restore = business bug (or record verified absence of a stock system) | — | Pending Execution |
-| TC-FR20-DOM-17 | SP double-tap ★ | Own `pending` order | — | Tap Cancel-Confirm twice rapidly | Student standard (16/10): client debounce + strict server state check — exactly-once side effects; double stock/coupon adjust or 500 = bug | — | Pending Execution |
-| TC-FR20-DOM-18 | SP reason field | Cancel flow | — | If reason input exists: submit empty / spaces / 500-char | Record: absent / optional / required + handling | — | Pending Execution |
+| TC-FR20-DOM-01 | Valid: pending→cancel | Own `pending` order, logged in | Order exists, status `pending` | Cancel → confirm dialog → Confirm | `canceled`; success toast; history updated | 200 → `canceled` (D01) | PASSED |
+| TC-FR20-DOM-02 | Valid: confirmed→cancel | Own `confirmed` order, logged in | Status `confirmed` | Cancel → Confirm | `canceled` (spec-valid transition) | 200 → `canceled` (D02) | PASSED |
+| TC-FR20-DOM-03 | Own-history listing | Logged in, ≥2 own orders mixed states | Orders seeded | Open Order History | Only own orders; code/date/total/status in Vietnamese + colors | Scoping ✓ no leak (D03); labels VN ✓ (code); **colors missing** (plain text) → FR20-BUG-04 | FAILED |
+| TC-FR20-DOM-04 | Invalid: shipping→cancel | Own `shipping` order, logged in (user, not admin) | Status `shipping` | Attempt Cancel | Rejected with message; status stays `shipping` | **200 → `canceled`** (D04; UI hides button but API allows) → FR20-BUG-01 | FAILED |
+| TC-FR20-DOM-05 | Invalid: delivered→cancel | Own `delivered` order | Status `delivered` | Attempt Cancel | Rejected (terminal); unchanged | 400, unchanged (D05) | PASSED |
+| TC-FR20-DOM-06 | Invalid: canceled→cancel | Own `canceled` order | Status `canceled` | Attempt Cancel again | Rejected/idempotent; unchanged, clear message | 400 `"Cannot cancel this order."` (D06) | PASSED |
+| TC-FR20-DOM-07 | Cross-user cancel ★ | User B's `pending` order id, acting as user A | Two users; B's order `pending` | A attempts cancel of B's order | Rejected (403/404); B's order unchanged | 404-masking, victim intact (D07) — reject holds | PASSED |
+| TC-FR20-DOM-08 | Guest history/cancel | No session | — | Open history / call cancel | Login required | 401/401 (D08) | PASSED |
+| TC-FR20-DOM-09 | Confirm dialog gate | Own `pending` order | — | Tap Cancel | Confirmation dialog appears BEFORE any state change | No dialog — `onPress → PUT` directly (App.js:312-329,961-968) → FR20-BUG-03 | FAILED |
+| TC-FR20-DOM-10 | Dismiss dialog | Own `pending` order | Dialog open | Dismiss/Back | No state change; still `pending` | Vacuous PASS — no dialog exists to dismiss (premise covered by GAP-04/BUG-03) | PASSED |
+| TC-FR20-DOM-11 | Loading feedback | Own `pending` order, normal network | — | Confirm cancel | Loading indicator during request; then success/error toast | No loading state on mobile cancel (code) → FR20-BUG-06 | FAILED |
+| TC-FR20-DOM-12 | Empty history | Fresh user, 0 orders | No orders | Open Order History | Illustration + friendly empty message (FR-24) | Text only, no illustration (App.js:947-949) → FR20-BUG-05 | FAILED |
+| TC-FR20-DOM-13 | Detail view | Own order (any state) | — | Open order detail | Items, totals, Vietnamese status shown correctly | Card shows id/date/total/status but **no item lines** (App.js:951-968) → FR20-BUG-07 | FAILED |
+| TC-FR20-DOM-14 | SP restore/re-order | Own `canceled` order | Status `canceled` | Look for restore / Re-order action | Record: restore offered? re-order creates NEW order? nothing? | Recorded: no restore/re-order affordance in mobile UI | PASSED |
+| TC-FR20-DOM-15 | SP coupon refund | Canceled order placed WITH coupon | Order used `VIP100`, used = 1 | Cancel the order | Student standard (16/10): successful cancel MUST refund the coupon (`used − 1`); consuming quota on a canceled order = business bug | used stays **1** after cancel (D15) → FR20-BUG-02 | FAILED |
+| TC-FR20-DOM-16 | SP stock restore | Canceled order (any items) | — | Cancel | Student standard (16/10): MUST restore stock (+quantity); no restore = business bug (or record verified absence of a stock system) | Recorded: no stock system exists (schema verified) — standard vacuous; coupon side is the actionable bug | PASSED |
+| TC-FR20-DOM-17 | SP double-tap ★ | Own `pending` order | — | Tap Cancel-Confirm twice rapidly | Student standard (16/10): client debounce + strict server state check — exactly-once side effects; double stock/coupon adjust or 500 = bug | Parallel taps → 200+400, exactly-once (D17) — safe by server state, though no debounce exists | PASSED |
+| TC-FR20-DOM-18 | SP reason field | Cancel flow | — | If reason input exists: submit empty / spaces / 500-char | Record: absent / optional / required + handling | Recorded: no reason field — `cancelOrder` sends `{}` (App.js:320) | PASSED |
 
 FR-20 total so far: **18 TCs** (timing/double-tap edges + status-text exactness in §5.3 BVA / Step 3).
 
@@ -802,16 +802,16 @@ FR-20 total so far: **18 TCs** (timing/double-tap edges + status-text exactness 
 
 | TC_ID | Boundary / point | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| TC-FR20-BVA-01 | B2 immediate re-cancel ★ | Just-canceled own order | Status `canceled` ≤1 s ago | 2nd Cancel immediately | 400/409 already-canceled; stock/coupon adjusted exactly once total | — | Pending Execution |
-| TC-FR20-BVA-02 | B1 fresh-shipping | Own order shipped seconds ago | Status just → `shipping` | Cancel at once | Rejected; stays `shipping` (validity edge holds at recency) | — | Pending Execution |
-| TC-FR20-BVA-03 | B3 cancel ∥ ship race ★ | Own `confirmed` order; admin ships same instant | Status `confirmed` | Fire user-Cancel + admin-ship in parallel | Exactly one winner (`canceled` XOR `shipping`); no 500; counters consistent with winner | — | Pending Execution |
-| TC-FR20-BVA-04 | B4 double-tap ★ | Own `pending` order | — | Two Cancel-Confirms, Δt ≤ 300 ms | Single cancel; stock/coupon adjusted once; 2nd harmless (debounce/server guard) | — | Pending Execution |
-| TC-FR20-BVA-05 | B2 delayed re-cancel | Own `canceled` order (5 s+) | Status `canceled` | Cancel again | Clean 400 already-canceled; unchanged | — | Pending Execution |
-| TC-FR20-BVA-06 | B5 adjacent ids | User B's order ids around own (`±1`) | Two users; B has orders | A cancels B's `id±1` | 403/404 each; B's orders unchanged (no IDOR) | — | Pending Execution |
-| TC-FR20-BVA-07 | B5 garbage ids | `0`, `-1`, `999999`, `"abc"` as order id | Logged in | Cancel each | 400/404; never 500; nothing changes | — | Pending Execution |
-| TC-FR20-BVA-08 | B6 exactly-1 list | User with precisely 1 order | 1 order | Open history | Single item rendered fully (code/date/total/status) | — | Pending Execution |
-| TC-FR20-BVA-09 | B6 many (15) | User with 15 orders | 15 orders seeded | Open history, scroll | All 15 listed, newest-first, no dupes/truncation | — | Pending Execution |
-| TC-FR20-BVA-10 | B7 bad token | Own `pending` order + expired/invalid token | — | Cancel with bad token | 401; order unchanged | — | Pending Execution |
+| TC-FR20-BVA-01 | B2 immediate re-cancel ★ | Just-canceled own order | Status `canceled` ≤1 s ago | 2nd Cancel immediately | 400/409 already-canceled; stock/coupon adjusted exactly once total | 400, unchanged (V01) | PASSED |
+| TC-FR20-BVA-02 | B1 fresh-shipping | Own order shipped seconds ago | Status just → `shipping` | Cancel at once | Rejected; stays `shipping` (validity edge holds at recency) | **200 → `canceled`** (V02) → FR20-BUG-01 | FAILED |
+| TC-FR20-BVA-03 | B3 cancel ∥ ship race ★ | Own `confirmed` order; admin ships same instant | Status `confirmed` | Fire user-Cancel + admin-ship in parallel | Exactly one winner (`canceled` XOR `shipping`); no 500; counters consistent with winner | Both 200, final `shipping` — single valid end-state, no 500 (V03); last-writer-wins TOCTOU noted as BUG-01 amplifier | PASSED |
+| TC-FR20-BVA-04 | B4 double-tap ★ | Own `pending` order | — | Two Cancel-Confirms, Δt ≤ 300 ms | Single cancel; stock/coupon adjusted once; 2nd harmless (debounce/server guard) | 200+400 exactly-once (D17) — no debounce, but state guard suffices | PASSED |
+| TC-FR20-BVA-05 | B2 delayed re-cancel | Own `canceled` order (5 s+) | Status `canceled` | Cancel again | Clean 400 already-canceled; unchanged | 400 (V05) | PASSED |
+| TC-FR20-BVA-06 | B5 adjacent ids | User B's order ids around own (`±1`) | Two users; B has orders | A cancels B's `id±1` | 403/404 each; B's orders unchanged (no IDOR) | 400/404, victim intact (V06/V06b) | PASSED |
+| TC-FR20-BVA-07 | B5 garbage ids | `0`, `-1`, `999999`, `"abc"` as order id | Logged in | Cancel each | 400/404; never 500; nothing changes | All 404 (V07) | PASSED |
+| TC-FR20-BVA-08 | B6 exactly-1 list | User with precisely 1 order | 1 order | Open history | Single item rendered fully (code/date/total/status) | 1 order, full fields (V08) | PASSED |
+| TC-FR20-BVA-09 | B6 many (15) | User with 15 orders | 15 orders seeded | Open history, scroll | All 15 listed, newest-first, no dupes/truncation | 15, ordered, no dupes (V09) | PASSED |
+| TC-FR20-BVA-10 | B7 bad token | Own `pending` order + expired/invalid token | — | Cancel with bad token | 401; order unchanged | Auth-rejected, unchanged — code **403** vs expected 401 (V10); noted, not filed | PASSED |
 
 FR-20 total: 18 DOM + 10 BVA + 10 GAP = **38 TCs**.
 
@@ -853,22 +853,36 @@ FR-20 total: 18 DOM + 10 BVA + 10 GAP = **38 TCs**.
 
 #### 5.4.3 Supplementary white-box test cases
 
-| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) |
-| :--- | :--- | :--- | :--- |
-| TC-FR20-GAP-01 | Shipping cancel (M1) | Own `shipping` order → user cancel via API | Rejected, stays `shipping` |
-| TC-FR20-GAP-02 | Coupon not refunded (M2) | Order with VIP100 (used = 1) → cancel → recount usage | `used` 1 → 0 (refund) |
-| TC-FR20-GAP-03 | Stock absence (M2) | Inspect schema + cancel flow for stock moves | Stock system exists AND restores — else record verified absence |
-| TC-FR20-GAP-04 | No confirm (M3) | Mobile order history → tap Cancel | Confirmation dialog before PUT |
-| TC-FR20-GAP-05 | Double-tap safe-ish (M4) | Two parallel cancels, same order | 1× success + 1× clean 400; side effects exactly once |
-| TC-FR20-GAP-06 | Race outcome (M4) | Parallel user-cancel ∥ admin-ship on `confirmed` order | Exactly one winner; valid end-state; no 500 |
-| TC-FR20-GAP-07 | 404-masking (M7) | User A cancels user B's order | Rejected (403 or 404); B unchanged — record masking |
-| TC-FR20-GAP-08 | No colors (M5) | Mobile history screenshot | Color-coded statuses (FR-11) |
-| TC-FR20-GAP-09 | No illustration (M6) | Fresh-user mobile history screenshot | Icon/illustration + message (FR-24) |
-| TC-FR20-GAP-10 | Label + base URL (M8) | Mobile profile screen; env check | `"Đăng xuất"`; configurable API base |
+| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR20-GAP-01 | Shipping cancel (M1) | Own `shipping` order → user cancel via API | Rejected, stays `shipping` | 200 → `canceled` (D04/V02) → FR20-BUG-01 | FAILED |
+| TC-FR20-GAP-02 | Coupon not refunded (M2) | Order with VIP100 (used = 1) → cancel → recount usage | `used` 1 → 0 (refund) | Stays 1 (D15) → FR20-BUG-02 | FAILED |
+| TC-FR20-GAP-03 | Stock absence (M2) | Inspect schema + cancel flow for stock moves | Stock system exists AND restores — else record verified absence | Recorded: no stock system (products schema) | PASSED |
+| TC-FR20-GAP-04 | No confirm (M3) | Mobile order history → tap Cancel | Confirmation dialog before PUT | Direct PUT, no dialog (code App.js:312-329) → FR20-BUG-03 | FAILED |
+| TC-FR20-GAP-05 | Double-tap safe-ish (M4) | Two parallel cancels, same order | 1× success + 1× clean 400; side effects exactly once | 200+400 exactly-once (D17) | PASSED |
+| TC-FR20-GAP-06 | Race outcome (M4) | Parallel user-cancel ∥ admin-ship on `confirmed` order | Exactly one winner; valid end-state; no 500 | Both 200, final `shipping` (V03) — valid state, TOCTOU noted | PASSED |
+| TC-FR20-GAP-07 | 404-masking (M7) | User A cancels user B's order | Rejected (403 or 404); B unchanged — record masking | 404, victim intact (D07) — reject holds | PASSED |
+| TC-FR20-GAP-08 | No colors (M5) | Mobile history screenshot | Color-coded statuses (FR-11) | Plain text (App.js:960) → FR20-BUG-04 | FAILED |
+| TC-FR20-GAP-09 | No illustration (M6) | Fresh-user mobile history screenshot | Icon/illustration + message (FR-24) | Text only (App.js:947-949) → FR20-BUG-05 | FAILED |
+| TC-FR20-GAP-10 | Label + base URL (M8) | Mobile profile screen; env check | `"Đăng xuất"`; configurable API base | `"Thoát"` + hardcoded 192.168.10.13 (App.js:940-942,:16) → FR20-BUG-07/08 | FAILED |
 
 ### 5.5 Execution & Bugs
 
-> TODO.
+> Executed 16/10/2026, 38/38 TCs. **24 PASSED, 14 FAILED → 8 bugs** (details: `Bug_Reports.md` §FR-20; screenshot: `screenshots/FR20_API_EVIDENCE.png` incl. code-ref panel; raw transcript: `scripts/exec_fr20_results.json`; runner: `scripts/exec_fr20.js`).
+> Test orders deleted afterwards (F9: 0 left); `mob*` users remain (documented). Mobile UI claims verified by code refs — Expo-web boot declined (SUT lacks react-native-web/react-dom; API base hardcodes unreachable 192.168.10.13); re-shoot on a real device for the demo video.
+
+| Bug ID | Title | Severity | Evidence | Related TCs |
+| :--- | :--- | :--- | :--- | :--- |
+| FR20-BUG-01 | User cancel from `shipping` allowed (+ race TOCTOU amplifier) | High | API evidence PNG (D04/V02/V03) + server.js:328-331 | DOM-04, BVA-02/03, GAP-01/06 |
+| FR20-BUG-02 | Cancel does not refund coupon usage (stays consumed) | High | API evidence PNG (D15) + server.js:333-340 | DOM-15, GAP-02 |
+| FR20-BUG-03 | Mobile cancel has no confirmation dialog (tap → PUT) | Medium | App.js:312-329,961-968 | DOM-09, GAP-04 |
+| FR20-BUG-04 | Mobile statuses have no color coding (FR-11) | Medium | App.js:960,1240-1248 | DOM-03/13, GAP-08 |
+| FR20-BUG-05 | Empty history is text-only, no illustration (FR-24 partial) | Low | App.js:947-949 | DOM-12, GAP-09 |
+| FR20-BUG-06 | No loading indicator on mobile cancel | Low | App.js:312-329 (no loading state) | DOM-11 |
+| FR20-BUG-07 | History cards omit item lines; logout labeled `"Thoát"` (FR-23) | Low | App.js:940-968 | DOM-13, GAP-10 |
+| FR20-BUG-08 | Mobile API base hardcoded to LAN IP (env portability) | Low | App.js:16 | GAP-10 |
+
+GitHub Issues: to be filed on the group repo with the PNG attached (links added here after filing).
 
 ---
 
@@ -881,8 +895,8 @@ FR-20 total: 18 DOM + 10 BVA + 10 GAP = **38 TCs**.
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
 | FR-09 | 48 | 48 | 28 | 20 | 0 | 10 |
 | FR-16 | 52 | 52 | 19 | 33 | 0 | 10 |
-| FR-20 | 38 | 0 | 0 | 0 | 38 | 0 |
-| **Total** | **175** | **137** | **60** | **77** | **38** | **30** |
+| FR-20 | 38 | 38 | 24 | 14 | 0 | 8 |
+| **Total** | **175** | **175** | **84** | **91** | **0** | **38** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 

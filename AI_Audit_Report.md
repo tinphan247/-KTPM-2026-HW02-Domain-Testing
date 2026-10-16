@@ -465,7 +465,7 @@ Per ISTQB CTFL v4.0 §4.2–4.3 (boundary + state-transition techniques compose:
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before execution).** Every claim cites exact file:line; the byte-level currency check models evidence-before-synthesis (a plausible bug was disproven, not asserted); GAP TCs map 1:1 to misses M1–M8.
+**VALID — reviewed and confirmed by execution, 16/10/2026.** All 8 misses M1–M8 adjudicated at runtime or by exact code refs (shipping-cancel, no refund, no dialog, no colors, text-only empty state, no loading, card/label gaps, hardcoded base); race/double-tap behaved safely by server state (400s), bounding M4 as standard-half-met rather than defect; 404-masking recorded as acceptable reject.
 
 #### (4) Reasoning
 
@@ -474,6 +474,36 @@ Per ISTQB CTFL v4.0 §4.3 and the Gap-Analysis rubric: mobile and backend are an
 #### (5) Student Fix
 
 - Student to review at next gate: confirm GAP TC wording, then approve Chặng 3B (execution: API script + Expo-web/viewport screenshots).
+- Execution confirms Artifact 15 in full (16/10/2026): 8 bugs FR20-BUG-01…08 filed in `Bug_Reports.md` + `Main_Report.md` §5.5. Runtime extras beyond white-box reading: (a) race ends last-writer-wins with both 200s (TOCTOU amplifier, no torn state); (b) bad-token → 403 not 401 (noted, not filed); (c) Expo-web declined for documented SUT reasons — UI verdicts rest on code refs.
+
+---
+
+### Artifact 16: FR-20 execution + screenshots + bug reports (G9.3 Analyse)
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~16:00 16/10/2026 (UTC+07)
+- **Full Prompt (user):** Chặng 3B — execute all FR-20 TCs on live SUT: `scripts/exec_fr20.js` (transitions, IDOR, token, concurrency/double-tap); mobile web/viewport UI screenshots (`FR20_UI_*.png`); fill Actual/Status + summaries; per-bug screenshots; bugs into `Bug_Reports.md` + §5.5; log Artifact 16; commit `test(FR-20): execute test cases, capture screenshots, and document bug reports`.
+
+#### (2) AI Output
+
+- `scripts/exec_fr20.js` (25 steps; mobA/B/C/D users; admin-driven state setup; parallel race + double-tap; id±1/garbage sweeps; 1- and 15-order histories; bad-token probe; test orders deleted, F9 = 0 left) → `scripts/exec_fr20_results.json`; `scripts/fr20_evidence.html` → `screenshots/FR20_API_EVIDENCE.png` (measured evidence + code-ref panel).
+- No `FR20_UI_*.png`: Expo-web boot requires react-native-web/react-dom (absent from SUT deps — installing = SUT modification, declined) and the app hardcodes unreachable 192.168.10.13; mobile UI verdicts grounded in exact App.js line refs instead (disclosed in §5.5 + evidence footer).
+- `Main_Report.md` §5.2.3/§5.3.3/§5.4.3: all 38 TCs filled — **24 PASSED, 14 FAILED**; §5.5: 8 bugs FR20-BUG-01…08; summaries (Main + README): Designed 175 / Executed 175 / Passed 84 / Failed 91 / Bugs 38.
+- `Bug_Reports.md`: 8 issues (env, pre-conditions, repro, expected/actual, severity, evidence, TC links). GitHub Issue links left TODO (group repo unknown — student files with PNG).
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before finalization).** API statuses derive from measured transcript values (quoted verbatim); every FAILED maps to a filed bug; UI verdicts cite exact code lines (no UI claim without a ref); the missing Expo screenshots are disclosed with reasons, not silently skipped; cleanup verified (0 test orders left).
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §5 and HW02 bug-reporting rules: lifecycle verdicts rest on DB-observed end-states (not response codes alone — the race TC proves why); the evidence split (live transcript vs code refs) is labeled per TC and per bug, so the report never presents a code reading as a runtime measurement.
+
+#### (5) Student Fix
+
+- Student to review at finalization gate: confirm severity set (esp. BUG-01/02 High calls, UI Lows), file the 8 issues on the group repo and paste links, shoot Expo-Go footage on a real device for the demo video, then approve Giai đoạn Hoàn thiện (Critique, git log, zip).
 - Execution confirms Artifact 11 in full (16/10/2026): 10 bugs FR16-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §4.5. Runtime extras beyond white-box reading: (a) NULL-price acceptance (missing key → NULL, not just unvalidated values); (b) whitespace-name leftover id 17 (cleanup gap closed manually, script hardened with `TRIM(name) = ''`); (c) 100-row batch in 1684ms (no perf issue — scale TC passes).
 
 ---

@@ -235,10 +235,61 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** no length cap (schema has none).
 - **Severity:** Low. **Related TCs:** BVA-19, GAP-10.
 
-## FR-20 — Mobile
+## FR-20 — Mobile (executed 16/10/2026, 38 TCs: 24 passed / 14 failed → 8 bugs)
 
-> TODO.
+Runner: `scripts/exec_fr20.js` → transcript `scripts/exec_fr20_results.json` (25 steps; users mobA/B/C/D; test orders deleted, F9 = 0 left).
+Screenshot: `screenshots/FR20_API_EVIDENCE.png` (measured lifecycle evidence + code-ref panel for mobile UI claims).
+Mobile UI not booted (Expo-web declined: SUT lacks react-native-web/react-dom and hardcodes unreachable 192.168.10.13) — UI verdicts rest on exact App.js line refs; re-shoot on device for demo video.
+GitHub Issue links: TODO — file on group repo with PNG attached.
 
-| Issue | Title | Severity | Status | Link |
-| :--- | :--- | :--- | :--- | :--- |
-| — | — | — | — | — |
+### FR20-BUG-01 — [High] User cancel from `shipping` allowed (+ race TOCTOU amplifier)
+- **Environment:** backend localhost:3000, `scripts/exec_fr20.js`
+- **Pre-conditions:** own order moved to `shipping` via admin transitions
+- **Steps:** user PUT /api/orders/:id/cancel → 200, status `canceled` (D04); seconds-fresh shipment likewise (V02). Parallel user-cancel ∥ admin-ship on `confirmed` → 200 + 200, final `shipping` (V03, last-writer-wins, no transaction).
+- **Expected:** user cancel rejected from `shipping` (FR-10); race must not silently override a just-placed cancel.
+- **Actual:** allowed; code comment admits the gate should be pending/confirmed-only. Root: `server.js:328-342`.
+- **Severity/Priority:** High / P1 (shipped goods cancellable by buyer).
+- **Attachments:** `screenshots/FR20_API_EVIDENCE.png`. **Related TCs:** DOM-04, BVA-02/03, GAP-01/06.
+
+### FR20-BUG-02 — [High] Cancel does not refund coupon usage (stays consumed)
+- **Steps:** VIP100 order (`used` 0→1 via /api/coupon-usage) → user cancel → 200 → `used` still 1 (D15).
+- **Expected (student standard):** successful cancel refunds (`used − 1`).
+- **Actual:** no compensation logic at all (single UPDATE). Root: `server.js:333-340`. (No stock system exists — verified via schema.)
+- **Severity:** High (paid discount lost on every canceled coupon order).
+- **Related TCs:** DOM-15, GAP-02.
+
+### FR20-BUG-03 — [Medium] Mobile cancel has no confirmation dialog (tap → PUT)
+- **Steps:** code inspection — `onPress={() => cancelOrder(o.id)}` fires PUT immediately; only post-hoc success/error Alerts.
+- **Expected:** confirm dialog before destructive cancel (FR-24).
+- **Actual:** one accidental tap cancels the order. Root: `App.js:312-329,961-968`.
+- **Severity:** Medium. **Related TCs:** DOM-09, GAP-04.
+
+### FR20-BUG-04 — [Medium] Mobile order statuses have no color coding (FR-11)
+- **Steps:** code inspection — status rendered as plain `<Text>`; Vietnamese labels exist but zero color rules.
+- **Expected:** clearly distinguished colors per status (FR-11).
+- **Actual:** monochrome list. Root: `App.js:960,1240-1248`.
+- **Severity:** Medium. **Related TCs:** DOM-03/13, GAP-08.
+
+### FR20-BUG-05 — [Low] Empty order history is text-only, no illustration (FR-24 partial)
+- **Steps:** code inspection — `orders.length === 0` renders bare text `"Bạn chưa có đơn hàng nào."`.
+- **Expected:** illustration/icon + friendly message.
+- **Actual:** message text holds; illustration missing. Root: `App.js:947-949`.
+- **Severity:** Low. **Related TCs:** DOM-12, GAP-09.
+
+### FR20-BUG-06 — [Low] No loading indicator on mobile cancel
+- **Steps:** code inspection — `cancelOrder` has no loading state (contrast: checkout flow has `checkoutLoading`).
+- **Expected:** loading feedback during the async cancel (FR-24).
+- **Actual:** silent tap → delayed Alert. Root: `App.js:312-329`.
+- **Severity:** Low. **Related TCs:** DOM-11.
+
+### FR20-BUG-07 — [Low] History cards omit item lines; logout labeled `"Thoát"` (FR-23)
+- **Steps:** code inspection — order card shows id/date/total/status + cancel button, no product lines; profile logout button reads `"Thoát"`.
+- **Expected:** item lines per order (FR-08-style completeness); `"Đăng xuất"` label (FR-23).
+- **Actual:** neither. Root: `App.js:940-968`.
+- **Severity:** Low. **Related TCs:** DOM-13, GAP-10.
+
+### FR20-BUG-08 — [Low] Mobile API base hardcoded to LAN IP (env portability)
+- **Steps:** code inspection — `const API_URL = "http://192.168.10.13:3000/api"`; this machine has no such interface, so the app cannot reach any backend off that LAN.
+- **Expected:** configurable base (env/flavor).
+- **Actual:** hardcoded IP. Root: `App.js:16`.
+- **Severity:** Low. **Related TCs:** GAP-10.
