@@ -242,13 +242,13 @@ Screenshot: `screenshots/FR20_API_EVIDENCE.png` (measured lifecycle evidence + c
 Mobile UI not booted (Expo-web declined: SUT lacks react-native-web/react-dom and hardcodes unreachable 192.168.10.13) — UI verdicts rest on exact App.js line refs; re-shoot on device for demo video.
 GitHub Issue links: TODO — file on group repo with PNG attached.
 
-### FR20-BUG-01 — [High] User cancel from `shipping` allowed (+ race TOCTOU amplifier)
+### FR20-BUG-01 — [Critical] User cancel from `shipping` allowed (+ race TOCTOU amplifier)
 - **Environment:** backend localhost:3000, `scripts/exec_fr20.js`
 - **Pre-conditions:** own order moved to `shipping` via admin transitions
 - **Steps:** user PUT /api/orders/:id/cancel → 200, status `canceled` (D04); seconds-fresh shipment likewise (V02). Parallel user-cancel ∥ admin-ship on `confirmed` → 200 + 200, final `shipping` (V03, last-writer-wins, no transaction).
 - **Expected:** user cancel rejected from `shipping` (FR-10); race must not silently override a just-placed cancel.
 - **Actual:** allowed; code comment admits the gate should be pending/confirmed-only. Root: `server.js:328-342`.
-- **Severity/Priority:** High / P1 (shipped goods cancellable by buyer).
+- **Severity/Priority:** Critical / P1 (shipped goods cancellable by buyer; state machine breached + race amplifier).
 - **Attachments:** `screenshots/FR20_API_EVIDENCE.png`. **Related TCs:** DOM-04, BVA-02/03, GAP-01/06.
 
 ### FR20-BUG-02 — [High] Cancel does not refund coupon usage (stays consumed)

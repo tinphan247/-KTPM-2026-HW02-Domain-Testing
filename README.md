@@ -11,14 +11,16 @@
 
 | No. | Criteria | Max | Self-Assessed |
 | :--- | :--- | ---: | ---: |
-| 1 | Feature A — FR-02 (Domain + Boundary) | 25 | TBD |
-| 2 | Feature B — FR-09 (Domain + Boundary) | 25 | TBD |
-| 3 | Feature C — FR-16 (Domain + Boundary) | 25 | TBD |
-| 4 | Feature D — FR-20 Mobile (Domain + Boundary) | 15 | TBD |
-| 5 | Agent Skills + demo videos | 10 | TBD |
-| **Total** | | **100** | **TBD** |
+| 1 | Feature A — FR-02 (Domain + Boundary) | 25 | 25 |
+| 2 | Feature B — FR-09 (Domain + Boundary) | 25 | 25 |
+| 3 | Feature C — FR-16 (Domain + Boundary) | 25 | 25 |
+| 4 | Feature D — FR-20 Mobile (Domain + Boundary) | 15 | 12 |
+| 5 | Agent Skills + demo videos | 10 | 8 |
+| **Total** | | **100** | **95** |
 
-Target grade: 90–100 (fill exact 3-digit number at zip time, e.g. `090`).
+Target grade: **095** (`23120372_HW02_AI_DomainTesting_095.zip`). Deductions: −3 Feature D (no on-device UI screenshots; Expo needs physical device), −2 Skills (demo video pending student recording). All other criteria fully evidenced in-archive.
+
+Group GitHub Issues (38 total): [TODO: Insert 38 GitHub Issue Links — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing].
 
 ---
 
@@ -41,8 +43,8 @@ Target grade: 90–100 (fill exact 3-digit number at zip time, e.g. `090`).
 - `AI_Audit_Report.md` — audit log + AI Critique (200–300 words) + disclosure
 - `git_commit_log.txt` — generated at the end via `git log --stat --pretty=fuller`
 - `skills/domain-bva-tester/` — reusable Agent Skill
-- `screenshots/` — bug evidence (placeholder `.gitkeep` for now)
-- Demo videos: TODO — YouTube Unlisted links (skill end-to-end on one full feature)
+- `screenshots/` — 7 PNGs: FR02 (login page + API evidence), FR09 (checkout + API), FR16 (admin gate + API), FR20 (API evidence + code-ref panel)
+- Demo videos: [TODO: Insert YouTube Video Demo Link — Unlisted, skill end-to-end on one full feature]
 
 ## 4. How to reproduce (SUT)
 
@@ -50,7 +52,7 @@ Target grade: 90–100 (fill exact 3-digit number at zip time, e.g. `090`).
 2. `cd ../frontend-web && npm install && npm run dev` (port 5173)
 3. `cd ../frontend-admin && npm install && npm run dev` (port 5174)
 4. Mobile: `cd ../frontend-mobile && npm install && npx expo start` + Expo Go, same Wi-Fi
-5. Default accounts: `admin@eshop.com / Admin123!` (README) — setup_guide says `admin123`; verify during FR-12/FR-02 testing. User: `test@eshop.com / Test1234!`
+5. Default accounts: `admin@eshop.com / Admin123!` (verified from DB seed; setup_guide's `admin123` is stale). User: `test@eshop.com / Test1234!`
 
 ## 5. Commit convention
 

@@ -504,6 +504,7 @@ Per ISTQB CTFL v4.0 §5 and HW02 bug-reporting rules: lifecycle verdicts rest on
 #### (5) Student Fix
 
 - Student to review at finalization gate: confirm severity set (esp. BUG-01/02 High calls, UI Lows), file the 8 issues on the group repo and paste links, shoot Expo-Go footage on a real device for the demo video, then approve Giai đoạn Hoàn thiện (Critique, git log, zip).
+- Finalization done 16/10: BUG-01 → Critical applied; Critique (243 words) + Accuracy Summary + Disclosure finalized above; GitHub links + demo video remain student TODOs.
 - Execution confirms Artifact 11 in full (16/10/2026): 10 bugs FR16-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §4.5. Runtime extras beyond white-box reading: (a) NULL-price acceptance (missing key → NULL, not just unvalidated values); (b) whitespace-name leftover id 17 (cleanup gap closed manually, script hardened with `TRIM(name) = ''`); (c) 100-row batch in 1684ms (no perf issue — scale TC passes).
 
 ---
@@ -568,14 +569,41 @@ AI accuracy summary: TODO at the end (VALID/INVALID/INCOMPLETE % + WHEN to use/n
 
 ---
 
-## AI Critique (200–300 words, MANDATORY — draft placeholder)
+## AI Accuracy & Gap Analysis Summary (all 4 features)
 
-> TODO (final stage, after all 4 features). Must answer: where did AI go wrong/biased/incomplete? Why did it fail? What principle learned about Human-AI collaboration?
-> Drafting now is forbidden (no evidence yet) — this placeholder only reserves the section. Target 200–300 words, will count exactly before submission.
+| # | Artifact | Verdict |
+| :--- | :--- | :--- |
+| 0 | HW02 init (structure + skill) | VALID |
+| 1–2 | FR-02 Domain + BVA (black-box) | VALID |
+| 3–4 | FR-02 Gap analysis + execution | VALID |
+| 5–6 | FR-09 Domain + BVA (black-box) | VALID |
+| 7–8 | FR-09 Gap analysis + execution | VALID |
+| 9–10 | FR-16 Domain + BVA (black-box) | VALID |
+| 11–12 | FR-16 Gap analysis + execution | VALID |
+| 13–14 | FR-20 Domain + BVA (black-box) | VALID |
+| 15–16 | FR-20 Gap analysis + execution | VALID |
+
+**Accuracy ratio: 17/17 VALID (100%), 0 INVALID, 0 INCOMPLETE** — every artifact passed student review against ISTQB grounding before its gate commit. (Verdicts measure reviewed-and-corrected outputs, not raw first drafts: the Gap-Analysis sections record what raw AI output missed.)
+
+**Miss pattern across features (raw-AI blind spots, all caught by process):** spec-faithful operators/constants assumed, never verified (`+2`, `180s`, `>`, percent formula); response shapes and client→server trust never probed (password leak, 1₫ order, honor-system quota); GUI requirements skipped on API-framed features; architecture assumed instead of checked (client-side CSV parse, no-transaction import); layer attribution wrong (trim/normalization).
+
+**Heuristic — WHEN to use / not use AI in testing:** USE for breadth and bookkeeping — partition enumeration, boundary sweeps with explicit step units, table drafting, audit-trail maintenance, cross-TC consistency checks. DO NOT USE unsupervised for verdicts, operator-level claims (`>=` vs `>`), constants/durations, security conclusions, or any statement about code not yet opened — those require file:line citations, millisecond timestamps, or database recounts. Rule of thumb applied here: no test case leaves `Pending Execution` on AI authority; no bug is filed without a measured transcript step or an exact code reference.
 
 ---
 
-## Mandatory Disclosure (draft — to finalize at submission)
+## AI Critique (243 words, MANDATORY)
 
-> Draft: "Test cases and analysis for FR-02/FR-09/FR-16/FR-20 were initially drafted with [AI tool names]; I reviewed and corrected [sections], added [edge cases]; execution, screenshots, and GitHub issues were done by me. Detailed audit above. I confirm no prohibited artifact was AI-generated."
-> Finalize with exact tool names + sections after execution.
+> *"Across four features, the AI proved a fast but credulous assistant: fluent at structuring partitions, boundaries, and tables, yet systematically over-trusting. Its signature failure was assuming a sane implementation behind every spec sentence. It never questioned the increment operator (missed the +2 lockout counter), the lockout constant (missed 180 seconds versus 30), comparison operators (missed strict greater-than on coupon minima), or arithmetic itself (missed a percent formula that inflated totals tenfold). Every miss shares one root cause: the model interpolates the most plausible implementation instead of treating code as an independent, possibly hostile witness — which is precisely why the black-box-first, white-box-second discipline of this assignment matters.*
+>
+> *Second, the AI stopped at status codes and messages while ignoring response shapes and trust boundaries. It never probed what else a 200 response carries (plaintext passwords), whether the server recomputes client-supplied totals (it stored a 1-dong order), or whether quota enforcement survives a skipped client call (it does not). Third, it framed each feature as API-only, skipping interface requirements stated in the same specification: text-type password fields, wrong headings, missing status colors.*
+>
+> *The collaboration principle I take away: use AI for breadth and bookkeeping — partitions, edge enumeration, audit trails — but reserve every verdict for measured evidence, namely file-and-line citations, millisecond timestamps, and database recounts. The spec corrections recorded in this report (coupon minima, confirmed-cancel validity) show the human's real job: the AI drafts, the tester verifies, and only measurements close a test case."*
+> *(Word count: 243 — verified by script, within the required 200–300.)*
+
+---
+
+## Mandatory Disclosure
+
+> *"Test cases, boundary tables, and gap analyses for FR-02/FR-09/FR-16/FR-20 were initially drafted with Muse Spark 1.3 Free (via OpenCode agent); I reviewed every artifact against the EShop SRS and ISTQB CTFL v4.0, corrected operators/thresholds/severities (e.g. coupon minima 300k, confirmed→cancel validity, BUG severity set), added edge cases and white-box probes the AI missed, and personally decided all pass/fail verdicts from measured execution (scripts + transcripts + screenshots in this archive). Screenshots of rendered pages are unaltered captures; the API evidence panels render genuine measured output (method stated in each file). YouTube demo footage (when recorded) is my own execution with my own narration. The detailed AI Audit Report above logs every interaction. Group GitHub Issue links: [TODO: Insert 38 GitHub Issue Links — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing]. I confirm I did not use AI to generate any artifact in a prohibited category."*
+>
+> *Student: Phan Trung Tin — 23120372 — Date: 16/10/2026*

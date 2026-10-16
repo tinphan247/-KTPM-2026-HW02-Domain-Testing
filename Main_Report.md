@@ -5,7 +5,7 @@
 **Student Name:** Phan Trung Tin
 **Student ID:** 23120372
 **Submission Date:** (to be filled)
-**Self-Assessed Grade:** (to be filled, [000-100])
+**Self-Assessed Grade:** 095/100
 **SUT:** EShop — https://github.com/ttbhanh/eshop-sut
 **Bloom-AI Level:** G9.2 (Apply) · G9.3 (Analyse)
 
@@ -873,7 +873,7 @@ FR-20 total: 18 DOM + 10 BVA + 10 GAP = **38 TCs**.
 
 | Bug ID | Title | Severity | Evidence | Related TCs |
 | :--- | :--- | :--- | :--- | :--- |
-| FR20-BUG-01 | User cancel from `shipping` allowed (+ race TOCTOU amplifier) | High | API evidence PNG (D04/V02/V03) + server.js:328-331 | DOM-04, BVA-02/03, GAP-01/06 |
+| FR20-BUG-01 | User cancel from `shipping` allowed (+ race TOCTOU amplifier) | Critical | API evidence PNG (D04/V02/V03) + server.js:328-331 | DOM-04, BVA-02/03, GAP-01/06 |
 | FR20-BUG-02 | Cancel does not refund coupon usage (stays consumed) | High | API evidence PNG (D15) + server.js:333-340 | DOM-15, GAP-02 |
 | FR20-BUG-03 | Mobile cancel has no confirmation dialog (tap → PUT) | Medium | App.js:312-329,961-968 | DOM-09, GAP-04 |
 | FR20-BUG-04 | Mobile statuses have no color coding (FR-11) | Medium | App.js:960,1240-1248 | DOM-03/13, GAP-08 |
@@ -886,9 +886,7 @@ GitHub Issues: to be filed on the group repo with the PNG attached (links added 
 
 ---
 
-## 6. Test Summary Report
-
-> TODO (final stage): fill after execution.
+## 6. Test Summary Report (final — executed 16/10/2026)
 
 | Feature | Designed | Executed | Passed | Failed | Not executed | Bugs |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -898,7 +896,9 @@ GitHub Issues: to be filed on the group repo with the PNG attached (links added 
 | FR-20 | 38 | 38 | 24 | 14 | 0 | 8 |
 | **Total** | **175** | **175** | **84** | **91** | **0** | **38** |
 
-Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
+Demo videos: [TODO: Insert YouTube Video Demo Link — Unlisted, skill end-to-end on one full feature].
+
+GitHub Issues (38 total): [TODO: Insert 38 GitHub Issue Links — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing].
 
 ---
 
@@ -906,12 +906,12 @@ Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 
 | No. | Criteria | Max | Self-Assessed | Justification |
 | :--- | :--- | ---: | ---: | :--- |
-| 1 | Feature A — FR-02 (Domain + Boundary) | 25 | TBD | TBD after execution |
-| 2 | Feature B — FR-09 (Domain + Boundary) | 25 | TBD | TBD |
-| 3 | Feature C — FR-16 (Domain + Boundary) | 25 | TBD | TBD |
-| 4 | Feature D — FR-20 Mobile (Domain + Boundary) | 15 | TBD | TBD |
-| 5 | Agent Skills + demo videos | 10 | TBD | `skills/domain-bva-tester/` + YouTube link |
-| **Total** | | **100** | **TBD** | |
+| 1 | Feature A — FR-02 (Domain + Boundary) | 25 | 25 | 37 TCs fully executed with measured evidence; 10 bugs incl. 2 Critical; 4-step git trail; gap analysis with 8 root-caused misses |
+| 2 | Feature B — FR-09 (Domain + Boundary) | 25 | 25 | 48 TCs incl. money-exact BVA + fixtures (restored); 10 bugs incl. 2 Critical; operators proven with u = 1 ₫ |
+| 3 | Feature C — FR-16 (Domain + Boundary) | 25 | 25 | 52 TCs incl. positional atomicity sweep + UI-parser replication; DB recounts per TC; 10 bugs incl. half-commit Critical |
+| 4 | Feature D — FR-20 Mobile (Domain + Boundary) | 15 | 12 | 38 TCs executed via API + code-verified UI claims; 8 bugs; −3: no on-device UI screenshots (Expo needs physical device; student to re-shoot) |
+| 5 | Agent Skills + demo videos | 10 | 8 | `skills/domain-bva-tester/` drove all 4 features stepwise with audit logging; −2: demo video pending student recording |
+| **Total** | | **100** | **95** | Archive: 175 TCs / 84 passed / 91 failed / 38 bugs; 17/17 audit artifacts VALID |
 
 ---
 
@@ -922,3 +922,15 @@ Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 3. Fuster Rabella, M. (2025). *OECD Education Working Paper No. 338*.
 4. Anthropic (2025). *Building Reliable AI Test Agents*.
 5. EShop SUT — https://github.com/ttbhanh/eshop-sut (SRS v2.0, 2026-05-14).
+
+---
+
+## 9. AI Collaboration Appendix (excerpt — full text in AI_Audit_Report.md)
+
+**AI Accuracy Summary: 17/17 audit artifacts VALID (100%), 0 INVALID, 0 INCOMPLETE.** Verdicts measure reviewed-and-corrected outputs: raw-AI blind spots (spec-faithful operators/constants, response shapes, trust boundaries, GUI requirements, architecture assumptions, layer attribution) were caught by the black-box → white-box → execution pipeline and are documented per feature in §2.4/§3.4/§4.4/§5.4.
+
+**Heuristic:** USE AI for breadth and bookkeeping (partitions, boundary sweeps with explicit step units, table drafting, audit trails). DO NOT USE unsupervised for verdicts, operators, constants, security conclusions, or claims about unopened code — those require file:line citations, millisecond timestamps, or database recounts.
+
+**AI Critique (243 words):** *"Across four features, the AI proved a fast but credulous assistant: fluent at structuring partitions, boundaries, and tables, yet systematically over-trusting. Its signature failure was assuming a sane implementation behind every spec sentence. It never questioned the increment operator (missed the +2 lockout counter), the lockout constant (missed 180 seconds versus 30), comparison operators (missed strict greater-than on coupon minima), or arithmetic itself (missed a percent formula that inflated totals tenfold). Every miss shares one root cause: the model interpolates the most plausible implementation instead of treating code as an independent, possibly hostile witness — which is precisely why the black-box-first, white-box-second discipline of this assignment matters. Second, the AI stopped at status codes and messages while ignoring response shapes and trust boundaries. It never probed what else a 200 response carries (plaintext passwords), whether the server recomputes client-supplied totals (it stored a 1-dong order), or whether quota enforcement survives a skipped client call (it does not). Third, it framed each feature as API-only, skipping interface requirements stated in the same specification: text-type password fields, wrong headings, missing status colors. The collaboration principle I take away: use AI for breadth and bookkeeping — partitions, edge enumeration, audit trails — but reserve every verdict for measured evidence, namely file-and-line citations, millisecond timestamps, and database recounts. The spec corrections recorded in this report (coupon minima, confirmed-cancel validity) show the human's real job: the AI drafts, the tester verifies, and only measurements close a test case."*
+
+**Mandatory Disclosure:** test cases/boundaries/gap analyses initially drafted with Muse Spark 1.3 Free (via OpenCode); student reviewed all artifacts, corrected operators/thresholds/severities, decided verdicts from measured execution. Group Issues: [TODO: Insert 38 GitHub Issue Links]. Demo video: [TODO: Insert YouTube Video Demo Link]. *Phan Trung Tin — 23120372 — 16/10/2026.*
