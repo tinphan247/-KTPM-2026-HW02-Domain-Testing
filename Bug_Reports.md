@@ -25,13 +25,74 @@ Related TCs: <TC IDs>
 
 ---
 
-## FR-02 — Login & Lockout
+## FR-02 — Login & Lockout (executed 16/10/2026, 37 TCs: 13 passed / 24 failed → 10 bugs)
 
-> TODO: filed after execution.
+Runner: `scripts/exec_fr02.js` → transcript `scripts/exec_fr02_results.json` (25 steps).
+Screenshots: `screenshots/FR02_UI_LOGIN_PAGE.png` (real page), `screenshots/FR02_API_EVIDENCE.png` (rendered from measured output — method disclosed).
+GitHub Issue links: TODO — file on group repo with PNGs attached.
 
-| Issue | Title | Severity | Status | Link |
-| :--- | :--- | :--- | :--- | :--- |
-| — | — | — | — | — |
+### FR02-BUG-01 — [Critical] Fail counter increments by +2, lockout fires on 2nd fail (spec: +1, lock on 3rd)
+- **Environment:** backend localhost:3000 (commit: eshop-sut main 16/10/2026), `scripts/exec_fr02.js` accounts `exec*`
+- **Pre-conditions:** fresh account, `login_attempts = 0`
+- **Steps:** 1. POST /api/login wrong pwd → 401, DB `attempts = 2` (A1). 2. POST wrong pwd again → 401, `attempts = 4`, `locked_until` set (A2). 3. POST correct pwd → 403 (F2).
+- **Expected:** +1 per fail (spec "đúng 1 đơn vị"); lock only on 3rd consecutive fail.
+- **Actual:** +2 per fail; locked on 2nd fail. Root: `server.js:54` (`login_attempts + 2`).
+- **Severity/Priority:** Critical / P1 (legit users locked after 2 typos; brute-force math broken)
+- **Attachments:** `screenshots/FR02_API_EVIDENCE.png` (A1/A2/F2). **Related TCs:** DOM-05/07/08/12, BVA-01/02/04/13, GAP-01.
+
+### FR02-BUG-02 — [High] Lockout lasts ~180s instead of spec 30s
+- **Steps:** lock account (2 wrongs) → read `locked_until − now` = **179 377 ms**; correct-pwd probes at 15/29/30/31s all → 403 (G1–G4).
+- **Expected:** 30s lockout (demo env).
+- **Actual:** ~180s. Root: `server.js:57` (`Date.now() + 180000`).
+- **Severity:** High. **Attachments:** `FR02_API_EVIDENCE.png`. **Related TCs:** DOM-08/10, BVA-05…09, GAP-02.
+
+### FR02-BUG-03 — [High] Empty password counted as failed attempt (+2)
+- **Steps:** fresh account (attempts 2) → POST empty password → 401, attempts 2→4 (C3).
+- **Expected (student-confirmed):** validation error, counter unchanged.
+- **Actual:** counted toward lockout. Root: no validation, `server.js:46-54`.
+- **Severity:** High. **Related TCs:** DOM-06, GAP-03.
+
+### FR02-BUG-04 — [High] Stale counter: first wrong attempt after expiry instantly re-arms lock
+- **Steps:** lock → simulate expiry (DB `locked_until` → past, disclosed) → POST wrong pwd → 401, attempts 4→**6**, `locked_until` re-armed (B1).
+- **Expected:** fresh-window fail #1 (counter = 1).
+- **Actual:** instant relock; counter never resets except on success. Root: `server.js:54-62`.
+- **Severity:** High. **Related TCs:** BVA-09, GAP-04.
+
+### FR02-BUG-05 — [High/Security] Plaintext password in login + /users/me responses; plaintext storage (SEC-01)
+- **Steps:** successful login → response JSON contains `"password":"Cx123456!"` (A5); `GET /api/users/me` also returns `password` (A6); DB stores raw passwords (seed `Test1234!`, register inserts raw).
+- **Expected:** never return/store plaintext passwords.
+- **Actual:** leaked in two endpoints + stored plaintext. Root: `server.js:52`, `server.js:20-30`, `database.js:92-93`.
+- **Severity:** High (Security). **Related TCs:** GAP-05.
+
+### FR02-BUG-06 — [Medium] No email normalization — uppercase / spaced emails rejected
+- **Steps:** `TEST@ESHOP.COM` + correct pwd → 401 (D1); `␣test@eshop.com␣` → 401 (D2).
+- **Expected (student standard):** case-insensitive + auto-trim accept.
+- **Actual:** exact-match only (`WHERE email = ?`, `server.js:35`).
+- **Severity:** Medium (usability; spec-silent → spec gap + defect). **Related TCs:** DOM-13/14, GAP-06/07.
+
+### FR02-BUG-07 — [Medium] Login form uses `type="text"` for email AND password (password visible)
+- **Steps:** open `/login` → inspect inputs.
+- **Expected:** email `type="email"` (FR-02), password `type="password"` (FR-22).
+- **Actual:** both `type="text"` (`Login.jsx:30,40`).
+- **Severity:** Medium (shoulder-surfing + no HTML5 validation). **Attachments:** `FR02_UI_LOGIN_PAGE.png`. **Related TCs:** GAP-08.
+
+### FR02-BUG-08 — [Low] Login page i18n/structure/feedback violations + lockout state swallowed
+- **Steps:** open `/login` (see screenshot); trigger lockout → UI always shows generic `"Đăng nhập thất bại..."`.
+- **Expected:** Vietnamese `<h1>` title, error above submit (FR-22), natural tab order (FR-21), visible lockout state.
+- **Actual:** heading `"Đăng Ký"` in `<h2>`, labels `Username` / button `Sign In` (EN), error div below form, submit `tabIndex={1}`, 403 detail swallowed (`Login.jsx:24,53-66`).
+- **Severity:** Low. **Attachments:** `FR02_UI_LOGIN_PAGE.png`. **Related TCs:** GAP-09.
+
+### FR02-BUG-09 — [Medium/Security] JWT never expires + hardcoded secret in source
+- **Steps:** code inspection; decode login JWT → no `exp` claim.
+- **Expected:** expiring tokens, secret out of source.
+- **Actual:** `jwt.sign({id, role}, SECRET_KEY)`, `SECRET_KEY = "super_secret_key_that_should_not_be_here"` (`server.js:9,51`).
+- **Severity:** Medium (Security). **Related TCs:** — (inspection).
+
+### FR02-BUG-10 — [Medium] Lost update: two concurrent fails collapse 0→2
+- **Steps:** fresh account → two parallel wrong-password POSTs → DB `attempts = 2` instead of 4 (F1).
+- **Expected:** each fail counted (≥ +1 each under any increment rule).
+- **Actual:** read-modify-write race + fire-and-forget `db.run` (`server.js:54-62`).
+- **Severity:** Medium (robustness; weakens lockout under double-click/attacker parallelism). **Related TCs:** BVA-13.
 
 ## FR-09 — Coupons
 

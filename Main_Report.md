@@ -101,21 +101,21 @@ Group non-duplication: confirmed with group members (to be listed in final versi
 
 | TC_ID | Partition / combination | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| TC-FR02-DOM-01 | All-VP happy path | `test@eshop.com` / `Test1234!` | Fresh seed account, 0 fails, active | 1. Open login 2. Enter creds 3. Submit | Login success, JWT returned (`Authorization: Bearer <token>`) | — | Pending Execution |
-| TC-FR02-DOM-02 | IP1.1 bad format | `testeshop.com` / `Test1234!` | Active account | Submit login | Rejected (HTML5 `type=email` block or server 400); must not authenticate | — | Pending Execution |
-| TC-FR02-DOM-03 | IP1.3 + IP5.2 empty | `` / `` | Active account | Submit login | Rejected, required-field handling | — | Pending Execution |
-| TC-FR02-DOM-04 | IP2.1 unregistered | `nouser999@eshop.com` / `Any123!x` | Email not in DB | Submit login | Generic error only — indistinguishable from wrong-password message (no existence leak) | — | Pending Execution |
-| TC-FR02-DOM-05 | VP2.1 + IP5.1 first fail | `test@eshop.com` / `Wrong123!` | 0 prior fails | Submit login | Generic error; `failed_attempts` = 1 | — | Pending Execution |
-| TC-FR02-DOM-06 | IP5.2 empty password | `test@eshop.com` / `` | 0 prior fails | Submit login | Validation error (HTTP 400 / blocked at form); `failed_attempts` NOT incremented — if backend counts it as a fail toward lockout, log as defect (student decision 16/10) | — | Pending Execution |
-| TC-FR02-DOM-07 | VP6.2 below threshold | `test@eshop.com` / `Wrong123!` | 1 prior consecutive fail | Submit login | Generic error; counter = 2; account still NOT locked | — | Pending Execution |
-| TC-FR02-DOM-08 | IP6.1 threshold reached | `test@eshop.com` / `Wrong123!` | 2 prior consecutive fails | Submit login (3rd fail) | Account locked for 30s; lockout message | — | Pending Execution |
-| TC-FR02-DOM-09 | IP8.1 + IP7.1 locked, correct creds | `test@eshop.com` / `Test1234!` | Account just locked | Submit immediately | Still rejected — lock takes precedence over correct password | — | Pending Execution |
-| TC-FR02-DOM-10 | VP7.1 lock expired | `test@eshop.com` / `Test1234!` | Locked, then wait 60s | Submit after wait | Login success (lock lifted) | — | Pending Execution |
-| TC-FR02-DOM-11 | Counter reset on success ★ Gap-analysis focus | `test@eshop.com` / `Test1234!` | 2 prior consecutive fails | Submit correct creds | Success AND consecutive-fail counter resets to 0 ("consecutive" per spec — student-confirmed 16/10) | — | Pending Execution |
-| TC-FR02-DOM-12 | Post-reset threshold ★ Gap-analysis focus | `test@eshop.com` / `Wrong123!` ×2 | Right after DOM-11 success | Fail twice | Generic errors, counter = 2, NOT locked (proves reset) | — | Pending Execution |
-| TC-FR02-DOM-13 | SP3.1 case variant | `TEST@ESHOP.COM` / `Test1234!` | Active account | Submit login | Student standard: expect case-insensitive accept; record actual at execution | — | Pending Execution |
-| TC-FR02-DOM-14 | SP4.1 surrounding spaces | `␣test@eshop.com␣` / `Test1234!` | Active account | Submit login | Student standard: expect auto-trim accept; record actual at execution | — | Pending Execution |
-| TC-FR02-DOM-15 | Message uniformity (O-domain) | wrong-pwd vs unregistered-email | Clean state | Run DOM-04 vs DOM-05, compare responses | Both responses identical in text + HTTP status (no cause leak) | — | Pending Execution |
+| TC-FR02-DOM-01 | All-VP happy path | `test@eshop.com` / `Test1234!` | Fresh seed account, 0 fails, active | 1. Open login 2. Enter creds 3. Submit | Login success, JWT returned (`Authorization: Bearer <token>`) | 200 + JWT (D3-seed-happy-path) | PASSED |
+| TC-FR02-DOM-02 | IP1.1 bad format | `testeshop.com` / `Test1234!` | Active account | Submit login | Rejected (HTML5 `type=email` block or server 400); must not authenticate | 401, not authenticated (C1). Note: UI uses `type=text`, so no HTML5 block — server rejects | PASSED |
+| TC-FR02-DOM-03 | IP1.3 + IP5.2 empty | `` / `` | Active account | Submit login | Rejected, required-field handling | 401 at API (C2); UI blocks via `required` | PASSED |
+| TC-FR02-DOM-04 | IP2.1 unregistered | `nouser999@eshop.com` / `Any123!x` | Email not in DB | Submit login | Generic error only — indistinguishable from wrong-password message (no existence leak) | 401 identical message (C0) | PASSED |
+| TC-FR02-DOM-05 | VP2.1 + IP5.1 first fail | `test@eshop.com` / `Wrong123!` | 0 prior fails | Submit login | Generic error; `failed_attempts` = 1 | 401 but attempts = **2** (A1) → FR02-BUG-01 | FAILED |
+| TC-FR02-DOM-06 | IP5.2 empty password | `test@eshop.com` / `` | 0 prior fails | Submit login | Validation error (HTTP 400 / blocked at form); `failed_attempts` NOT incremented — if backend counts it as a fail toward lockout, log as defect (student decision 16/10) | 401, attempts 2→**4** (C3) → FR02-BUG-03 | FAILED |
+| TC-FR02-DOM-07 | VP6.2 below threshold | `test@eshop.com` / `Wrong123!` | 1 prior consecutive fail | Submit login | Generic error; counter = 2; account still NOT locked | 2nd fail → **locked**, attempts = 4 (A2) → FR02-BUG-01 | FAILED |
+| TC-FR02-DOM-08 | IP6.1 threshold reached | `test@eshop.com` / `Wrong123!` | 2 prior consecutive fails | Submit login (3rd fail) | Account locked for 30s; lockout message | Already locked since 2nd fail; 3rd submit → 403; duration **180s** not 30s → FR02-BUG-01/02 | FAILED |
+| TC-FR02-DOM-09 | IP8.1 + IP7.1 locked, correct creds | `test@eshop.com` / `Test1234!` | Account just locked | Submit immediately | Still rejected — lock takes precedence over correct password | 403 locked-message (A3) | PASSED |
+| TC-FR02-DOM-10 | VP7.1 lock expired | `test@eshop.com` / `Test1234!` | Locked, then wait 60s | Submit after wait | Login success (lock lifted) | Still 403 at 60s (180s lock); success only after ~180s/simulated expiry (A5, G4) → FR02-BUG-02 | FAILED |
+| TC-FR02-DOM-11 | Counter reset on success ★ Gap-analysis focus | `test@eshop.com` / `Test1234!` | 2 prior consecutive fails | Submit correct creds | Success AND consecutive-fail counter resets to 0 ("consecutive" per spec — student-confirmed 16/10) | 200, attempts reset to 0, `locked_until` NULL (A5/H1) | PASSED |
+| TC-FR02-DOM-12 | Post-reset threshold ★ Gap-analysis focus | `test@eshop.com` / `Wrong123!` ×2 | Right after DOM-11 success | Fail twice | Generic errors, counter = 2, NOT locked (proves reset) | 2 fails after reset → **locked**, attempts = 4 (H2) → FR02-BUG-01 | FAILED |
+| TC-FR02-DOM-13 | SP3.1 case variant | `TEST@ESHOP.COM` / `Test1234!` | Active account | Submit login | Student standard: expect case-insensitive accept; record actual at execution | 401 (D1) → FR02-BUG-06 | FAILED |
+| TC-FR02-DOM-14 | SP4.1 surrounding spaces | `␣test@eshop.com␣` / `Test1234!` | Active account | Submit login | Student standard: expect auto-trim accept; record actual at execution | 401 (D2) → FR02-BUG-06 | FAILED |
+| TC-FR02-DOM-15 | Message uniformity (O-domain) | wrong-pwd vs unregistered-email | Clean state | Run DOM-04 vs DOM-05, compare responses | Both responses identical in text + HTTP status (no cause leak) | 401/401 identical (C0). Note: 403-locked class differs once locked | PASSED |
 
 Deferred to BVA (§2.3): fail-count edges 2/3/4, lockout timing 29s/30s/31s, counter-increment exactness (+1, no double-count on double-click), email max-length (spec-silent).
 
@@ -173,21 +173,21 @@ Deferred to BVA (§2.3): fail-count edges 2/3/4, lockout timing 29s/30s/31s, cou
 
 | TC_ID | Boundary / point | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| TC-FR02-BVA-01 | B1 max- (2 fails) | `test@eshop.com` / `Wrong123!` | 1 prior consecutive fail | Submit (2nd fail) | Generic error; counter = 2; NOT locked | — | Pending Execution |
-| TC-FR02-BVA-02 | B1 threshold (3rd fail) | `test@eshop.com` / `Wrong123!` | 2 prior consecutive fails | Submit (3rd fail) | Locked 30s (proves `>= 3`, not `> 3`) | — | Pending Execution |
-| TC-FR02-BVA-03 | B1 max+ (4th submit, locked) | `test@eshop.com` / `Test1234!` | Just locked | Submit twice more | Still rejected; lock window NOT extended (no sliding-window relock) | — | Pending Execution |
-| TC-FR02-BVA-04 | B1×correct (3rd try correct) ★ | `test@eshop.com` / `Test1234!` | 2 prior consecutive fails | Submit correct creds | Success, no lock (threshold counts fails only), counter reset | — | Pending Execution |
-| TC-FR02-BVA-05 | B2 max- (29s) | correct creds | Locked 29s ago | Submit at 29s | Still rejected (locked) | — | Pending Execution |
-| TC-FR02-BVA-06 | B2 edge (30s) ★ | correct creds | Locked 30s ago | Submit at 30s | Operator determination: record accept/reject (`< 30` vs `<= 30`) | — | Pending Execution |
-| TC-FR02-BVA-07 | B2 max+ (31s) | correct creds | Locked 31s ago | Submit at 31s | Success (lock lifted) | — | Pending Execution |
-| TC-FR02-BVA-08 | B2 nom (15s) | correct creds | Locked 15s ago | Submit at 15s | Still rejected (mid-window hold) | — | Pending Execution |
-| TC-FR02-BVA-09 | B2×wrong (fail at 30s) ★ | `test@eshop.com` / `Wrong123!` | Lock just expired (~30s) | Submit wrong creds | Generic error as fresh-window fail #1 (counter = 1), NOT instant relock | — | Pending Execution |
-| TC-FR02-BVA-10 | B3 min+ (1 char) | `a` / `b` | Active account | Submit | Rejected (format/length); record counter behavior | — | Pending Execution |
-| TC-FR02-BVA-11 | B3 min- (7-char pwd) | `test@eshop.com` / `Abc123!` (7) | Active account | Submit | Generic wrong-password error (no length rule in FR-02); any client-side block recorded as extra-spec behavior | — | Pending Execution |
-| TC-FR02-BVA-12 | B3 max+ (1000 chars) | 1000-char email / 1000-char password | Active account | Submit | Graceful rejection, no 500/timeout/partial login | — | Pending Execution |
-| TC-FR02-BVA-13 | B4 increment exactness | `test@eshop.com` / `Wrong123!` | 0 prior fails | Double-click submit rapidly for ONE attempt | Counter = 1 (exactly +1, no double-count) | — | Pending Execution |
+| TC-FR02-BVA-01 | B1 max- (2 fails) | `test@eshop.com` / `Wrong123!` | 1 prior consecutive fail | Submit (2nd fail) | Generic error; counter = 2; NOT locked | 2nd fail → **locked**, counter = 4 (A2) → FR02-BUG-01 | FAILED |
+| TC-FR02-BVA-02 | B1 threshold (3rd fail) | `test@eshop.com` / `Wrong123!` | 2 prior consecutive fails | Submit (3rd fail) | Locked 30s (proves `>= 3`, not `> 3`) | Locks — but already on 2nd fail and for 180s → FR02-BUG-01/02 | FAILED |
+| TC-FR02-BVA-03 | B1 max+ (4th submit, locked) | `test@eshop.com` / `Test1234!` | Just locked | Submit twice more | Still rejected; lock window NOT extended (no sliding-window relock) | 403 + DB unchanged (A4) | PASSED |
+| TC-FR02-BVA-04 | B1×correct (3rd try correct) ★ | `test@eshop.com` / `Test1234!` | 2 prior consecutive fails | Submit correct creds | Success, no lock (threshold counts fails only), counter reset | 403 — locked since 2nd fail, correct-at-3rd impossible (F2) → FR02-BUG-01 | FAILED |
+| TC-FR02-BVA-05 | B2 max- (29s) | correct creds | Locked 29s ago | Submit at 29s | Still rejected (locked) | 403 at 29.0s (G2) | PASSED |
+| TC-FR02-BVA-06 | B2 edge (30s) ★ | correct creds | Locked 30s ago | Submit at 30s | Operator determination: record accept/reject (`< 30` vs `<= 30`) | 403 at 30.0s (G3) — masked by 180s duration; code isolates operator as `<` (server.js:40) → FR02-BUG-02 | FAILED |
+| TC-FR02-BVA-07 | B2 max+ (31s) | correct creds | Locked 31s ago | Submit at 31s | Success (lock lifted) | 403 at 31.1s (G4) → FR02-BUG-02 | FAILED |
+| TC-FR02-BVA-08 | B2 nom (15s) | correct creds | Locked 15s ago | Submit at 15s | Still rejected (mid-window hold) | 403 at 15.0s (G1) | PASSED |
+| TC-FR02-BVA-09 | B2×wrong (fail at 30s) ★ | `test@eshop.com` / `Wrong123!` | Lock just expired (~30s) | Submit wrong creds | Generic error as fresh-window fail #1 (counter = 1), NOT instant relock | 401 but attempts = **6** + relocked (B1) → FR02-BUG-04 | FAILED |
+| TC-FR02-BVA-10 | B3 min+ (1 char) | `a` / `b` | Active account | Submit | Rejected (format/length); record counter behavior | 401 in 2ms, graceful (E1) | PASSED |
+| TC-FR02-BVA-11 | B3 min- (7-char pwd) | `test@eshop.com` / `Abc123!` (7) | Active account | Submit | Generic wrong-password error (no length rule in FR-02); any client-side block recorded as extra-spec behavior | 401 generic in 3ms (E2); no hidden pre-check at API | PASSED |
+| TC-FR02-BVA-12 | B3 max+ (1000 chars) | 1000-char email / 1000-char password | Active account | Submit | Graceful rejection, no 500/timeout/partial login | 401 in 12ms, no 500 (E3) | PASSED |
+| TC-FR02-BVA-13 | B4 increment exactness | `test@eshop.com` / `Wrong123!` | 0 prior fails | Double-click submit rapidly for ONE attempt | Counter = 1 (exactly +1, no double-count) | 0→**2** for two concurrent fails: unit is +2 **and** lost update (F1) → FR02-BUG-01/10 | FAILED |
 
-FR-02 total: 15 DOM + 13 BVA = **28 TCs**. Timing TCs (BVA-05…09) require stopwatch control (±1s tolerance noted at execution).
+FR-02 total: 15 DOM + 13 BVA + 9 GAP = **37 TCs**. Executed 16/10/2026 via `scripts/exec_fr02.js` (25 API steps, fresh users per scenario, ±1s tolerance on timing probes, ms-precision DB timestamps; lock expiry simulated via DB where noted).
 
 ### 2.4 AI Gap Analysis & Human Review
 
@@ -229,21 +229,37 @@ FR-02 total: 15 DOM + 13 BVA = **28 TCs**. Timing TCs (BVA-05…09) require stop
 
 #### 2.4.3 Supplementary white-box test cases
 
-| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) |
-| :--- | :--- | :--- | :--- |
-| TC-FR02-GAP-01 | Early lock (M1+M3) | Fresh account → wrong pwd ×2 | 2nd fail must NOT lock (counter = 2) |
-| TC-FR02-GAP-02 | Duration (M2) | Lock account → read `locked_until − now` (ms) | ≈ 30 000 ms, not ≈ 180 000 ms |
-| TC-FR02-GAP-03 | Empty-pwd count (M7) | Fresh account → submit empty password via API | Validation error, counter unchanged |
-| TC-FR02-GAP-04 | Stale-counter relock (M4) | Lock → expire (or simulate) → 1 wrong attempt | Fresh-window fail #1 (counter = 1), no instant relock |
-| TC-FR02-GAP-05 | Password leak (M5) | Successful login → inspect response body | No `password` field in response; no plaintext storage (SEC-01) |
-| TC-FR02-GAP-06 | Case sensitivity (M8) | `TEST@ESHOP.COM` + correct pwd | Accept (case-insensitive standard) |
-| TC-FR02-GAP-07 | Whitespace (M8) | `␣test@eshop.com␣` + correct pwd | Accept (auto-trim standard) |
-| TC-FR02-GAP-08 | Form input types (M6) | Inspect login form fields | Email `type="email"`, password `type="password"` |
-| TC-FR02-GAP-09 | Form feedback/i18n (M6) | Inspect headings, labels, error placement, tab order; trigger lockout in UI | Vietnamese `<h1>` title, error above submit, natural tab order, visible lockout state |
+| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR02-GAP-01 | Early lock (M1+M3) | Fresh account → wrong pwd ×2 | 2nd fail must NOT lock (counter = 2) | 2nd fail → locked, attempts = 4 (A2) → FR02-BUG-01 | FAILED |
+| TC-FR02-GAP-02 | Duration (M2) | Lock account → read `locked_until − now` (ms) | ≈ 30 000 ms, not ≈ 180 000 ms | **179 377 ms** ≈ 180s; 403 at 15/29/30/31s → FR02-BUG-02 | FAILED |
+| TC-FR02-GAP-03 | Empty-pwd count (M7) | Fresh account → submit empty password via API | Validation error, counter unchanged | 401, attempts 2→4 (C3) → FR02-BUG-03 | FAILED |
+| TC-FR02-GAP-04 | Stale-counter relock (M4) | Lock → expire (or simulate) → 1 wrong attempt | Fresh-window fail #1 (counter = 1), no instant relock | 401 but attempts = 6 + relocked (B1) → FR02-BUG-04 | FAILED |
+| TC-FR02-GAP-05 | Password leak (M5) | Successful login → inspect response body | No `password` field in response; no plaintext storage (SEC-01) | Response carries plaintext `"Cx123456!"`; `/users/me` too; DB stores plaintext → FR02-BUG-05 | FAILED |
+| TC-FR02-GAP-06 | Case sensitivity (M8) | `TEST@ESHOP.COM` + correct pwd | Accept (case-insensitive standard) | 401 (D1) → FR02-BUG-06 | FAILED |
+| TC-FR02-GAP-07 | Whitespace (M8) | `␣test@eshop.com␣` + correct pwd | Accept (auto-trim standard) | 401 (D2) → FR02-BUG-06 | FAILED |
+| TC-FR02-GAP-08 | Form input types (M6) | Inspect login form fields | Email `type="email"`, password `type="password"` | Both `type="text"` — password visible (Login.jsx:30,40; FR02_UI_LOGIN_PAGE.png) → FR02-BUG-07 | FAILED |
+| TC-FR02-GAP-09 | Form feedback/i18n (M6) | Inspect headings, labels, error placement, tab order; trigger lockout in UI | Vietnamese `<h1>` title, error above submit, natural tab order, visible lockout state | Heading `"Đăng Ký"` in `<h2>`, `Username`/`Sign In` (EN), error below form, `tabIndex={1}`, 403 swallowed into generic message (Login.jsx:24,53-66) → FR02-BUG-08 | FAILED |
 
 ### 2.5 Execution & Bugs
 
-> TODO: Actual Result + Pass/Fail per TC; links to `Bug_Reports.md` + GitHub Issues + `screenshots/FR02-*`.
+> Executed 16/10/2026, 37/37 TCs. **13 PASSED, 24 FAILED → 10 bugs** (details: `Bug_Reports.md` §FR-02; screenshots: `screenshots/FR02_UI_LOGIN_PAGE.png`, `screenshots/FR02_API_EVIDENCE.png`; raw transcript: `scripts/exec_fr02_results.json`; runner: `scripts/exec_fr02.js`).
+> Test accounts `exec*` left in DB (documented; seed accounts untouched except counter-resetting successful logins).
+
+| Bug ID | Title | Severity | Evidence | Related TCs |
+| :--- | :--- | :--- | :--- | :--- |
+| FR02-BUG-01 | Fail counter increments by +2 → lockout fires on 2nd fail (spec: +1, lock on 3rd) | Critical | API evidence PNG (A1/A2/F2) + server.js:54 | DOM-05/07/08/12, BVA-01/02/04/13, GAP-01 |
+| FR02-BUG-02 | Lockout lasts ~180s instead of 30s | High | API evidence PNG (deltaMs 179377; G1–G4) + server.js:57 | DOM-08/10, BVA-05…09, GAP-02 |
+| FR02-BUG-03 | Empty password counted as failed attempt (+2) | High | API evidence PNG (C3) + server.js:46-54 | DOM-06, GAP-03 |
+| FR02-BUG-04 | Stale counter: first wrong attempt after expiry instantly re-arms lock (4→6) | High | API evidence PNG (B1) + server.js:54-62 | BVA-09, GAP-04 |
+| FR02-BUG-05 | Plaintext password in `POST /api/login` + `GET /api/users/me` responses; plaintext storage (SEC-01) | High (Security) | API evidence PNG (A5/A6) + server.js:52, database.js:92-93 | GAP-05 |
+| FR02-BUG-06 | No email normalization — uppercase / spaced emails rejected | Medium | API evidence PNG (D1/D2) + server.js:35 | DOM-13/14, GAP-06/07 |
+| FR02-BUG-07 | Login form: email + password inputs are `type="text"` (password visible on screen) | Medium | UI screenshot + Login.jsx:30,40 | GAP-08 |
+| FR02-BUG-08 | Login page: wrong `"Đăng Ký"` heading (`<h2>`), EN labels/buttons, error below form, `tabIndex={1}`, 403 lockout swallowed into generic message | Low | UI screenshot + Login.jsx:24,53-66 | GAP-09 |
+| FR02-BUG-09 | JWT never expires (`no expiresIn`) + hardcoded `SECRET_KEY` in source | Medium (Security) | server.js:9,51 | — (code inspection) |
+| FR02-BUG-10 | Lost update: two concurrent fails collapse 0→2 (read-modify-write + fire-and-forget `db.run`) | Medium | API evidence PNG (F1) + server.js:54-62 | BVA-13 |
+
+GitHub Issues: to be filed on the group repo with the PNGs attached (links added here after filing).
 
 ---
 
@@ -330,11 +346,11 @@ FR-02 total: 15 DOM + 13 BVA = **28 TCs**. Timing TCs (BVA-05…09) require stop
 
 | Feature | Designed | Executed | Passed | Failed | Not executed | Bugs |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| FR-02 | 37 | 0 | 0 | 0 | 37 | 0 |
+| FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
 | FR-09 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-16 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **37** | **0** | **0** | **0** | **37** | **0** |
+| **Total** | **37** | **37** | **13** | **24** | **0** | **10** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 

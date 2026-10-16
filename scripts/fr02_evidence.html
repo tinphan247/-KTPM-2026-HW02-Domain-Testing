@@ -1,0 +1,36 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>FR-02 API Evidence (measured 16/10/2026)</title>
+<style>body{font-family:Consolas,monospace;background:#fff;color:#111;margin:24px}h1{font-size:20px}h2{font-size:15px;margin-top:26px;background:#f2f2f2;padding:6px 10px}.bug{border:1px solid #ccc;padding:10px 14px;margin:10px 0}pre{background:#0b0b0b;color:#7dff9a;padding:12px;overflow-x:auto;font-size:12.5px}.k{color:#ffd479}.note{font-size:12px;color:#333}.foot{font-size:11px;color:#666;margin-top:20px}</style></head><body>
+<h1>FR-02 Login &amp; Lockout — API execution evidence (backend localhost:3000, measured 16/10/2026)</h1>
+<p class="note">Raw transcript: <b>scripts/exec_fr02_results.json</b> (25 steps). Method: fresh registered users per scenario; DB inspected via sqlite (600ms settle — server <code>db.run</code> is fire-and-forget); lock expiry simulated by setting <code>locked_until</code> to the past where noted.</p>
+
+<h2>FR02-BUG-01 — counter +2, lockout on 2nd fail (spec: +1, lock on 3rd)</h2>
+<div class="bug"><pre>A1-first-fail  {"status":401,"err":"Invalid email or password","attempts":<span class="k">2</span>}
+A2-second-fail {"status":401,"attempts":<span class="k">4</span>,"locked_until":"2026-10-16T02:59:38.749Z"}
+F1-double-submit {"before":0,"after":<span class="k">2</span>}  // two concurrent fails collapse (lost update)
+F2-correct-third {"status":<span class="k">403</span>,"err":"Tài khoản đã bị khóa..."}</pre></div>
+
+<h2>FR02-BUG-02 — lock lasts ~180s, not 30s</h2>
+<div class="bug"><pre>A2 deltaMs: <span class="k">179377</span> ms  (≈180000, i.e. Date.now()+180000 in code)
+G1-15s {elapsedMs:15007,status:403}  G2-29s {elapsedMs:29026,status:403}
+G3-30s {elapsedMs:30041,status:403}  G4-31s {elapsedMs:31058,status:403}</pre></div>
+
+<h2>FR02-BUG-03 — empty password counted (+2)</h2>
+<div class="bug"><pre>C3-empty-password {"status":401,"attemptsBefore":2,"attemptsAfter":<span class="k">4</span>}</pre></div>
+
+<h2>FR02-BUG-04 — stale counter: first wrong after expiry instantly re-locks</h2>
+<div class="bug"><pre>B1-wrong-after-expiry {"status":401,"attempts":<span class="k">6</span>,"relocked":<span class="k">true</span>}</pre></div>
+
+<h2>FR02-BUG-05 — plaintext password in login + /users/me responses (SEC-01)</h2>
+<div class="bug"><pre>A5-post-expiry-success {"status":200,"respHasPassword":<span class="k">true</span>,"respPasswordValue":"Cx123456!"}
+A6-users-me {"status":200,"hasPassword":<span class="k">true</span>}   // passwords also stored plaintext (seed/register)</pre></div>
+
+<h2>FR02-BUG-06 — no email normalization (case/space rejected)</h2>
+<div class="bug"><pre>D1-upper-email {"status":401}   D2-spaced-email {"status":401}   // vs student standard: accept</pre></div>
+
+<h2>Uniformity held (401-class) + lengths graceful + reset-on-success held</h2>
+<div class="bug"><pre>C0-uniformity {"unkStatus":401,"wrongStatus":401, same message}   // DOM-15 (401-class) PASS
+E1-1char/E2-7char/E3-1000char {"status":401}  // no 500
+A5 attempts reset to 0, locked_until NULL      // DOM-11 reset-on-success PASS
+A4-fourth-while-locked {"status":403,"unchanged":true}  // no sliding-window extension</pre></div>
+<p class="foot">Rendered from genuine measured output for issue attachments. UI bugs (type=text, heading, placement) evidenced by FR02_UI_LOGIN_PAGE.png + code refs Login.jsx:24,30,40,56,66.</p>
+</body></html>

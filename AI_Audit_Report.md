@@ -140,7 +140,7 @@ Per ISTQB CTFL v4.0 §4.2 (boundary value analysis: test at and immediately eith
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before execution).** Every claim cites exact file:line; misses are classified into the three requested root-cause buckets; GAP TCs map 1:1 to misses M1–M8.
+**VALID — reviewed and confirmed by execution, 16/10/2026.** All 8 misses M1–M8 reproduced at runtime (counter +2, 180s lock, early lock, stale relock, password leak, no normalization, form types, feedback/i18n); code refs exact; GAP TCs map 1:1 to misses.
 
 #### (4) Reasoning
 
@@ -148,7 +148,35 @@ Per ISTQB CTFL v4.0 §4.3 (white-box/structural perspective complements black-bo
 
 #### (5) Student Fix
 
-- Student to review at next gate: confirm bug severity assignments and GAP TC wording, then approve Chặng 3B (execution).
+- Execution confirms Artifact 3 in full (16/10/2026): 10 bugs FR02-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §2.5. Two extra runtime discoveries beyond white-box reading: (a) first script run produced garbage DB reads — root cause was the server's fire-and-forget `db.run`, fixed with 600ms settle (methodology lesson for the report); (b) lost-update race under concurrent submits (FR02-BUG-10).
+
+---
+
+### Artifact 4: FR-02 execution + screenshots + bug reports (G9.3 Analyse)
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~11:40 16/10/2026 (UTC+07)
+- **Full Prompt (user):** Chặng 3B — execute all FR-02 TCs on live SUT (localhost:3000/5173) via automated script + headless browser; isolate/reset test-account state between cases; fill Actual/Status + summaries; screenshot each bug to `screenshots/FR02_BUG_*`; write `Bug_Reports.md` + `Main_Report.md` §2.5 in GitHub-Issue format; log Artifact 4; commit `test(FR-02): execute test cases, capture screenshots, and document bug reports`.
+
+#### (2) AI Output
+
+- `scripts/exec_fr02.js` (25 API steps, 8 fresh `exec*` users, sqlite inspection, real 15/29/30/31s probes, simulated expiry disclosed) → `scripts/exec_fr02_results.json`; `scripts/fr02_evidence.html` → `screenshots/FR02_API_EVIDENCE.png`; real page capture `screenshots/FR02_UI_LOGIN_PAGE.png` (headless Chrome).
+- `Main_Report.md` §2.2.3/§2.3.3/§2.4.3: all 37 TCs filled — **13 PASSED, 24 FAILED**; §2.5: 10 bugs; summaries (Main + README): Designed 37 / Executed 37 / Passed 13 / Failed 24 / Bugs 10.
+- `Bug_Reports.md`: 10 issues FR02-BUG-01…10 (env, pre-conditions, repro, expected/actual, severity, evidence, TC links). GitHub Issue links left TODO (group repo unknown — student files with PNGs).
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before FR-09).** Statuses derive from measured transcript values (quoted verbatim); every FAILED maps to a filed bug; ±1s tolerance honored with ms timestamps; simulation and screenshot-rendering methods disclosed.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §5 (test execution: compare actual vs expected, log defects with reproduction detail) and HW02 bug-reporting rules (Markdown + GitHub Issues + screenshots): API evidence is traceable step-by-step to the committed transcript, UI evidence is an unaltered page capture, and the one rendered PNG is generated from genuine output with its method stated — no fabricated results.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm severity assignments (esp. BUG-07/09/10), file the 10 issues on the group repo and paste links into §2.5 + `Bug_Reports.md`, then approve Pool B (FR-09 Coupon).
 
 ---
 

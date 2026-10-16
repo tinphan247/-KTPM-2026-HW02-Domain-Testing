@@ -1,0 +1,136 @@
+[
+  {
+    "step": "A1-first-fail",
+    "status": 401,
+    "err": "Invalid email or password",
+    "attempts": 2
+  },
+  {
+    "step": "A2-second-fail",
+    "status": 401,
+    "attempts": 4,
+    "locked_until": "2026-10-16T02:59:38.749Z",
+    "deltaMs": 179377
+  },
+  {
+    "step": "A3-correct-while-locked",
+    "status": 403,
+    "err": "Tài khoản đã bị khóa. Vui lòng thử lại sau."
+  },
+  {
+    "step": "A4-fourth-while-locked",
+    "status": 403,
+    "unchanged": true
+  },
+  {
+    "step": "A5-post-expiry-success",
+    "status": 200,
+    "hasToken": true,
+    "respHasPassword": true,
+    "respPasswordValue": "Cx123456!",
+    "attempts": 0,
+    "locked_until": null,
+    "jwt": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzkyMTE5NDAwfQ.e69-fbhTJvRHaFmRI4EBSAcHJGKy0iZnYoGu6jSWYcI"
+  },
+  {
+    "step": "A6-users-me",
+    "status": 200,
+    "hasPassword": true
+  },
+  {
+    "step": "B1-wrong-after-expiry",
+    "status": 401,
+    "attempts": 6,
+    "relocked": true
+  },
+  {
+    "step": "C0-uniformity",
+    "unkStatus": 401,
+    "unkErr": "Invalid email or password",
+    "wrongStatus": 401,
+    "wrongErr": "Invalid email or password"
+  },
+  {
+    "step": "C1-malformed-email",
+    "status": 401
+  },
+  {
+    "step": "C2-empty-email",
+    "status": 401
+  },
+  {
+    "step": "C3-empty-password",
+    "status": 401,
+    "attemptsBefore": 2,
+    "attemptsAfter": 4
+  },
+  {
+    "step": "D1-upper-email",
+    "status": 401
+  },
+  {
+    "step": "D2-spaced-email",
+    "status": 401
+  },
+  {
+    "step": "D3-seed-happy-path",
+    "status": 200,
+    "hasToken": true
+  },
+  {
+    "step": "E1-1char",
+    "status": 401,
+    "ms": 2
+  },
+  {
+    "step": "E2-7char",
+    "status": 401,
+    "ms": 3
+  },
+  {
+    "step": "E3-1000char",
+    "status": 401,
+    "ms": 12
+  },
+  {
+    "step": "F1-double-submit",
+    "before": 0,
+    "after": 2
+  },
+  {
+    "step": "F2-correct-third",
+    "status": 403,
+    "err": "Tài khoản đã bị khóa. Vui lòng thử lại sau."
+  },
+  {
+    "step": "G1-15s",
+    "elapsedMs": 15007,
+    "status": 403
+  },
+  {
+    "step": "G2-29s",
+    "elapsedMs": 29026,
+    "status": 403
+  },
+  {
+    "step": "G3-30s",
+    "elapsedMs": 30041,
+    "status": 403
+  },
+  {
+    "step": "G4-31s",
+    "elapsedMs": 31058,
+    "status": 403
+  },
+  {
+    "step": "H1-success-after-1-fail",
+    "status": 200,
+    "attempts": 0
+  },
+  {
+    "step": "H2-two-fails-after-reset",
+    "status": 401,
+    "attempts": 4,
+    "locked": true
+  }
+]
