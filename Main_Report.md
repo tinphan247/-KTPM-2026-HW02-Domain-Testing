@@ -51,9 +51,73 @@ Group non-duplication: confirmed with group members (to be listed in final versi
 - Success returns JWT, sent as `Authorization: Bearer <token>`.
 - Step indicator / back-to-login rules belong to FR-03, not FR-02.
 
-### 2.2 Domain Testing (to be executed with skill — Step 1+3)
+### 2.2 Domain Testing (skill Step 1 — black-box, spec-only)
 
-> TODO (next commit): Domain variables table, Equivalence Partitions (valid/invalid), representative values, Domain TCs `FR02-DT-01...`.
+> Method: `skills/domain-bva-tester/SKILL.md` Step 1. Source: SRS v2.0 §FR-02 only.
+> Backend/frontend login code was NOT inspected (preserved for Gap Analysis).
+> Exact boundary values (fail #2/#3/#4, 29s/30s/31s) are deferred to §2.3 BVA.
+
+#### 2.2.1 Domain variables
+
+| # | Variable | Type | Spec constraint (FR-02) |
+| :--- | :--- | :--- | :--- |
+| V1 | `email_format` | string | Must be valid email; field uses `type="email"` (HTML5) |
+| V2 | `email_registered` | boolean (DB state) | Account must exist; failure message must NOT leak cause |
+| V3 | `email_case` | string variant | Spec silent on case sensitivity |
+| V4 | `email_spaces` | string variant | Spec silent on leading/trailing whitespace |
+| V5 | `password_correct` | boolean | Must match stored credential; empty rejected |
+| V6 | `failed_attempts` | integer (account state) | +1 per failed login; `>=3` consecutive fails → lock 30s |
+| V7 | `lockout_elapsed` | time (account state) | Lock lasts 30s (demo); only meaningful when locked |
+| V8 | `account_status` | enum | `active` vs `locked` (no `disabled` state in spec) |
+
+#### 2.2.2 Equivalence partitions
+
+| Variable | ID | Class | Partition description | Representative value |
+| :--- | :--- | :--- | :--- | :--- |
+| V1 email_format | VP1.1 | Valid | Syntactically valid email | `test@eshop.com` |
+| | IP1.1 | Invalid | Missing `@` | `testeshop.com` |
+| | IP1.2 | Invalid | Missing domain part | `test@` |
+| | IP1.3 | Invalid | Empty string | `` (empty) |
+| V2 email_registered | VP2.1 | Valid | Email exists in DB | `test@eshop.com` (seed) |
+| | IP2.1 | Invalid | Well-formed but unregistered | `nouser999@eshop.com` |
+| V3 email_case | VP3.1 | Valid | Exact registered case | `test@eshop.com` |
+| | SP3.1 | Spec-silent | Different case | `TEST@ESHOP.COM` |
+| V4 email_spaces | VP4.1 | Valid | No surrounding spaces | `test@eshop.com` |
+| | SP4.1 | Spec-silent | Leading/trailing space | `␣test@eshop.com␣` |
+| V5 password_correct | VP5.1 | Valid | Correct password | `Test1234!` |
+| | IP5.1 | Invalid | Wrong password | `Wrong123!` |
+| | IP5.2 | Invalid | Empty password | `` (empty) |
+| V6 failed_attempts | VP6.1 | Valid | Fresh account, 0 prior fails | `0` |
+| | VP6.2 | Valid | Below threshold (1–2 fails) | `1` |
+| | IP6.1 | Invalid(=locked) | At/above threshold | `3` (just locked) |
+| V7 lockout_elapsed | IP7.1 | Invalid | Still inside lock window | retry immediately after lock |
+| | VP7.1 | Valid | Lock window expired | retry after 60s wait |
+| V8 account_status | VP8.1 | Valid | Active | normal account |
+| | IP8.1 | Invalid | Temporarily locked (30s) | account right after 3rd fail |
+
+`SP` = spec-silent partition (no expected behavior defined; actual recorded at execution, prime Gap-Analysis material).
+
+#### 2.2.3 Domain test cases
+
+| TC_ID | Partition / combination | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR02-DOM-01 | All-VP happy path | `test@eshop.com` / `Test1234!` | Fresh seed account, 0 fails, active | 1. Open login 2. Enter creds 3. Submit | Login success, JWT returned (`Authorization: Bearer <token>`) | — | Pending Execution |
+| TC-FR02-DOM-02 | IP1.1 bad format | `testeshop.com` / `Test1234!` | Active account | Submit login | Rejected (HTML5 `type=email` block or server 400); must not authenticate | — | Pending Execution |
+| TC-FR02-DOM-03 | IP1.3 + IP5.2 empty | `` / `` | Active account | Submit login | Rejected, required-field handling | — | Pending Execution |
+| TC-FR02-DOM-04 | IP2.1 unregistered | `nouser999@eshop.com` / `Any123!x` | Email not in DB | Submit login | Generic error only — indistinguishable from wrong-password message (no existence leak) | — | Pending Execution |
+| TC-FR02-DOM-05 | VP2.1 + IP5.1 first fail | `test@eshop.com` / `Wrong123!` | 0 prior fails | Submit login | Generic error; `failed_attempts` = 1 | — | Pending Execution |
+| TC-FR02-DOM-06 | IP5.2 empty password | `test@eshop.com` / `` | 0 prior fails | Submit login | Rejected (treated as failed attempt or validation error — record which) | — | Pending Execution |
+| TC-FR02-DOM-07 | VP6.2 below threshold | `test@eshop.com` / `Wrong123!` | 1 prior consecutive fail | Submit login | Generic error; counter = 2; account still NOT locked | — | Pending Execution |
+| TC-FR02-DOM-08 | IP6.1 threshold reached | `test@eshop.com` / `Wrong123!` | 2 prior consecutive fails | Submit login (3rd fail) | Account locked for 30s; lockout message | — | Pending Execution |
+| TC-FR02-DOM-09 | IP8.1 + IP7.1 locked, correct creds | `test@eshop.com` / `Test1234!` | Account just locked | Submit immediately | Still rejected — lock takes precedence over correct password | — | Pending Execution |
+| TC-FR02-DOM-10 | VP7.1 lock expired | `test@eshop.com` / `Test1234!` | Locked, then wait 60s | Submit after wait | Login success (lock lifted) | — | Pending Execution |
+| TC-FR02-DOM-11 | Counter reset on success | `test@eshop.com` / `Test1234!` | 2 prior consecutive fails | Submit correct creds | Success AND consecutive-fail counter resets ("consecutive" per spec) | — | Pending Execution |
+| TC-FR02-DOM-12 | Post-reset threshold | `test@eshop.com` / `Wrong123!` ×2 | Right after DOM-11 success | Fail twice | Generic errors, counter = 2, NOT locked (proves reset) | — | Pending Execution |
+| TC-FR02-DOM-13 | SP3.1 case variant | `TEST@ESHOP.COM` / `Test1234!` | Active account | Submit login | Spec-silent — record accept/reject as-is | — | Pending Execution |
+| TC-FR02-DOM-14 | SP4.1 surrounding spaces | `␣test@eshop.com␣` / `Test1234!` | Active account | Submit login | Spec-silent — record accept/reject/trim behavior | — | Pending Execution |
+| TC-FR02-DOM-15 | Message uniformity (O-domain) | wrong-pwd vs unregistered-email | Clean state | Run DOM-04 vs DOM-05, compare responses | Both responses identical in text + HTTP status (no cause leak) | — | Pending Execution |
+
+Deferred to BVA (§2.3): fail-count edges 2/3/4, lockout timing 29s/30s/31s, counter-increment exactness (+1, no double-count on double-click), email max-length (spec-silent).
 
 ### 2.3 Boundary Value Analysis (skill — Step 2+3)
 
@@ -152,11 +216,11 @@ Group non-duplication: confirmed with group members (to be listed in final versi
 
 | Feature | Designed | Executed | Passed | Failed | Not executed | Bugs |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| FR-02 | 0 | 0 | 0 | 0 | 0 | 0 |
+| FR-02 | 15 | 0 | 0 | 0 | 15 | 0 |
 | FR-09 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-16 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **0** | **0** | **0** | **0** | **0** | **0** |
+| **Total** | **15** | **0** | **0** | **0** | **15** | **0** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 

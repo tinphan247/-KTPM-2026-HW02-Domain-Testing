@@ -47,6 +47,43 @@ Per ISTQB CTFL v4.0 §1.4 (test planning before design) and HW02 guiding princip
 
 ---
 
+### Artifact 1: FR-02 Domain Testing black-box (G9.2 Apply) — via domain-bva-tester Step 1
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~10:45 16/10/2026 (UTC+07)
+- **Full Prompt (user):**
+  ```text
+  Kích hoạt Agent Skill domain-bva-tester, thực hiện Step 1: Domain Testing (Black-box) cho FR-02:
+  chỉ đọc spec FR-02, tuyệt đối chưa đọc source code login; xác định domain variables
+  (email format/existence/case/spaces, password, failed_attempts, lockout_elapsed_time,
+  account_status); lập bảng Equivalence Partitioning Valid/Invalid + representative values
+  (dùng seed test@eshop.com); thiết kế TCs TC-FR02-DOM-01... vào Main_Report.md
+  (Actual/Status = Pending Execution); log Artifact 1; commit
+  "feat(FR-02): add black-box Domain Testing partitions and test cases".
+  ```
+
+#### (2) AI Output
+
+- `Main_Report.md` §2.2: 8 domain variables (V1–V8), EP table (VP/IP + 2 spec-silent `SP` partitions for email case and whitespace), 15 TCs `TC-FR02-DOM-01…15` with partition mapping; boundary edges explicitly deferred to BVA (§2.3).
+- `Main_Report.md` §6 + `README.md` §2: FR-02 Designed = 15 (rest 0).
+- No source-code inspection performed; no execution results invented (all Status = Pending Execution).
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before BVA).** Partitions are disjoint, cover the FR-02 spec domain (format, existence, correctness, fail-counter state, lock state), and representatives use the real seed account. Two spec-silent partitions (case, whitespace) are correctly flagged rather than assumed.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.2 (equivalence partitioning: divide input domain into partitions expected to be treated identically) and course Domain-Testing steps (variables → partitions → representatives → TCs, black-box before white-box): state variables (`failed_attempts`, `lockout_elapsed`, `account_status`) are treated as first-class domain inputs alongside field inputs, and exact edges are held back for BVA to avoid technique overlap.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm representatives, confirm DOM-06 expectation (empty password = fail-count vs validation), confirm DOM-11/DOM-12 reset interpretation of "consecutive", then approve BVA step.
+
+---
+
 ## Audit entry template (copy for each later artifact)
 
 ```markdown
