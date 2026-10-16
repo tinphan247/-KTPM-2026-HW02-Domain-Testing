@@ -149,6 +149,7 @@ Per ISTQB CTFL v4.0 §4.3 (white-box/structural perspective complements black-bo
 #### (5) Student Fix
 
 - Execution confirms Artifact 3 in full (16/10/2026): 10 bugs FR02-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §2.5. Two extra runtime discoveries beyond white-box reading: (a) first script run produced garbage DB reads — root cause was the server's fire-and-forget `db.run`, fixed with 600ms settle (methodology lesson for the report); (b) lost-update race under concurrent submits (FR02-BUG-10).
+- Student severity review (16/10, applied): FR02-BUG-05 High→Critical, FR02-BUG-07 Medium→High, FR02-BUG-08 Low→Medium; BUG-09/10 stay Medium. GitHub Issue links pending (student files on group repo).
 
 ---
 
@@ -168,7 +169,7 @@ Per ISTQB CTFL v4.0 §4.3 (white-box/structural perspective complements black-bo
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before FR-09).** Statuses derive from measured transcript values (quoted verbatim); every FAILED maps to a filed bug; ±1s tolerance honored with ms timestamps; simulation and screenshot-rendering methods disclosed.
+**VALID — reviewed and approved by student, 16/10/2026.** Statuses derive from measured transcript values (quoted verbatim); every FAILED maps to a filed bug; ±1s tolerance honored with ms timestamps; simulation and screenshot-rendering methods disclosed. Severity set finalized in review: BUG-05 Critical, BUG-07 High, BUG-08 Medium.
 
 #### (4) Reasoning
 
@@ -176,7 +177,36 @@ Per ISTQB CTFL v4.0 §5 (test execution: compare actual vs expected, log defects
 
 #### (5) Student Fix
 
-- Student to review at next gate: confirm severity assignments (esp. BUG-07/09/10), file the 10 issues on the group repo and paste links into §2.5 + `Bug_Reports.md`, then approve Pool B (FR-09 Coupon).
+- Student to review at next gate: confirm severity assignments (esp. BUG-07/09/10), file the 10 issues on the group repo and paste links into §2.5 + `Bug_Reports.md`, then approve Pool B (FR-09 Coupon). *(Review done 16/10: severities updated — BUG-05 Critical, BUG-07 High, BUG-08 Medium; GitHub links pending batch URLs from student.)*
+
+---
+
+### Artifact 5: FR-09 Domain Testing black-box (G9.2 Apply) — via domain-bva-tester Step 1
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~12:00 16/10/2026 (UTC+07)
+- **Full Prompt (user):** severity tune (BUG-05→Critical, BUG-07→High, BUG-08→Medium, GitHub links later) + run skill Step 1 Domain black-box for FR-09: spec + 4 seed codes only, no coupon/checkout source; variables from C1–C5 + money math (code text/existence, active, expiry incl. null, used/max, subtotal/min, per-user C5, percent-vs-fixed, over-discount); EP with VP/IP/SP (fixed > subtotal → 0 or negative? shipping in min_order?); 17 TCs `TC-FR09-DOM-*` (percent + fixed happy paths, one-condition violations C1→C5, spec-silent case/space/reapply/over-discount); update summaries; log Artifact 5 + finalize Artifacts 3–4; commit `feat(FR-09): add black-box Domain Testing partitions and test cases`.
+
+#### (2) AI Output
+
+- Severity updates applied in `Bug_Reports.md` + `Main_Report.md` §2.5 (counts unchanged, still 10 bugs).
+- `Main_Report.md` §3.2: 9 variables (V1–V9, spec C-numbering C1 exists+active / C2 expiry / C3 min_order / C4 JWT / C5 max_uses), EP table (VP/IP + 5 SP: lowercase, spaces, stacking, repeat, rounding), 17 TCs `TC-FR09-DOM-01…17` — 3 happy-path math TCs with concrete VND figures (SAVE10 −400 000 → 3 600 000; BIGBUY → 3 950 000; VIP100 → 3 900 000), 6 single-violation TCs (one per C-condition incl. separate C1-nonexistent vs C1-inactive), quota TCs incl. VIP100 2×success + 3rd-reject, 5 SP record-as-is TCs. Boundary money/date/count edges deferred to BVA (§3.3).
+- Summaries: FR-09 Designed = 17; Total 54 / Executed 37 / Passed 13 / Failed 24 / Bugs 10.
+- No coupon/checkout source inspected; all Status = Pending Execution.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before BVA).** C-conditions isolated one-per-TC (fault isolation); concrete expected money figures make execution verdicts unambiguous; setup-dependent TCs (deactivated code, cheap item, custom price) declare preconditions instead of assuming seed data covers them; SP class keeps case/space/stacking/rounding honest.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.2 (each invalid partition exercised at least once; valid partitions combined into happy paths) and the domain-testing single-fault principle: DOM-04…09 each violate exactly one of C1–C5 while holding the other four, so any rejection unambiguously maps to its condition; quota TCs (DOM-09…11) additionally cover the per-user counting dimension of C5 across successive orders.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm concrete VND figures, setup-dependent preconditions (DOM-05/07/17), SP record-as-is stance (esp. stacking DOM-15/16), then approve BVA step.
 
 ---
 

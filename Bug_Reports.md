@@ -58,11 +58,11 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** instant relock; counter never resets except on success. Root: `server.js:54-62`.
 - **Severity:** High. **Related TCs:** BVA-09, GAP-04.
 
-### FR02-BUG-05 — [High/Security] Plaintext password in login + /users/me responses; plaintext storage (SEC-01)
+### FR02-BUG-05 — [Critical/Security] Plaintext password in login + /users/me responses; plaintext storage (SEC-01)
 - **Steps:** successful login → response JSON contains `"password":"Cx123456!"` (A5); `GET /api/users/me` also returns `password` (A6); DB stores raw passwords (seed `Test1234!`, register inserts raw).
 - **Expected:** never return/store plaintext passwords.
 - **Actual:** leaked in two endpoints + stored plaintext. Root: `server.js:52`, `server.js:20-30`, `database.js:92-93`.
-- **Severity:** High (Security). **Related TCs:** GAP-05.
+- **Severity:** Critical (Security — credential exposure enables account takeover at scale). **Related TCs:** GAP-05.
 
 ### FR02-BUG-06 — [Medium] No email normalization — uppercase / spaced emails rejected
 - **Steps:** `TEST@ESHOP.COM` + correct pwd → 401 (D1); `␣test@eshop.com␣` → 401 (D2).
@@ -70,17 +70,17 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** exact-match only (`WHERE email = ?`, `server.js:35`).
 - **Severity:** Medium (usability; spec-silent → spec gap + defect). **Related TCs:** DOM-13/14, GAP-06/07.
 
-### FR02-BUG-07 — [Medium] Login form uses `type="text"` for email AND password (password visible)
+### FR02-BUG-07 — [High] Login form uses `type="text"` for email AND password (password visible)
 - **Steps:** open `/login` → inspect inputs.
 - **Expected:** email `type="email"` (FR-02), password `type="password"` (FR-22).
 - **Actual:** both `type="text"` (`Login.jsx:30,40`).
-- **Severity:** Medium (shoulder-surfing + no HTML5 validation). **Attachments:** `FR02_UI_LOGIN_PAGE.png`. **Related TCs:** GAP-08.
+- **Severity:** High (plaintext password on screen — shoulder-surfing; plus no HTML5 email validation). **Attachments:** `FR02_UI_LOGIN_PAGE.png`. **Related TCs:** GAP-08.
 
-### FR02-BUG-08 — [Low] Login page i18n/structure/feedback violations + lockout state swallowed
+### FR02-BUG-08 — [Medium] Login page i18n/structure/feedback violations + lockout state swallowed
 - **Steps:** open `/login` (see screenshot); trigger lockout → UI always shows generic `"Đăng nhập thất bại..."`.
 - **Expected:** Vietnamese `<h1>` title, error above submit (FR-22), natural tab order (FR-21), visible lockout state.
 - **Actual:** heading `"Đăng Ký"` in `<h2>`, labels `Username` / button `Sign In` (EN), error div below form, submit `tabIndex={1}`, 403 detail swallowed (`Login.jsx:24,53-66`).
-- **Severity:** Low. **Attachments:** `FR02_UI_LOGIN_PAGE.png`. **Related TCs:** GAP-09.
+- **Severity:** Medium (hides FR-02 lockout state from users — functional impact beyond cosmetics). **Attachments:** `FR02_UI_LOGIN_PAGE.png`. **Related TCs:** GAP-09.
 
 ### FR02-BUG-09 — [Medium/Security] JWT never expires + hardcoded secret in source
 - **Steps:** code inspection; decode login JWT → no `exp` claim.

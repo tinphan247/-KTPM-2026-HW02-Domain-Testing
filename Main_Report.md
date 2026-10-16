@@ -252,10 +252,10 @@ FR-02 total: 15 DOM + 13 BVA + 9 GAP = **37 TCs**. Executed 16/10/2026 via `scri
 | FR02-BUG-02 | Lockout lasts ~180s instead of 30s | High | API evidence PNG (deltaMs 179377; G1–G4) + server.js:57 | DOM-08/10, BVA-05…09, GAP-02 |
 | FR02-BUG-03 | Empty password counted as failed attempt (+2) | High | API evidence PNG (C3) + server.js:46-54 | DOM-06, GAP-03 |
 | FR02-BUG-04 | Stale counter: first wrong attempt after expiry instantly re-arms lock (4→6) | High | API evidence PNG (B1) + server.js:54-62 | BVA-09, GAP-04 |
-| FR02-BUG-05 | Plaintext password in `POST /api/login` + `GET /api/users/me` responses; plaintext storage (SEC-01) | High (Security) | API evidence PNG (A5/A6) + server.js:52, database.js:92-93 | GAP-05 |
+| FR02-BUG-05 | Plaintext password in `POST /api/login` + `GET /api/users/me` responses; plaintext storage (SEC-01) | Critical (Security) | API evidence PNG (A5/A6) + server.js:52, database.js:92-93 | GAP-05 |
 | FR02-BUG-06 | No email normalization — uppercase / spaced emails rejected | Medium | API evidence PNG (D1/D2) + server.js:35 | DOM-13/14, GAP-06/07 |
-| FR02-BUG-07 | Login form: email + password inputs are `type="text"` (password visible on screen) | Medium | UI screenshot + Login.jsx:30,40 | GAP-08 |
-| FR02-BUG-08 | Login page: wrong `"Đăng Ký"` heading (`<h2>`), EN labels/buttons, error below form, `tabIndex={1}`, 403 lockout swallowed into generic message | Low | UI screenshot + Login.jsx:24,53-66 | GAP-09 |
+| FR02-BUG-07 | Login form: email + password inputs are `type="text"` (password visible on screen) | High | UI screenshot + Login.jsx:30,40 | GAP-08 |
+| FR02-BUG-08 | Login page: wrong `"Đăng Ký"` heading (`<h2>`), EN labels/buttons, error below form, `tabIndex={1}`, 403 lockout swallowed into generic message | Medium | UI screenshot + Login.jsx:24,53-66 | GAP-09 |
 | FR02-BUG-09 | JWT never expires (`no expiresIn`) + hardcoded `SECRET_KEY` in source | Medium (Security) | server.js:9,51 | — (code inspection) |
 | FR02-BUG-10 | Lost update: two concurrent fails collapse 0→2 (read-modify-write + fire-and-forget `db.run`) | Medium | API evidence PNG (F1) + server.js:54-62 | BVA-13 |
 
@@ -271,9 +271,73 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 - `percent: discount = total*value/100`; `fixed: discount = value`; `final = total - discount`.
 - Sample codes: `SAVE10` (10%, min 300k, 2099-12-31, 1 use), `BIGBUY` (50k fixed, min 500k, 2099, 1), `VIP100` (100k fixed, min 300k, 2099, 2), `EXPIRED` (20%, min 100k, 2020-01-01, 1).
 
-### 3.2 Domain Testing
+### 3.2 Domain Testing (skill Step 1 — black-box, spec-only)
 
-> TODO: `FR09-DT-*`.
+> Method: `skills/domain-bva-tester/SKILL.md` Step 1. Sources: SRS v2.0 §FR-09 + the 4 seed codes only.
+> Coupon/checkout code (backend + frontend) was NOT inspected (preserved for Gap Analysis).
+> C-numbering below follows the SPEC (C1 exists+active · C2 `now < expired_at` · C3 `total >= min_order_amount` · C4 valid JWT · C5 `used < max_uses`).
+> Reference prices: Keychron Q1 = 4 000 000 ₫ (qualifies all seeds); sub-threshold carts need an admin-created cheap item (setup note in TC).
+> Exact money/date/count edges (`min−1/min/min+1`, expiry-day edges, 1st/2nd/3rd use) are deferred to §3.3 BVA.
+
+#### 3.2.1 Domain variables
+
+| # | Variable | Type | Spec constraint (FR-09) |
+| :--- | :--- | :--- | :--- |
+| V1 | `coupon_code_text` | string | Free-text input at checkout |
+| V2 | `code_exists_active` (C1) | boolean (DB state) | Must exist AND `is_active = 1` |
+| V3 | `expired_at` (C2) | date (DB state) | `now` must be before `expired_at` |
+| V4 | `subtotal_vs_min` (C3) | money comparison | `total >= min_order_amount` |
+| V5 | `auth_jwt` (C4) | session state | Valid JWT required |
+| V6 | `used_vs_max` (C5) | count comparison | `used_count < max_uses_per_user` |
+| V7 | `discount_type` | enum | `percent`: `total×value/100`; `fixed`: `value`; `final = total − discount` |
+| V8 | `code_case` / `code_spaces` | string variants | Spec silent |
+| V9 | `stacking_repeat` | interaction | Spec silent: two codes / same code twice on one cart; rounding of percent math |
+
+#### 3.2.2 Equivalence partitions
+
+| Variable | ID | Class | Partition description | Representative value |
+| :--- | :--- | :--- | :--- | :--- |
+| V1 text | VP1.1 | Valid | Exact seed code | `SAVE10` |
+| | IP1.1 | Invalid | Well-formed but nonexistent | `FAKE99` |
+| | IP1.2 | Invalid | Empty string | `` (empty) |
+| V2 C1 | VP2.1 | Valid | Exists + active | `SAVE10` (`is_active=1`) |
+| | IP2.1 | Invalid | Exists but deactivated (admin setup) | deactivated `SAVE10` |
+| V3 C2 | VP3.1 | Valid | Unexpired | `SAVE10` (2099-12-31) |
+| | IP3.1 | Invalid | Expired | `EXPIRED` (2020-01-01) |
+| V4 C3 | VP4.1 | Valid | Subtotal well above min | 4 000 000 ₫ cart vs 300 000 ₫ min |
+| | IP4.1 | Invalid | Subtotal below min | 50 000 ₫ test item vs 300 000 ₫ min |
+| V5 C4 | VP5.1 | Valid | Logged in (JWT) | `test@eshop.com` session |
+| | IP5.1 | Invalid | Guest (no/invalid token) | logged-out checkout |
+| V6 C5 | VP6.1 | Valid | Uses remaining | fresh user, or VIP100 1st/2nd use (max 2) |
+| | IP6.1 | Invalid | Quota exhausted | SAVE10 reused (max 1); VIP100 3rd use (max 2) |
+| V7 type | VP7.1 | Valid | Percent math | SAVE10 10% × 4 000 000 = 400 000 → final 3 600 000 |
+| | VP7.2 | Valid | Fixed math | BIGBUY −50 000 → 3 950 000; VIP100 −100 000 → 3 900 000 |
+| V8 variants | SP8.1/8.2 | Spec-silent | Lowercase / surrounding spaces | `save10`, `␣SAVE10␣` — record actual |
+| V9 interaction | SP9.1–9.3 | Spec-silent | Stack two codes / repeat same code / percent rounding (e.g. 10% × 4 555 555 = 455 555.5) — record actual | — |
+
+#### 3.2.3 Domain test cases
+
+| TC_ID | Partition / combination | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR09-DOM-01 | All-VP percent happy path | Cart 4 000 000 ₫ + `SAVE10`, logged in, fresh user | C1–C5 all hold | Apply at checkout | −400 000 (10%), final 3 600 000 | — | Pending Execution |
+| TC-FR09-DOM-02 | All-VP fixed happy path | Cart 4 000 000 ₫ + `BIGBUY` (min 500k) | C1–C5 hold | Apply | −50 000, final 3 950 000 | — | Pending Execution |
+| TC-FR09-DOM-03 | All-VP fixed happy path | Cart 4 000 000 ₫ + `VIP100` (min 300k) | C1–C5 hold | Apply | −100 000, final 3 900 000 | — | Pending Execution |
+| TC-FR09-DOM-04 | C1 violated only | `FAKE99` on qualifying cart, logged in | C2–C5 hold, code nonexistent | Apply | Rejected (code does not exist) | — | Pending Execution |
+| TC-FR09-DOM-05 | C1 violated only (inactive) | Deactivated `SAVE10` (admin setup), qualifying cart | C2–C5 hold | Apply | Rejected (inactive) | — | Pending Execution |
+| TC-FR09-DOM-06 | C2 violated only | `EXPIRED` on ≥100 000 ₫ cart, logged in, fresh user | C1,C3–C5 hold | Apply | Rejected (expired) | — | Pending Execution |
+| TC-FR09-DOM-07 | C3 violated only | `SAVE10` on 50 000 ₫ test item (admin-created), logged in | C1,C2,C4,C5 hold | Apply | Rejected (below 300 000 ₫ min) | — | Pending Execution |
+| TC-FR09-DOM-08 | C4 violated only | `SAVE10` on qualifying cart, logged out | C1–C3,C5 hold | Apply as guest | Rejected (login required) | — | Pending Execution |
+| TC-FR09-DOM-09 | C5 violated only | `SAVE10` reused by same user (max 1) | C1–C4 hold, quota spent | Use once → order again with `SAVE10` | 2nd use rejected (quota exhausted) | — | Pending Execution |
+| TC-FR09-DOM-10 | C5 within quota | `VIP100` 1st + 2nd order (max 2) | C1–C4 hold | Two successive orders | Both succeed, −100 000 each | — | Pending Execution |
+| TC-FR09-DOM-11 | C5 violated only | `VIP100` 3rd order (max 2) | C1–C4 hold, quota spent | Third order | Rejected (quota exhausted) | — | Pending Execution |
+| TC-FR09-DOM-12 | IP1.2 empty code | `` on qualifying cart, logged in | — | Apply empty | Rejected / validation message | — | Pending Execution |
+| TC-FR09-DOM-13 | SP8.1 lowercase | `save10`, qualifying cart, logged in | C1–C5 hold for `SAVE10` | Apply | Record accept/reject as-is | — | Pending Execution |
+| TC-FR09-DOM-14 | SP8.2 spaces | `␣SAVE10␣`, qualifying cart, logged in | C1–C5 hold | Apply | Record accept/reject/trim as-is | — | Pending Execution |
+| TC-FR09-DOM-15 | SP9.1 stacking | `SAVE10` then `BIGBUY` on same cart | Both codes individually valid | Apply both | Record: replace / combine / reject-second | — | Pending Execution |
+| TC-FR09-DOM-16 | SP9.2 repeat | `SAVE10` applied twice on same cart | Valid single use | Apply twice | Record: double discount / idempotent / reject | — | Pending Execution |
+| TC-FR09-DOM-17 | SP9.3 rounding | 10% on 4 555 555 ₫ total (admin-priced item) | C1–C5 hold | Apply `SAVE10` | Record exact discount (455 555.5 → ?): round up/down, final math | — | Pending Execution |
+
+FR-09 total so far: **17 TCs** (BVA edges to be added in §3.3).
 
 ### 3.3 Boundary Value Analysis
 
@@ -347,10 +411,10 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 | Feature | Designed | Executed | Passed | Failed | Not executed | Bugs |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
-| FR-09 | 0 | 0 | 0 | 0 | 0 | 0 |
+| FR-09 | 17 | 0 | 0 | 0 | 17 | 0 |
 | FR-16 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **37** | **37** | **13** | **24** | **0** | **10** |
+| **Total** | **54** | **37** | **13** | **24** | **17** | **10** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 
