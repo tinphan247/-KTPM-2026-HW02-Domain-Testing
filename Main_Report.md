@@ -557,14 +557,68 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 | TC-FR16-DOM-17 | ★ IP11.1 first-row-bad | Row1 invalid (empty name) + rows2-3 valid, admin | Count C | Upload | **0 imported** (atomic; C unchanged) + 1 error cited | — | Pending Execution |
 | TC-FR16-DOM-18 | ★ IP11.2 last-row-bad | Rows1-2 valid + row3 invalid (price `abc`), admin | Count C | Upload | **0 imported** — proves rollback of the 2 prior valid rows (C unchanged) + 1 error cited | — | Pending Execution |
 | TC-FR16-DOM-19 | ★ VP11.1 commit exactness | 5 valid rows, admin | Count C | Upload → recount + spot-check fields | Exactly C+5, all fields match CSV | — | Pending Execution |
-| TC-FR16-DOM-20 | SP11.1 trailing newline | Valid 2-row file + trailing blank line(s), admin | Count C | Upload | Record: blank ignored (2 imported) vs error-row rollback (0) | — | Pending Execution |
-| TC-FR16-DOM-21 | SP11.2 spaced commas | `Áo , 100000 , mô tả , http://x/d.png , 1`, admin | Count C | Upload | Record: trimmed-accept vs kept-spaces vs reject | — | Pending Execution |
+| TC-FR16-DOM-20 | SP11.1 trailing newline | Valid 2-row file + trailing blank line(s), admin | Count C | Upload | Student standard (16/10): trailing blank line ignored → 2 imported; treating it as error-row (full rollback) or inserting an empty product = CSV-handling bug | — | Pending Execution |
+| TC-FR16-DOM-21 | SP11.2 spaced commas | `Áo , 100000 , mô tả , http://x/d.png , 1`, admin | Count C | Upload | Student standard (16/10): trim surrounding spaces → accept; importing untrimmed values = minor defect | — | Pending Execution |
 
 FR-16 total so far: **21 TCs** (count/size edges + stock-template verification in §4.3 BVA / Step 3).
 
-### 4.3 Boundary Value Analysis
+### 4.3 Boundary Value Analysis (skill Step 2 — black-box, spec-only)
 
-> TODO: 0/1/N rows, price `0/0.01/-1/abc`, empty name, bad header, `FR16-BVA-*`.
+> Method: `skills/domain-bva-tester/SKILL.md` Step 2. Header K = 5 columns (`name,price,description,imageUrl,category_id`).
+> Step units: rows **u = 1 row** · error index **u = 1 index** · price **u = 1 ₫** · columns **u = 1 column** · string length **u = 1 char**.
+> Large/odd-size fixtures (100-row batch, 1000-char strings, `stock`-column file) are declared setup; counts verified by DB recount. Import code still NOT inspected.
+
+#### 4.3.1 Boundaries and step units
+
+| # | Boundary | Threshold | Step unit | Operator under test |
+| :--- | :--- | :--- | :--- | :--- |
+| B1 | Data-row count (excl. header) | 0 / 1 / nominal / large | u = 1 row | empty-file handling; payload/timeout at scale |
+| B2 | Error-row index in N = 5 batch | 1 … 5 | u = 1 index | positional atomicity: prefix of 0/1/3/4 valid rows must ALL roll back |
+| B3 | `price` value | 0 | u = 1 ₫ | `> 0` vs `>= 0`; negatives; huge values |
+| B4 | Columns per row vs K = 5 | K | u = 1 column | strict arity (blank / K−1 / K / K+1) |
+| B5 | `name` length (+ FR-15 max 255) | 0 / 255 | u = 1 char | empty reject; 255 accept; 256+ consistent-with-FR-15 reject |
+| B6 | Extra `stock` column (SP probe) | header template | — | strict-header reject vs tolerant-accept; default stock value |
+
+#### 4.3.2 BVA point analysis
+
+**B1 — row count (u = 1 row):** 0-byte file → graceful reject, no 500 (BVA-01); header-only → 0 imported + clear message, no crash (BVA-02); 1 row → C+1 (BVA-03, min+); 5 rows nominal → C+5 (BVA-04); 100 rows → C+100 + elapsed time noted, timeout/payload watch (BVA-05).
+
+**B2 — error index in N = 5 (u = 1 index):** err@1 → 0 imported, 4 valid followers discarded (BVA-06, min); err@2 → row-1 rolled back (BVA-07, min+); err@4 → 3 valid predecessors rolled back (BVA-08, max−); err@5 ★ → 4 predecessors rolled back, DB exactly C (BVA-09, max — harshest atomicity point).
+
+**B3 — price (u = 1 ₫):** −1 → rollback (BVA-10); 0 → probe `> 0` vs `>= 0`, record (BVA-11 ★); 1 → accept (BVA-12, min+); 999 999 999 → accept, overflow/coercion watch (BVA-13).
+
+**B4 — arity vs K = 5 (u = 1 column):** blank mid-file row (0 cols) → skipped per ignore-blank standard, rest imported (BVA-14); 4 cols (K−1) → rollback (BVA-15); 6 cols (K+1) → rollback (BVA-16).
+
+**B5 — name length (u = 1 char):** 1 char `A` → accept (BVA-17); 255 chars → accept, consistent with FR-15 max (BVA-18); 256/1000 chars → reject + rollback for FR-15 consistency, else log inconsistency (BVA-19); 0 chars stays in DOM-11.
+
+**B6 — stock probe:** header + `stock` column, valid rows → record strict-reject vs tolerant-accept; if accepted, inspect stored/default stock (BVA-20 ★).
+
+#### 4.3.3 BVA test cases
+
+| TC_ID | Boundary / point | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR16-BVA-01 | B1 0-byte file | Empty (0 byte) upload, admin | — | Upload | Graceful reject (no file content), no 500/crash | — | Pending Execution |
+| TC-FR16-BVA-02 | B1 header-only | Header line only, 0 data rows, admin | Count C | Upload | 0 imported + clear "no data" message (not a crash, not a silent success hiding an error) | — | Pending Execution |
+| TC-FR16-BVA-03 | B1 min+ (1 row) | 1 valid row, admin | Count C | Upload → recount | Exactly C+1 | — | Pending Execution |
+| TC-FR16-BVA-04 | B1 nominal (5 rows) | 5 valid rows, admin | Count C | Upload → recount | Exactly C+5 | — | Pending Execution |
+| TC-FR16-BVA-05 | B1 large (100 rows) | 100 valid rows, admin | Count C, timer on | Upload → recount + elapsed | Exactly C+100; note time; no timeout/truncation | — | Pending Execution |
+| TC-FR16-BVA-06 | B2 err@1 (min) | N = 5: row1 bad (empty name) + rows2-5 valid, admin | Count C | Upload | 0 imported (C unchanged) + 1 cited error | — | Pending Execution |
+| TC-FR16-BVA-07 | B2 err@2 (min+) | N = 5: row2 bad (price `abc`), rest valid, admin | Count C | Upload | Row-1 rolled back: C unchanged + 1 cited error | — | Pending Execution |
+| TC-FR16-BVA-08 | B2 err@4 (max−) | N = 5: row4 bad (price `-1`), rest valid, admin | Count C | Upload | 3 valid predecessors rolled back: C unchanged | — | Pending Execution |
+| TC-FR16-BVA-09 | B2 err@5 (max) ★ | N = 5: rows1-4 valid + row5 bad (`category_id = 9999`), admin | Count C | Upload | **Harshest point:** all 4 predecessors rolled back, DB exactly C + 1 cited error | — | Pending Execution |
+| TC-FR16-BVA-10 | B3 −1 | Row price `-1` + 2 valid rows, admin | Count C | Upload | Rollback (C unchanged) | — | Pending Execution |
+| TC-FR16-BVA-11 | B3 0 ★ | Row price `0` + 2 valid rows, admin | Count C | Upload | Probe: record accept (`>= 0`) vs rollback (`> 0`) | — | Pending Execution |
+| TC-FR16-BVA-12 | B3 min+ (1 ₫) | Row price `1` + 2 valid rows, admin | Count C | Upload | Accept (C+3 if batch otherwise valid) | — | Pending Execution |
+| TC-FR16-BVA-13 | B3 huge | Row price `999999999` + valid rows, admin | Count C | Upload | Accept with exact value (no overflow/coercion); else cited reason | — | Pending Execution |
+| TC-FR16-BVA-14 | B4 blank mid-file | Valid rows with an empty line between row2/row3, admin | Count C | Upload | Blank skipped per ignore-blank standard; valid rows imported | — | Pending Execution |
+| TC-FR16-BVA-15 | B4 K−1 cols | Row with 4 fields among valid rows, admin | Count C | Upload | Rollback (C unchanged) + cited row | — | Pending Execution |
+| TC-FR16-BVA-16 | B4 K+1 cols | Row with 6 fields among valid rows, admin | Count C | Upload | Rollback (C unchanged) + cited row | — | Pending Execution |
+| TC-FR16-BVA-17 | B5 1 char | Name `A`, rest valid, admin | Count C | Upload | Accept | — | Pending Execution |
+| TC-FR16-BVA-18 | B5 255 chars | 255-char name, rest valid, admin | Count C | Upload | Accept (FR-15 max = 255) | — | Pending Execution |
+| TC-FR16-BVA-19 | B5 256/1000 chars | 256-char then 1000-char names, rest valid, admin | Count C | Upload each | Reject + rollback (FR-15 consistency); if accepted, log inconsistency defect | — | Pending Execution |
+| TC-FR16-BVA-20 | B6 stock column ★ | Header `name,price,description,imageUrl,category_id,stock` + 2 valid rows with stock values, admin | Count C | Upload → inspect created rows | Record: strict-header reject vs tolerant-accept; if accepted, record stored stock (and stock of no-stock imports = default?) | — | Pending Execution |
+
+FR-16 total: 21 DOM + 20 BVA = **41 TCs**.
 
 ### 4.4 AI Gap Analysis & Human Review
 
@@ -609,9 +663,9 @@ FR-16 total so far: **21 TCs** (count/size edges + stock-template verification i
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
 | FR-09 | 48 | 48 | 28 | 20 | 0 | 10 |
-| FR-16 | 21 | 0 | 0 | 0 | 21 | 0 |
+| FR-16 | 41 | 0 | 0 | 0 | 41 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **106** | **85** | **41** | **44** | **21** | **20** |
+| **Total** | **126** | **85** | **41** | **44** | **41** | **20** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 

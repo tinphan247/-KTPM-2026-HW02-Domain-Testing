@@ -287,7 +287,7 @@ Per ISTQB CTFL v4.0 §5 (execution compares actual vs expected with reproducible
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before BVA).** Atomicity is tested positionally (bad row first vs last vs none) with DB-count assertions, which is the only black-box way to distinguish "validate-then-insert" from "insert-then-rollback-on-error"; every invalid-row TC asserts both the rollback AND the error report (spec demands both); setup-free TCs use only seeds, fixture-dependent ones declare preconditions.
+**VALID — reviewed and approved by student, 16/10/2026.** Atomicity is tested positionally (the only black-box way to separate validate-then-insert from insert-then-rollback); every invalid-row TC asserts both rollback AND error report; setup-free TCs use seeds only. Review decisions: atomicity trio confirmed as core; DOM-20/21 upgraded to normative best-practice (ignore trailing blank, trim spaces); duplicates stay observational vs FR-15; stock kept as SP probe; BVA dimensions approved.
 
 #### (4) Reasoning
 
@@ -296,6 +296,36 @@ Per ISTQB CTFL v4.0 §4.2 (state-aware partitioning: batch composition is a doma
 #### (5) Student Fix
 
 - Student to review at next gate: confirm atomicity triple, SP record-as-is stance (duplicates/trailing newline/spaces), stock-column verification plan, then approve BVA step (count/size edges).
+- Review done 16/10 (decisions above, DOM-20/21 upgraded in §4.2); Artifact 9 verdict confirmed VALID.
+
+---
+
+### Artifact 10: FR-16 BVA black-box (G9.2 Apply) — via domain-bva-tester Step 2
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~13:40 16/10/2026 (UTC+07)
+- **Full Prompt (user):** BVA for FR-16 (still black-box): row-count edges (0-byte / header-only / 1 / 5 / 100 rows), error-index sweep in N = 5 (err@1/2/4/5, max = harshest), price edges u = 1 ₫ (−1 / 0-probe / 1 / 999999999), arity vs K = 5 (0 / K−1 / K / K+1 cols), name-length edges (1 / 255 / 256-1000 chars); BVA table + `TC-FR16-BVA-*` into §4.3; summaries; finalize Artifact 9; log Artifact 10; commit `feat(FR-16): add Boundary Value Analysis (BVA) points and test cases`.
+
+#### (2) AI Output
+
+- `Main_Report.md` §4.2: DOM-20/21 upgraded to normative best-practice (ignore trailing blank, trim spaces).
+- `Main_Report.md` §4.3: 6 boundaries (B1 rows u=1 · B2 index u=1 · B3 price u=1₫ · B4 arity u=1 col · B5 length u=1 char · B6 stock probe), point-analysis tables, 20 BVA TCs `TC-FR16-BVA-01…20` — empty/header-only handling, C+N recounts, full err@1/2/4/5 sweep, price 0-probe (`> 0` vs `>= 0`), blank/K−1/K+1 arity, 255 vs 256/1000 length vs FR-15, stock-column probe. Fixture-dependent TCs declare setup; large batch notes timing.
+- Summaries: FR-16 Designed 21 → 41; Total 126 / Executed 85 / Passed 41 / Failed 44 / Bugs 20.
+- No import source inspected; all Status = Pending Execution.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before Gap Analysis).** The err@1/2/4/5 sweep covers every rollback-prefix shape (0/1/3/4 committed prefixes); price-0 and stock-column probes are determination probes, not pass/fail traps; length edges cross-check FR-15 consistency instead of inventing new limits; scale TC (100 rows) watches timeout/truncation rather than just counting.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.2 (boundaries on every ordered dimension, including structural ones like position-in-batch) and the skill's step-unit rule: positional atomicity cannot be covered by a single "one bad row" TC — the implementation could validate-then-insert (any position behaves identically) or insert-then-rollback (late errors expose half-commits), and only the full index sweep distinguishes them at black-box level.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm index sweep, price-0/stock probes, 100-row scale TC, then approve opening import source for Step 3 (Gap Analysis).
 
 ---
 
