@@ -1,1 +1,278 @@
-(generated at submission time via: git log --stat --pretty=fuller > git_commit_log.txt)
+commit ef2661ac301bd8d0c4a6d936b6723acb586e36bc
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 11:49:23 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 11:49:23 2026 +0700
+
+    docs(hw02): attach git commit log
+
+ git_commit_log.txt | Bin 88 -> 23706 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+
+commit 9754c44fbf9adf94ff9350ba26dc92dae7c66936
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 11:48:55 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 11:48:55 2026 +0700
+
+    docs(hw02): finalize severity, critique and self-assessment
+
+ AI_Audit_Report.md | 40 ++++++++++++++++++++++++++++++++++------
+ Bug_Reports.md     |  4 ++--
+ Main_Report.md     | 36 ++++++++++++++++++++++++------------
+ README.md          | 22 ++++++++++++----------
+ 4 files changed, 72 insertions(+), 30 deletions(-)
+
+commit fc801aec889b20986e96e9ef750835b28ce07363
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 11:32:45 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 11:32:45 2026 +0700
+
+    test(FR-20): execute test cases, capture screenshots, and document bug reports
+
+ AI_Audit_Report.md                |  32 +++++++-
+ Bug_Reports.md                    |  65 +++++++++++++--
+ Main_Report.md                    | 100 +++++++++++++----------
+ README.md                         |   4 +-
+ screenshots/FR20_API_EVIDENCE.png | Bin 0 -> 98394 bytes
+ scripts/exec_fr20.js              | 168 ++++++++++++++++++++++++++++++++++++++
+ scripts/exec_fr20_results.json    | 133 ++++++++++++++++++++++++++++++
+ scripts/fr20_evidence.html        |  32 ++++++++
+ 8 files changed, 481 insertions(+), 53 deletions(-)
+
+commit 714703258d3298d40826cdfe3801b761b14568d0
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 11:26:20 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 11:26:20 2026 +0700
+
+    docs(FR-20): complete white-box inspection and AI gap analysis
+
+ AI_Audit_Report.md | 31 +++++++++++++++++++++++++++++-
+ Main_Report.md     | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ README.md          |  4 ++--
+ 3 files changed, 83 insertions(+), 7 deletions(-)
+
+commit 9fefa4ea7f6ee55fc13382a22427c95b9a7b0b67
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 11:22:02 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 11:22:02 2026 +0700
+
+    feat(FR-20): add Boundary Value Analysis (BVA) points and test cases
+
+ AI_Audit_Report.md | 32 +++++++++++++++++++++++++++-
+ Main_Report.md     | 61 +++++++++++++++++++++++++++++++++++++++++++++++-------
+ README.md          |  4 ++--
+ 3 files changed, 87 insertions(+), 10 deletions(-)
+
+commit 1e2e1dcef4f6447b797b266f2f8073047e798935
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 11:10:12 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 11:10:12 2026 +0700
+
+    feat(FR-20): add black-box Domain Testing partitions and test cases
+
+ AI_Audit_Report.md | 35 +++++++++++++++++++++++++--
+ Bug_Reports.md     |  8 +++---
+ Main_Report.md     | 71 +++++++++++++++++++++++++++++++++++++++++++++++++-----
+ README.md          |  4 +--
+ 4 files changed, 104 insertions(+), 14 deletions(-)
+
+commit 63e5c246cd78004b899a6e9ed6a507012ca69464
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 11:04:41 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 11:04:41 2026 +0700
+
+    test(FR-16): execute test cases, capture screenshots, and document bug reports
+
+ AI_Audit_Report.md                |  32 +++-
+ Bug_Reports.md                    |  72 +++++++-
+ Main_Report.md                    | 130 ++++++++------
+ README.md                         |   4 +-
+ screenshots/FR16_API_EVIDENCE.png | Bin 0 -> 115727 bytes
+ screenshots/FR16_UI_ADMIN.png     | Bin 0 -> 9860 bytes
+ scripts/exec_fr16.js              | 234 ++++++++++++++++++++++++
+ scripts/exec_fr16_results.json    | 361 ++++++++++++++++++++++++++++++++++++++
+ scripts/fr16_evidence.html        |  39 ++++
+ 9 files changed, 807 insertions(+), 65 deletions(-)
+
+commit ee547c46b4bdc508f1e454daecd475a2920dccb1
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 10:58:00 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 10:58:00 2026 +0700
+
+    docs(FR-16): complete white-box inspection and AI gap analysis
+
+ AI_Audit_Report.md | 31 +++++++++++++++++++++++++++++-
+ Main_Report.md     | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ README.md          |  4 ++--
+ 3 files changed, 84 insertions(+), 7 deletions(-)
+
+commit 863ff8c0507151995ea5cb37aef1e6f8a567b6e8
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 10:52:27 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 10:52:27 2026 +0700
+
+    feat(FR-16): add Boundary Value Analysis (BVA) points and test cases
+
+ AI_Audit_Report.md | 32 +++++++++++++++++++++++++-
+ Main_Report.md     | 66 +++++++++++++++++++++++++++++++++++++++++++++++++-----
+ README.md          |  4 ++--
+ 3 files changed, 93 insertions(+), 9 deletions(-)
+
+commit 8a6b79d37834afa1e8e2a493d2c1ce758de1cf71
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 10:46:47 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 10:46:47 2026 +0700
+
+    feat(FR-16): add black-box Domain Testing partitions and test cases
+
+ AI_Audit_Report.md | 35 +++++++++++++++++++--
+ Bug_Reports.md     |  8 ++---
+ Main_Report.md     | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ README.md          |  4 +--
+ 4 files changed, 124 insertions(+), 14 deletions(-)
+
+commit f5d3bbf51ebc428428ea6f49f6ed44dddc1923e9
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 10:40:33 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 10:40:33 2026 +0700
+
+    test(FR-09): execute test cases, capture screenshots, and document bug reports
+
+ AI_Audit_Report.md                |  31 ++++-
+ Bug_Reports.md                    |  73 ++++++++++-
+ Main_Report.md                    | 122 ++++++++++--------
+ README.md                         |   4 +-
+ screenshots/FR09_API_EVIDENCE.png | Bin 0 -> 134417 bytes
+ screenshots/FR09_UI_CHECKOUT.png  | Bin 0 -> 26743 bytes
+ scripts/exec_fr09.js              | 189 ++++++++++++++++++++++++++++
+ scripts/exec_fr09_results.json    | 253 ++++++++++++++++++++++++++++++++++++++
+ scripts/fr09_evidence.html        |  46 +++++++
+ 9 files changed, 657 insertions(+), 61 deletions(-)
+
+commit 13e2b0ba084de85c34d420de8f09cd510b93c2d7
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 10:34:15 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 10:34:15 2026 +0700
+
+    docs(FR-09): complete white-box inspection and AI gap analysis
+
+ AI_Audit_Report.md | 31 +++++++++++++++++++++++++++++-
+ Main_Report.md     | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ README.md          |  4 ++--
+ 3 files changed, 84 insertions(+), 7 deletions(-)
+
+commit 9e5e5a402491c876703a5c4f48b37e61cdcefbad
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 10:28:19 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 10:28:19 2026 +0700
+
+    feat(FR-09): add Boundary Value Analysis (BVA) points and test cases
+
+ AI_Audit_Report.md | 34 ++++++++++++++++++++++++++--
+ Main_Report.md     | 66 +++++++++++++++++++++++++++++++++++++++++++++++++-----
+ README.md          |  4 ++--
+ 3 files changed, 94 insertions(+), 10 deletions(-)
+
+commit d5387f9709962dc4ca71c7a59ed50c9cc26e0653
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 10:13:21 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 10:13:21 2026 +0700
+
+    feat(FR-09): add black-box Domain Testing partitions and test cases
+
+ AI_Audit_Report.md | 34 ++++++++++++++++++++++--
+ Bug_Reports.md     | 12 ++++-----
+ Main_Report.md     | 78 +++++++++++++++++++++++++++++++++++++++++++++++++-----
+ README.md          |  4 +--
+ 4 files changed, 111 insertions(+), 17 deletions(-)
+
+commit 54a3e93015162b138e161515c5999f9801ee9037
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 10:02:16 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 10:02:16 2026 +0700
+
+    test(FR-02): execute test cases, capture screenshots, and document bug reports
+
+ AI_Audit_Report.md                 |  32 +++++++-
+ Bug_Reports.md                     |  75 ++++++++++++++++--
+ Main_Report.md                     | 104 +++++++++++++-----------
+ README.md                          |   4 +-
+ screenshots/FR02_API_EVIDENCE.png  | Bin 0 -> 108140 bytes
+ screenshots/FR02_UI_LOGIN_PAGE.png | Bin 0 -> 19148 bytes
+ scripts/exec_fr02.js               | 157 +++++++++++++++++++++++++++++++++++++
+ scripts/exec_fr02_results.json     | 136 ++++++++++++++++++++++++++++++++
+ scripts/fr02_evidence.html         |  36 +++++++++
+ 9 files changed, 489 insertions(+), 55 deletions(-)
+
+commit a3d220cf67418eec0faff548235672238fcae88b
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 09:54:04 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 09:54:04 2026 +0700
+
+    docs(FR-02): complete white-box inspection and AI gap analysis
+
+ AI_Audit_Report.md | 32 ++++++++++++++++++++++++++++++--
+ Main_Report.md     | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+ README.md          |  4 ++--
+ 3 files changed, 83 insertions(+), 7 deletions(-)
+
+commit b85f1f6497247dc63a3aa6a5648171cda5e33f7d
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 09:49:05 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 09:49:05 2026 +0700
+
+    feat(FR-02): add Boundary Value Analysis (BVA) points and test cases
+
+ AI_Audit_Report.md | 44 ++++++++++++++++++++++++++--
+ Main_Report.md     | 84 ++++++++++++++++++++++++++++++++++++++++++++++++------
+ README.md          |  4 +--
+ 3 files changed, 119 insertions(+), 13 deletions(-)
+
+commit 0c6c26e224d727cd33e0e6aff214ef926048f40a
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 09:45:15 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 09:45:15 2026 +0700
+
+    feat(FR-02): add black-box Domain Testing partitions and test cases
+
+ AI_Audit_Report.md | 37 ++++++++++++++++++++++++++++
+ Main_Report.md     | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++---
+ README.md          |  4 +--
+ 3 files changed, 107 insertions(+), 6 deletions(-)
+
+commit a0d728088e44200a11fb668c5fe83e48519e2c68
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 09:28:17 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 09:28:17 2026 +0700
+
+    chore(hw02): initialize report structure and create domain-bva-tester skill
+
+ .gitignore                                         |  10 ++
+ AI_Audit_Report.md                                 |  90 ++++++++++
+ Bug_Reports.md                                     |  58 +++++++
+ Main_Report.md                                     | 184 +++++++++++++++++++++
+ README.md                                          |  58 +++++++
+ git_commit_log.txt                                 |   1 +
+ screenshots/.gitkeep                               |   2 +
+ skills/domain-bva-tester/SKILL.md                  |  69 ++++++++
+ skills/domain-bva-tester/templates/audit_entry.md  |  21 +++
+ .../domain-bva-tester/templates/test_case_table.md |   8 +
+ 10 files changed, 501 insertions(+)
