@@ -198,7 +198,7 @@ Per ISTQB CTFL v4.0 §5 (test execution: compare actual vs expected, log defects
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before BVA).** C-conditions isolated one-per-TC (fault isolation); concrete expected money figures make execution verdicts unambiguous; setup-dependent TCs (deactivated code, cheap item, custom price) declare preconditions instead of assuming seed data covers them; SP class keeps case/space/stacking/rounding honest.
+**VALID — reviewed and approved by student, 16/10/2026**, with three review decisions applied: (a) VND figures kept; BVA to use u = 1 ₫ precision; (b) admin/DB fixtures approved for DOM-05/07/17 (declare + restore); (c) DOM-15/16 stance upgraded from record-as-is to normative single-code-per-order (overwrite-or-error; no double discount — stacking = serious bug).
 
 #### (4) Reasoning
 
@@ -206,7 +206,37 @@ Per ISTQB CTFL v4.0 §4.2 (each invalid partition exercised at least once; valid
 
 #### (5) Student Fix
 
-- Student to review at next gate: confirm concrete VND figures, setup-dependent preconditions (DOM-05/07/17), SP record-as-is stance (esp. stacking DOM-15/16), then approve BVA step.
+- Student review decisions (16/10/2026): VND figures confirmed; u = 1 ₫ for BVA money edges; fixtures approved (DOM-05/07/17 + BVA setup, restore after run); DOM-15/16 upgraded to normative single-code expectation. Applied in §3.2 + §3.3.
+
+---
+
+### Artifact 6: FR-09 BVA black-box (G9.2 Apply) — via domain-bva-tester Step 2
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~12:20 16/10/2026 (UTC+07)
+- **Full Prompt (user):** BVA for FR-09 (still black-box): money edges with u = 1 VND for SAVE10/BIGBUY/VIP100 mins, usage edges + increment-timing probe, expiry edges u = 1s, zero-floor edges; BVA table + `TC-FR09-BVA-*` into §3.3; summaries; finalize Artifact 5; log Artifact 6; commit `feat(FR-09): add Boundary Value Analysis (BVA) points and test cases`. (User-supplied mins SAVE10 100k / VIP100 200k — see correction below.)
+
+#### (2) AI Output
+
+- **Threshold correction:** user's BVA prompt stated SAVE10 min 100 000 and VIP100 min 200 000 — contradicted by SRS v2.0 (300 000 / 300 000) and seed data (`database.js`: SAVE10 300000, VIP100 300000, BIGBUY 500000, EXPIRED 100000). Corrected to spec values throughout; correction banner placed at §3.3 head. (The 100 000 figure matches EXPIRED's min — likely source of the mix-up.)
+- `Main_Report.md` §3.2: DOM-15/16 upgraded to normative single-code-per-order expectation.
+- `Main_Report.md` §3.3: 4 boundaries (B1 money u=1₫ · B2 usage u=1 · B3 time u=1s · B4 zero floor), point-analysis tables, 20 BVA TCs `TC-FR09-BVA-01…20` — per-code min−/min/min+ with exact expected money (e.g. 300 000 → −30 000 → 270 000), usage 0/1/2 + apply-without-checkout quota probe (BVA-14 ★), expiry T−1/T/T+1 with `<` vs `<=` probe (BVA-16 ★), floor discount−1/= /+1 (BVA-18…20). Fixture-dependent TCs declare setup + restore.
+- Summaries: FR-09 Designed 17 → 37; Total 74 / Executed 37 / Passed 13 / Failed 24 / Bugs 10.
+- No coupon/checkout source inspected; all Status = Pending Execution.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before Gap Analysis).** Every ordered variable carries an explicit step unit; min-points assert exact money math (not just accept/reject), making `>=` vs `>` failures self-evidencing; the two ★ probes (increment timing, expiry operator) are designed as determination probes per the skill; seed-impossible edges use declared fixtures instead of being skipped.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.2 (BVA at edges with the smallest meaningful increment) and the skill's step-unit rule: u = 1 ₫ is the DB/API integer precision, so min−/min pairs (299 999/300 000) decide the `>=` vs `>` operator with no ambiguity; keeping the user's wrong thresholds would have produced false failures at execution — correcting against the SRS before designing edges is exactly the evidence-before-synthesis discipline the course requires.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm spec-min correction (SAVE10/VIP100 = 300k), fixture plan (cheap items, near-term-expiry coupon, FIX200), probe TCs BVA-14/16, then approve opening coupon/checkout source for Step 3 (Gap Analysis).
 
 ---
 

@@ -333,15 +333,69 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 | TC-FR09-DOM-12 | IP1.2 empty code | `` on qualifying cart, logged in | — | Apply empty | Rejected / validation message | — | Pending Execution |
 | TC-FR09-DOM-13 | SP8.1 lowercase | `save10`, qualifying cart, logged in | C1–C5 hold for `SAVE10` | Apply | Record accept/reject as-is | — | Pending Execution |
 | TC-FR09-DOM-14 | SP8.2 spaces | `␣SAVE10␣`, qualifying cart, logged in | C1–C5 hold | Apply | Record accept/reject/trim as-is | — | Pending Execution |
-| TC-FR09-DOM-15 | SP9.1 stacking | `SAVE10` then `BIGBUY` on same cart | Both codes individually valid | Apply both | Record: replace / combine / reject-second | — | Pending Execution |
-| TC-FR09-DOM-16 | SP9.2 repeat | `SAVE10` applied twice on same cart | Valid single use | Apply twice | Record: double discount / idempotent / reject | — | Pending Execution |
+| TC-FR09-DOM-15 | SP9.1 stacking | `SAVE10` then `BIGBUY` on same cart | Both codes individually valid | Apply both | Student standard (16/10): max 1 code per order — new code must overwrite old or error; stacking discounts = serious business bug | — | Pending Execution |
+| TC-FR09-DOM-16 | SP9.2 repeat | `SAVE10` applied twice on same cart | Valid single use | Apply twice | Student standard (16/10): re-apply must be idempotent — NO double discount; double-charging discount = serious bug | — | Pending Execution |
 | TC-FR09-DOM-17 | SP9.3 rounding | 10% on 4 555 555 ₫ total (admin-priced item) | C1–C5 hold | Apply `SAVE10` | Record exact discount (455 555.5 → ?): round up/down, final math | — | Pending Execution |
 
 FR-09 total so far: **17 TCs** (BVA edges to be added in §3.3).
 
-### 3.3 Boundary Value Analysis
+### 3.3 Boundary Value Analysis (skill Step 2 — black-box, spec-only)
 
-> TODO: `total = min_order-1/min_order/min_order+1` per code, `expired_at` day boundaries, `max_uses` 1st/2nd/3rd use, `FR09-BVA-*`.
+> Method: `skills/domain-bva-tester/SKILL.md` Step 2. **Threshold correction (verified 16/10 against SRS v2.0 + seed data):** `SAVE10` min = **300 000 ₫** (not 100 000), `VIP100` min = **300 000 ₫** (not 200 000), `BIGBUY` min = 500 000 ₫. All BVA points below use these verified values.
+> Step units: money **u = 1 ₫** (DB/API integer precision — catches `<` vs `<=`); usage **u = 1 use**; time **u = 1 s**.
+> Sub-threshold carts, near-term-expiry coupons and over-discount fixtures require admin/DB setup (student-approved 16/10, restore after run). Coupon/checkout code still NOT inspected.
+
+#### 3.3.1 Boundaries and step units
+
+| # | Boundary | Threshold | Step unit | Operator under test |
+| :--- | :--- | :--- | :--- | :--- |
+| B1 | Subtotal vs `min_order` (C3) | per-code min | u = 1 ₫ | `>=` vs `>` (off-by-one đồng) |
+| B2 | `used_count` vs `max_uses` (C5) | per-code max | u = 1 use | `<` vs `<=`; increment timing (apply vs checkout) |
+| B3 | `now` vs `expired_at` (C2) | per-coupon timestamp | u = 1 s | `<` vs `<=` at the exact second |
+| B4 | `final = subtotal − discount` floor | 0 ₫ | u = 1 ₫ | floor at 0 vs negative total |
+
+#### 3.3.2 BVA point analysis
+
+**B1 — C3 money edges (u = 1 ₫):**
+
+| Code (min) | min− (reject) | min (accept) | min+ (accept) | Empty cart | TCs |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| SAVE10 (300 000) | 299 999 → reject | 300 000 → −30 000 → 270 000 | 300 001 → accept | 0 → reject | BVA-01…04 |
+| BIGBUY (500 000) | 499 999 → reject | 500 000 → −50 000 → 450 000 | 500 001 → accept | (covered by SAVE10 empty) | BVA-05…07 |
+| VIP100 (300 000) | 299 999 → reject | 300 000 → −100 000 → 200 000 | 300 001 → accept | — | BVA-08…10 |
+
+**B2 — C5 usage edges (VIP100, max = 2, u = 1 use):** used = 0 → 1st order pass (BVA-11); used = 1 → 2nd order pass at max (BVA-12); used = 2 → 3rd order reject max+ (BVA-13). Increment-timing probe: validate-only applies (no checkout) ×3 must NOT consume quota (BVA-14).
+
+**B3 — C2 time edges (fixture coupon expiring at T, u = 1 s):** T−1s → accept max− (BVA-15); exactly T → probe `<` vs `<=`, record (BVA-16 ★); T+1s → reject max+ (BVA-17).
+
+**B4 — zero floor (fixture FIX200: fixed 200 000 ₫, min 0):** subtotal 199 999 (discount−1) / 200 000 (=discount) / 200 001 (discount+1) → final must stop at 0, never negative (BVA-18…20).
+
+#### 3.3.3 BVA test cases
+
+| TC_ID | Boundary / point | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR09-BVA-01 | B1 empty cart | `SAVE10`, cart 0 ₫, logged in | C1,C2,C4,C5 hold | Apply | Rejected (below min) | — | Pending Execution |
+| TC-FR09-BVA-02 | B1 SAVE10 min− | `SAVE10`, subtotal 299 999 ₫ (fixture item) | C1,C2,C4,C5 hold | Apply | Rejected — 1 ₫ short | — | Pending Execution |
+| TC-FR09-BVA-03 | B1 SAVE10 min | `SAVE10`, subtotal 300 000 ₫ | C1,C2,C4,C5 hold | Apply | Accept: −30 000 → final 270 000 (proves `>=`, not `>`) | — | Pending Execution |
+| TC-FR09-BVA-04 | B1 SAVE10 min+ | `SAVE10`, subtotal 300 001 ₫ | C1,C2,C4,C5 hold | Apply | Accept | — | Pending Execution |
+| TC-FR09-BVA-05 | B1 BIGBUY min− | `BIGBUY`, subtotal 499 999 ₫ | C1,C2,C4,C5 hold | Apply | Rejected | — | Pending Execution |
+| TC-FR09-BVA-06 | B1 BIGBUY min | `BIGBUY`, subtotal 500 000 ₫ | C1,C2,C4,C5 hold | Apply | Accept: −50 000 → 450 000 | — | Pending Execution |
+| TC-FR09-BVA-07 | B1 BIGBUY min+ | `BIGBUY`, subtotal 500 001 ₫ | C1,C2,C4,C5 hold | Apply | Accept | — | Pending Execution |
+| TC-FR09-BVA-08 | B1 VIP100 min− | `VIP100`, subtotal 299 999 ₫ | C1,C2,C4,C5 hold | Apply | Rejected | — | Pending Execution |
+| TC-FR09-BVA-09 | B1 VIP100 min | `VIP100`, subtotal 300 000 ₫ | C1,C2,C4,C5 hold | Apply | Accept: −100 000 → 200 000 | — | Pending Execution |
+| TC-FR09-BVA-10 | B1 VIP100 min+ | `VIP100`, subtotal 300 001 ₫ | C1,C2,C4,C5 hold | Apply | Accept | — | Pending Execution |
+| TC-FR09-BVA-11 | B2 used=0 | `VIP100`, qualifying cart, fresh user | C1–C4 hold | 1st order with code | Success, used → 1 | — | Pending Execution |
+| TC-FR09-BVA-12 | B2 used=1 (at max) | `VIP100`, same user | C1–C4 hold, used = 1 | 2nd order | Success (at max, proves `< max+1` i.e. 2 allowed) | — | Pending Execution |
+| TC-FR09-BVA-13 | B2 max+ (used=2) | `VIP100`, same user | C1–C4 hold, used = 2 | 3rd order | Rejected (quota exhausted) | — | Pending Execution |
+| TC-FR09-BVA-14 | B2 increment timing ★ | `VIP100`, qualifying cart | used = 0 | Validate/apply on cart ×3 WITHOUT checkout, then place 1 order | Quota intact until checkout (used = 1 after order); apply-only must NOT consume uses | — | Pending Execution |
+| TC-FR09-BVA-15 | B3 T−1s | Fixture coupon exp T, qualifying cart | C1,C3–C5 hold | Apply 1s before T | Accept (max−) | — | Pending Execution |
+| TC-FR09-BVA-16 | B3 exactly T ★ | Same fixture | C1,C3–C5 hold | Apply at second T | Probe: record accept/reject (`<` vs `<=`) | — | Pending Execution |
+| TC-FR09-BVA-17 | B3 T+1s | Same fixture | C1,C3–C5 hold | Apply 1s after T | Rejected (max+) | — | Pending Execution |
+| TC-FR09-BVA-18 | B4 discount−1 | Fixture FIX200 (fixed 200 000, min 0), subtotal 199 999 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 0 (floor) — negative total = bug | — | Pending Execution |
+| TC-FR09-BVA-19 | B4 discount=subtotal | Same fixture, subtotal 200 000 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 0 exactly | — | Pending Execution |
+| TC-FR09-BVA-20 | B4 discount+1 | Same fixture, subtotal 200 001 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 1 ₫ | — | Pending Execution |
+
+FR-09 total: 17 DOM + 20 BVA = **37 TCs**.
 
 ### 3.4 AI Gap Analysis & Human Review
 
@@ -411,10 +465,10 @@ FR-09 total so far: **17 TCs** (BVA edges to be added in §3.3).
 | Feature | Designed | Executed | Passed | Failed | Not executed | Bugs |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
-| FR-09 | 17 | 0 | 0 | 0 | 17 | 0 |
+| FR-09 | 37 | 0 | 0 | 0 | 37 | 0 |
 | FR-16 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **54** | **37** | **13** | **24** | **17** | **10** |
+| **Total** | **74** | **37** | **13** | **24** | **37** | **10** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 
