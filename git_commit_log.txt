@@ -1,3 +1,43 @@
+commit 6ed56b8ea1b48ae60c73b97de1a1f85ded4ac01c
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 12:18:57 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 12:18:57 2026 +0700
+
+    docs(hw02): refresh reports PDF and commit log (final)
+
+ AI_Audit_Report.pdf | Bin 422896 -> 422749 bytes
+ Main_Report.pdf     | Bin 1638541 -> 1638839 bytes
+ 2 files changed, 0 insertions(+), 0 deletions(-)
+
+commit 8cec36dc0c0245fa41dea65c3925e5d07fce2bc6
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 12:18:11 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 12:18:11 2026 +0700
+
+    docs(hw02): file 38 GitHub issue links in reports
+
+ AI_Audit_Report.md          |   2 +-
+ Bug_Reports.md              |  46 +++++++++++++++--
+ Main_Report.md              |  12 ++---
+ README.md                   |   2 +-
+ scripts/create_issues.js    | 118 ++++++++++++++++++++++++++++++++++++++++++++
+ scripts/created_issues.json |  40 +++++++++++++++
+ scripts/fill_issue_links.py |  83 +++++++++++++++++++++++++++++++
+ 7 files changed, 291 insertions(+), 12 deletions(-)
+
+commit 505dbeb32d5cbe3940de1d0f3ccce7f03d273241
+Author:     23120372 <23120372@student.hcmus.edu.vn>
+AuthorDate: Fri Oct 16 11:53:59 2026 +0700
+Commit:     23120372 <23120372@student.hcmus.edu.vn>
+CommitDate: Fri Oct 16 11:53:59 2026 +0700
+
+    docs(hw02): refresh commit log (complete)
+
+ git_commit_log.txt | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
 commit de833dcdce0fab1f402370cbaeac7534c49d75f4
 Author:     23120372 <23120372@student.hcmus.edu.vn>
 AuthorDate: Fri Oct 16 11:53:33 2026 +0700
