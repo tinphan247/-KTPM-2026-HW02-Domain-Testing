@@ -1,0 +1,253 @@
+[
+  {
+    "step": "F0-fixtures",
+    "timeb1": {
+      "message": "Coupon created",
+      "id": 5
+    },
+    "fix200": {
+      "message": "Coupon created",
+      "id": 6
+    },
+    "inact1": {
+      "message": "Coupon created",
+      "id": 7
+    }
+  },
+  {
+    "step": "H1-save10-4M",
+    "status": 200,
+    "discount": -36000000,
+    "final": 40000000
+  },
+  {
+    "step": "H2-bigbuy-4M",
+    "status": 200,
+    "discount": 50000,
+    "final": 3950000
+  },
+  {
+    "step": "H3-vip100-4M",
+    "status": 200,
+    "discount": 100000,
+    "final": 3900000
+  },
+  {
+    "step": "H4-rounding",
+    "status": 200,
+    "discount": -40999995,
+    "final": 45555550
+  },
+  {
+    "step": "V1-fake",
+    "status": 404,
+    "err": "Mã giảm giá không tồn tại hoặc đã bị vô hiệu hóa"
+  },
+  {
+    "step": "V2-inactive",
+    "status": 404,
+    "err": "Mã giảm giá không tồn tại hoặc đã bị vô hiệu hóa"
+  },
+  {
+    "step": "V3-expired",
+    "status": 400,
+    "err": "Mã giảm giá đã hết hạn"
+  },
+  {
+    "step": "V4-submin",
+    "status": 400,
+    "err": "Đơn hàng chưa đủ giá trị tối thiểu 300,000 ₫ để áp dụng mã này"
+  },
+  {
+    "step": "V5-guest-nouser",
+    "status": 200,
+    "body": {
+      "success": true,
+      "coupon_id": 1,
+      "discount_amount": -36000000,
+      "final_amount": 40000000,
+      "message": "Áp dụng thành công! Giảm 10%"
+    }
+  },
+  {
+    "step": "V6-empty",
+    "status": 400,
+    "err": "Vui lòng nhập mã giảm giá"
+  },
+  {
+    "step": "V7-guest-foreign-id",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "step": "S1-lower",
+    "status": 404
+  },
+  {
+    "step": "S2-spaced",
+    "status": 404
+  },
+  {
+    "step": "K1-stack",
+    "first": 200,
+    "second": 200
+  },
+  {
+    "step": "K2-repeat",
+    "first": 200,
+    "second": 200
+  },
+  {
+    "step": "M0-empty",
+    "status": 400,
+    "err": "Đơn hàng chưa đủ giá trị tối thiểu 300,000 ₫ để áp dụng mã này"
+  },
+  {
+    "step": "M1-s10min-",
+    "status": 400,
+    "err": "Đơn hàng chưa đủ giá trị tối thiểu 300,000 ₫ để áp dụng mã này"
+  },
+  {
+    "step": "M2-s10min",
+    "status": 400,
+    "err": "Đơn hàng chưa đủ giá trị tối thiểu 300,000 ₫ để áp dụng mã này"
+  },
+  {
+    "step": "M3-s10min+",
+    "status": 200,
+    "discount": -2700009,
+    "final": 3000010
+  },
+  {
+    "step": "M4-bbmin-",
+    "status": 400,
+    "err": "Đơn hàng chưa đủ giá trị tối thiểu 500,000 ₫ để áp dụng mã này"
+  },
+  {
+    "step": "M5-bbmin",
+    "status": 400,
+    "err": "Đơn hàng chưa đủ giá trị tối thiểu 500,000 ₫ để áp dụng mã này"
+  },
+  {
+    "step": "M6-bbmin+",
+    "status": 200,
+    "discount": 50000,
+    "final": 450001
+  },
+  {
+    "step": "M7-vmin-",
+    "status": 400,
+    "err": "Đơn hàng chưa đủ giá trị tối thiểu 300,000 ₫ để áp dụng mã này"
+  },
+  {
+    "step": "M8-vmin",
+    "status": 400,
+    "err": "Đơn hàng chưa đủ giá trị tối thiểu 300,000 ₫ để áp dụng mã này"
+  },
+  {
+    "step": "M9-vmin+",
+    "status": 200,
+    "discount": 100000,
+    "final": 200001
+  },
+  {
+    "step": "Q1-first",
+    "checkout": 200,
+    "used": 1
+  },
+  {
+    "step": "Q2-second",
+    "checkout": 200,
+    "used": 2
+  },
+  {
+    "step": "Q3-third",
+    "status": 400,
+    "err": "Bạn đã sử dụng mã này 2 lần (đã đạt giới hạn)",
+    "used": 2
+  },
+  {
+    "step": "Q4-reuse-norecord",
+    "status": 200,
+    "used": 0
+  },
+  {
+    "step": "Q5-double-record",
+    "used": 2
+  },
+  {
+    "step": "Q6-reuse-after-record",
+    "status": 400
+  },
+  {
+    "step": "Q7-noid-exhausted",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "step": "Q8-foreign-id",
+    "status": 200,
+    "ok": true
+  },
+  {
+    "step": "N1-apply-only",
+    "before": 0,
+    "after": 0
+  },
+  {
+    "step": "T1-tampered-checkout",
+    "checkout": 200,
+    "orderId": 4,
+    "stored": {
+      "id": 4,
+      "user_id": 19,
+      "total_amount": 1,
+      "status": "pending",
+      "shipping_address": "HN",
+      "created_at": "2026-10-16 03:35:23"
+    }
+  },
+  {
+    "step": "Z1-below",
+    "status": 200,
+    "discount": 200000,
+    "final": -1
+  },
+  {
+    "step": "Z2-equal",
+    "status": 200,
+    "discount": 200000,
+    "final": 0
+  },
+  {
+    "step": "Z3-above",
+    "status": 200,
+    "discount": 200000,
+    "final": 1
+  },
+  {
+    "step": "R1-race",
+    "a": 200,
+    "b": 200,
+    "used": 1
+  },
+  {
+    "step": "E1-Tminus1",
+    "status": 200,
+    "skewMs": 22
+  },
+  {
+    "step": "E2-Texact",
+    "status": 400,
+    "skewMs": 17
+  },
+  {
+    "step": "E3-Tplus1",
+    "status": 400,
+    "skewMs": 1233
+  },
+  {
+    "step": "F9-restore",
+    "seeds": 4
+  }
+]

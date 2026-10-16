@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>FR-09 API Evidence (measured 16/10/2026)</title>
+<style>body{font-family:Consolas,monospace;background:#fff;color:#111;margin:24px}h1{font-size:20px}h2{font-size:15px;margin-top:26px;background:#f2f2f2;padding:6px 10px}.bug{border:1px solid #ccc;padding:10px 14px;margin:10px 0}pre{background:#0b0b0b;color:#7dff9a;padding:12px;overflow-x:auto;font-size:12.5px}.k{color:#ffd479}.note{font-size:12px;color:#333}.foot{font-size:11px;color:#666;margin-top:20px}</style></head><body>
+<h1>FR-09 Coupon — API execution evidence (backend localhost:3000, measured 16/10/2026)</h1>
+<p class="note">Raw transcript: <b>scripts/exec_fr09_results.json</b> (44 steps). Fresh users per scenario; fixtures TIMEB1/FIX200/INACT1 created via admin endpoint and <b>deleted afterwards (seeds=4 verified)</b>; expiry edges use real sleeps (skew logged).</p>
+
+<h2>FR09-BUG-01 [Critical] — percent formula catastrophic: total*(1-value)</h2>
+<div class="bug"><pre>H1 SAVE10 4M -&gt; {"status":200,"discount":<span class="k">-36000000</span>,"final":<span class="k">40000000</span>}   // 10x INCREASE
+H4 4555555 -&gt; {"discount":-40999995,"final":45555550}   // fixed codes OK: H2 -50000 -&gt; 3950000, H3 -100000 -&gt; 3900000</pre></div>
+
+<h2>FR09-BUG-02 [High] — C3 strict &gt; rejects equality (spec &gt;=)</h2>
+<div class="bug"><pre>M2 SAVE10@300000 -&gt; 400 "chưa đủ giá trị tối thiểu"  |  M3 @300001 -&gt; 200
+M5 BIGBUY@500000 -&gt; 400  |  M8 VIP100@300000 -&gt; 400  |  M1/M4/M7 (min-1) -&gt; 400 correctly</pre></div>
+
+<h2>FR09-BUG-03 [High] — apply-coupon has NO auth; user_id is client-supplied</h2>
+<div class="bug"><pre>V5 guest, no user_id -&gt; {"status":200,"coupon_id":1,...}   // C4 unenforced
+V7 guest + чужой user_id -&gt; {"status":200,"ok":true}       // quota of a stranger accepted
+Q8 exhausted + fresh user's id -&gt; {"status":200}         // impersonation bypass</pre></div>
+
+<h2>FR09-BUG-04 [High] — usage check skipped when user_id omitted</h2>
+<div class="bug"><pre>Q7 SAVE10 exhausted-quota user, NO user_id -&gt; {"status":200,"ok":true}  // C5 bypassed entirely</pre></div>
+
+<h2>FR09-BUG-05 [Critical] — checkout trusts any client total_amount (FR-08)</h2>
+<div class="bug"><pre>T1 checkout(total_amount=1) -&gt; {"checkout":200,"orderId":4,"stored":{...,"total_amount":<span class="k">1</span>,"status":"pending"}}</pre></div>
+
+<h2>FR09-BUG-06 [High] — quota = voluntary post-checkout client call (never enforced)</h2>
+<div class="bug"><pre>Q4 checkout SAVE10 w/o usage call -&gt; reuse {"status":200,"used":0}   // unlimited reuse
+Q5 double usage record -&gt; {"used":2} for ONE order                     // double count
+N1 apply-only x3 -&gt; used 0 (nothing consumes on apply)
+Q3 VIP100 3rd use -&gt; 400 only when usage WAS recorded (gate itself works)</pre></div>
+
+<h2>FR09-BUG-07 [Medium] — no zero floor: negative final_amount</h2>
+<div class="bug"><pre>Z1 FIX200@199999 -&gt; {"discount":200000,"final":<span class="k">-1</span>}  |  Z2 @200000 -&gt; final 0  |  Z3 @200001 -&gt; final 1</pre></div>
+
+<h2>FR09-BUG-08 [Medium] — no server-side single-code rule (stacking via API)</h2>
+<div class="bug"><pre>K1 SAVE10 then BIGBUY -&gt; {"first":200,"second":200}   |   K2 SAVE10 twice -&gt; {"first":200,"second":200}</pre></div>
+
+<h2>FR09-BUG-10 [Medium] — last-quota race: parallel applies both pass</h2>
+<div class="bug"><pre>R1 VIP100 at used=1, 2x parallel apply -&gt; {"a":200,"b":200}  // check-then-act, no transaction</pre></div>
+
+<h2>Held behaviors (PASS)</h2>
+<div class="bug"><pre>V1/V2 404 uniform (fake/inactive)  |  V3 400 expired  |  V4 400 sub-min  |  V6 400 empty
+Q1/Q2 VIP100 1st+2nd success, Q6 reuse-after-record 400  |  E1 T-1s 200, E3 T+1s 400
+S1/S2 lowercase/spaced -&gt; 404 via API (UI normalizes trim+upper — layer divergence)
+F9 seeds=4 (fixtures removed)</pre></div>
+<p class="foot">Rendered from genuine measured output for issue attachments. UI bugs (editable total, single-slot overwrite) evidenced by FR09_UI_CHECKOUT.png + Checkout.jsx:14,29,91-103.</p>
+</body></html>

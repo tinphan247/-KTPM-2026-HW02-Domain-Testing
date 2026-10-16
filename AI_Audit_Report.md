@@ -227,7 +227,7 @@ Per ISTQB CTFL v4.0 §4.2 (each invalid partition exercised at least once; valid
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before execution).** Every claim cites exact file:line; misses split into dev-bug / architecture-flaw / layer-divergence buckets; GAP TCs map 1:1 to misses M1–M8.
+**VALID — reviewed and confirmed by execution, 16/10/2026.** All 8 misses M1–M8 reproduced at runtime (percent math, `>` operator, missing auth, conditional usage check, client-trust checkout, normalization layers, no floor, no single-code rule); quota-lifecycle TCs (Q1–Q3) confirm the usage gate itself works when `user_id` is supplied — bounding the bypass bugs precisely.
 
 #### (4) Reasoning
 
@@ -236,6 +236,35 @@ Per ISTQB CTFL v4.0 §4.3 (structural perspective complements black-box) and the
 #### (5) Student Fix
 
 - Student to review at next gate: confirm GAP TC wording and cross-FR deferrals, then approve Chặng 3B (execution).
+- Execution confirms Artifact 7 in full (16/10/2026): 10 bugs FR09-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §3.5. Runtime nuance beyond white-box reading: E2 hit T+17ms (HTTP skew) — exact-T operator stays code-determined (`expiry < now` = accept at T); quota gate verified working when `user_id` IS supplied (Q1–Q3/Q6), which bounds BUG-03/04/06 to their exact bypass shapes.
+
+---
+
+### Artifact 8: FR-09 execution + screenshots + bug reports (G9.3 Analyse)
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~13:00 16/10/2026 (UTC+07)
+- **Full Prompt (user):** Chặng 3B — execute all FR-09 TCs on live SUT via `scripts/exec_fr09.js` + UI checks (raw → `exec_fr09_results.json`; manage/reset VIP100 `used_count` for exact results); fill Actual/Status + summaries; per bug: UI (`FR09_UI_*.png`) + API (`FR09_API_EVIDENCE.png`) screenshots; bugs `BUG-FR09-*` into `Bug_Reports.md` + §3.5; log Artifact 8; commit `test(FR-09): execute test cases, capture screenshots, and document bug reports`.
+
+#### (2) AI Output
+
+- `scripts/exec_fr09.js` (44 steps; fresh `cpn*` users; fixtures TIMEB1/FIX200/INACT1 created via admin endpoint — no role check needed — and DELETED after, seeds = 4 verified; real T−1/T/T+1 probes with skew logged; simulated nothing) → `scripts/exec_fr09_results.json`; `scripts/fr09_evidence.html` → `screenshots/FR09_API_EVIDENCE.png`; real capture `screenshots/FR09_UI_CHECKOUT.png` (editable total + coupon box).
+- `Main_Report.md` §3.2.3/§3.3.3/§3.4.3: all 48 TCs filled — **28 PASSED, 20 FAILED**; §3.5: 10 bugs FR09-BUG-01…10; summaries (Main + README): Designed 85 / Executed 85 / Passed 41 / Failed 44 / Bugs 20.
+- `Bug_Reports.md`: 10 issues (env, pre-conditions, repro, expected/actual, severity, evidence, TC links). GitHub Issue links left TODO (group repo unknown — student files with PNGs).
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before FR-16).** Statuses derive from measured transcript values (quoted verbatim); every FAILED maps to a filed bug; ±1s/±1₫ tolerances honored (expiry skew logged per probe); fixture lifecycle (create → verify → delete → seeds = 4) evidenced in-transcript (F0/F9).
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §5 (execution compares actual vs expected with reproducible defect records) and HW02 bug-reporting rules: quota-sensitive TCs use isolated users so `used_count` is exact (no cross-TC contamination); time/percent/floor edges assert computed money values rather than bare statuses, making operator/formula failures self-evidencing; the rendered PNG derives from genuine output with its method stated.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm severity set (esp. BUG-07/08/09/10 Medium calls, BUG-01/05 Critical calls), file the 10 issues on the group repo and paste links, then approve Pool C (FR-16 CSV import).
 
 ---
 

@@ -319,23 +319,23 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 
 | TC_ID | Partition / combination | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| TC-FR09-DOM-01 | All-VP percent happy path | Cart 4 000 000 ₫ + `SAVE10`, logged in, fresh user | C1–C5 all hold | Apply at checkout | −400 000 (10%), final 3 600 000 | — | Pending Execution |
-| TC-FR09-DOM-02 | All-VP fixed happy path | Cart 4 000 000 ₫ + `BIGBUY` (min 500k) | C1–C5 hold | Apply | −50 000, final 3 950 000 | — | Pending Execution |
-| TC-FR09-DOM-03 | All-VP fixed happy path | Cart 4 000 000 ₫ + `VIP100` (min 300k) | C1–C5 hold | Apply | −100 000, final 3 900 000 | — | Pending Execution |
-| TC-FR09-DOM-04 | C1 violated only | `FAKE99` on qualifying cart, logged in | C2–C5 hold, code nonexistent | Apply | Rejected (code does not exist) | — | Pending Execution |
-| TC-FR09-DOM-05 | C1 violated only (inactive) | Deactivated `SAVE10` (admin setup), qualifying cart | C2–C5 hold | Apply | Rejected (inactive) | — | Pending Execution |
-| TC-FR09-DOM-06 | C2 violated only | `EXPIRED` on ≥100 000 ₫ cart, logged in, fresh user | C1,C3–C5 hold | Apply | Rejected (expired) | — | Pending Execution |
-| TC-FR09-DOM-07 | C3 violated only | `SAVE10` on 50 000 ₫ test item (admin-created), logged in | C1,C2,C4,C5 hold | Apply | Rejected (below 300 000 ₫ min) | — | Pending Execution |
-| TC-FR09-DOM-08 | C4 violated only | `SAVE10` on qualifying cart, logged out | C1–C3,C5 hold | Apply as guest | Rejected (login required) | — | Pending Execution |
-| TC-FR09-DOM-09 | C5 violated only | `SAVE10` reused by same user (max 1) | C1–C4 hold, quota spent | Use once → order again with `SAVE10` | 2nd use rejected (quota exhausted) | — | Pending Execution |
-| TC-FR09-DOM-10 | C5 within quota | `VIP100` 1st + 2nd order (max 2) | C1–C4 hold | Two successive orders | Both succeed, −100 000 each | — | Pending Execution |
-| TC-FR09-DOM-11 | C5 violated only | `VIP100` 3rd order (max 2) | C1–C4 hold, quota spent | Third order | Rejected (quota exhausted) | — | Pending Execution |
-| TC-FR09-DOM-12 | IP1.2 empty code | `` on qualifying cart, logged in | — | Apply empty | Rejected / validation message | — | Pending Execution |
-| TC-FR09-DOM-13 | SP8.1 lowercase | `save10`, qualifying cart, logged in | C1–C5 hold for `SAVE10` | Apply | Record accept/reject as-is | — | Pending Execution |
-| TC-FR09-DOM-14 | SP8.2 spaces | `␣SAVE10␣`, qualifying cart, logged in | C1–C5 hold | Apply | Record accept/reject/trim as-is | — | Pending Execution |
-| TC-FR09-DOM-15 | SP9.1 stacking | `SAVE10` then `BIGBUY` on same cart | Both codes individually valid | Apply both | Student standard (16/10): max 1 code per order — new code must overwrite old or error; stacking discounts = serious business bug | — | Pending Execution |
-| TC-FR09-DOM-16 | SP9.2 repeat | `SAVE10` applied twice on same cart | Valid single use | Apply twice | Student standard (16/10): re-apply must be idempotent — NO double discount; double-charging discount = serious bug | — | Pending Execution |
-| TC-FR09-DOM-17 | SP9.3 rounding | 10% on 4 555 555 ₫ total (admin-priced item) | C1–C5 hold | Apply `SAVE10` | Record exact discount (455 555.5 → ?): round up/down, final math | — | Pending Execution |
+| TC-FR09-DOM-01 | All-VP percent happy path | Cart 4 000 000 ₫ + `SAVE10`, logged in, fresh user | C1–C5 all hold | Apply at checkout | −400 000 (10%), final 3 600 000 | 200 but discount **−36 000 000** → final **40 000 000** (H1) → FR09-BUG-01 | FAILED |
+| TC-FR09-DOM-02 | All-VP fixed happy path | Cart 4 000 000 ₫ + `BIGBUY` (min 500k) | C1–C5 hold | Apply | −50 000, final 3 950 000 | −50 000 → 3 950 000 (H2) | PASSED |
+| TC-FR09-DOM-03 | All-VP fixed happy path | Cart 4 000 000 ₫ + `VIP100` (min 300k) | C1–C5 hold | Apply | −100 000, final 3 900 000 | −100 000 → 3 900 000 (H3) | PASSED |
+| TC-FR09-DOM-04 | C1 violated only | `FAKE99` on qualifying cart, logged in | C2–C5 hold, code nonexistent | Apply | Rejected (code does not exist) | 404 uniform (V1) | PASSED |
+| TC-FR09-DOM-05 | C1 violated only (inactive) | Deactivated `SAVE10` (admin setup), qualifying cart | C2–C5 hold | Apply | Rejected (inactive) | 404 via INACT1 fixture (V2) | PASSED |
+| TC-FR09-DOM-06 | C2 violated only | `EXPIRED` on ≥100 000 ₫ cart, logged in, fresh user | C1,C3–C5 hold | Apply | Rejected (expired) | 400 expired (V3) | PASSED |
+| TC-FR09-DOM-07 | C3 violated only | `SAVE10` on 50 000 ₫ test item (admin-created), logged in | C1,C2,C4,C5 hold | Apply | Rejected (below 300 000 ₫ min) | 400 min-gate (V4; total passed directly, no item needed) | PASSED |
+| TC-FR09-DOM-08 | C4 violated only | `SAVE10` on qualifying cart, logged out | C1–C3,C5 hold | Apply as guest | Rejected (login required) | **200 success quote** without any auth (V5) → FR09-BUG-03 | FAILED |
+| TC-FR09-DOM-09 | C5 violated only | `SAVE10` reused by same user (max 1) | C1–C4 hold, quota spent | Use once → order again with `SAVE10` | 2nd use rejected (quota exhausted) | 400 after usage recorded (Q6) | PASSED |
+| TC-FR09-DOM-10 | C5 within quota | `VIP100` 1st + 2nd order (max 2) | C1–C4 hold | Two successive orders | Both succeed, −100 000 each | used 0→1→2 (Q1/Q2) | PASSED |
+| TC-FR09-DOM-11 | C5 violated only | `VIP100` 3rd order (max 2) | C1–C4 hold, quota spent | Third order | Rejected (quota exhausted) | 400 quota message (Q3) | PASSED |
+| TC-FR09-DOM-12 | IP1.2 empty code | `` on qualifying cart, logged in | — | Apply empty | Rejected / validation message | 400 validation (V6) | PASSED |
+| TC-FR09-DOM-13 | SP8.1 lowercase | `save10`, qualifying cart, logged in | C1–C5 hold for `SAVE10` | Apply | Record accept/reject as-is | 404 via API (S1); UI normalizes trim+upper → would accept (layer divergence noted) | PASSED |
+| TC-FR09-DOM-14 | SP8.2 spaces | `␣SAVE10␣`, qualifying cart, logged in | C1–C5 hold | Apply | Record accept/reject/trim as-is | 404 via API (S2); UI normalizes → would accept | PASSED |
+| TC-FR09-DOM-15 | SP9.1 stacking | `SAVE10` then `BIGBUY` on same cart | Both codes individually valid | Apply both | Student standard (16/10): max 1 code per order — new code must overwrite old or error; stacking discounts = serious business bug | Both **200** via API (K1) → FR09-BUG-08 | FAILED |
+| TC-FR09-DOM-16 | SP9.2 repeat | `SAVE10` applied twice on same cart | Valid single use | Apply twice | Student standard (16/10): re-apply must be idempotent — NO double discount; double-charging discount = serious bug | Both **200** via API (K2) → FR09-BUG-08 | FAILED |
+| TC-FR09-DOM-17 | SP9.3 rounding | 10% on 4 555 555 ₫ total (admin-priced item) | C1–C5 hold | Apply `SAVE10` | Record exact discount (455 555.5 → ?): round up/down, final math | −40 999 995 → 45 555 550 (H4) — no rounding at all, formula bug → FR09-BUG-01 | FAILED |
 
 FR-09 total so far: **17 TCs** (BVA edges to be added in §3.3).
 
@@ -374,26 +374,26 @@ FR-09 total so far: **17 TCs** (BVA edges to be added in §3.3).
 
 | TC_ID | Boundary / point | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| TC-FR09-BVA-01 | B1 empty cart | `SAVE10`, cart 0 ₫, logged in | C1,C2,C4,C5 hold | Apply | Rejected (below min) | — | Pending Execution |
-| TC-FR09-BVA-02 | B1 SAVE10 min− | `SAVE10`, subtotal 299 999 ₫ (fixture item) | C1,C2,C4,C5 hold | Apply | Rejected — 1 ₫ short | — | Pending Execution |
-| TC-FR09-BVA-03 | B1 SAVE10 min | `SAVE10`, subtotal 300 000 ₫ | C1,C2,C4,C5 hold | Apply | Accept: −30 000 → final 270 000 (proves `>=`, not `>`) | — | Pending Execution |
-| TC-FR09-BVA-04 | B1 SAVE10 min+ | `SAVE10`, subtotal 300 001 ₫ | C1,C2,C4,C5 hold | Apply | Accept | — | Pending Execution |
-| TC-FR09-BVA-05 | B1 BIGBUY min− | `BIGBUY`, subtotal 499 999 ₫ | C1,C2,C4,C5 hold | Apply | Rejected | — | Pending Execution |
-| TC-FR09-BVA-06 | B1 BIGBUY min | `BIGBUY`, subtotal 500 000 ₫ | C1,C2,C4,C5 hold | Apply | Accept: −50 000 → 450 000 | — | Pending Execution |
-| TC-FR09-BVA-07 | B1 BIGBUY min+ | `BIGBUY`, subtotal 500 001 ₫ | C1,C2,C4,C5 hold | Apply | Accept | — | Pending Execution |
-| TC-FR09-BVA-08 | B1 VIP100 min− | `VIP100`, subtotal 299 999 ₫ | C1,C2,C4,C5 hold | Apply | Rejected | — | Pending Execution |
-| TC-FR09-BVA-09 | B1 VIP100 min | `VIP100`, subtotal 300 000 ₫ | C1,C2,C4,C5 hold | Apply | Accept: −100 000 → 200 000 | — | Pending Execution |
-| TC-FR09-BVA-10 | B1 VIP100 min+ | `VIP100`, subtotal 300 001 ₫ | C1,C2,C4,C5 hold | Apply | Accept | — | Pending Execution |
-| TC-FR09-BVA-11 | B2 used=0 | `VIP100`, qualifying cart, fresh user | C1–C4 hold | 1st order with code | Success, used → 1 | — | Pending Execution |
-| TC-FR09-BVA-12 | B2 used=1 (at max) | `VIP100`, same user | C1–C4 hold, used = 1 | 2nd order | Success (at max, proves `< max+1` i.e. 2 allowed) | — | Pending Execution |
-| TC-FR09-BVA-13 | B2 max+ (used=2) | `VIP100`, same user | C1–C4 hold, used = 2 | 3rd order | Rejected (quota exhausted) | — | Pending Execution |
-| TC-FR09-BVA-14 | B2 increment timing ★ | `VIP100`, qualifying cart | used = 0 | Validate/apply on cart ×3 WITHOUT checkout, then place 1 order | Quota intact until checkout (used = 1 after order); apply-only must NOT consume uses | — | Pending Execution |
-| TC-FR09-BVA-15 | B3 T−1s | Fixture coupon exp T, qualifying cart | C1,C3–C5 hold | Apply 1s before T | Accept (max−) | — | Pending Execution |
-| TC-FR09-BVA-16 | B3 exactly T ★ | Same fixture | C1,C3–C5 hold | Apply at second T | Probe: record accept/reject (`<` vs `<=`) | — | Pending Execution |
-| TC-FR09-BVA-17 | B3 T+1s | Same fixture | C1,C3–C5 hold | Apply 1s after T | Rejected (max+) | — | Pending Execution |
-| TC-FR09-BVA-18 | B4 discount−1 | Fixture FIX200 (fixed 200 000, min 0), subtotal 199 999 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 0 (floor) — negative total = bug | — | Pending Execution |
-| TC-FR09-BVA-19 | B4 discount=subtotal | Same fixture, subtotal 200 000 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 0 exactly | — | Pending Execution |
-| TC-FR09-BVA-20 | B4 discount+1 | Same fixture, subtotal 200 001 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 1 ₫ | — | Pending Execution |
+| TC-FR09-BVA-01 | B1 empty cart | `SAVE10`, cart 0 ₫, logged in | C1,C2,C4,C5 hold | Apply | Rejected (below min) | 400 min-gate (M0) | PASSED |
+| TC-FR09-BVA-02 | B1 SAVE10 min− | `SAVE10`, subtotal 299 999 ₫ (fixture item) | C1,C2,C4,C5 hold | Apply | Rejected — 1 ₫ short | 400 (M1) | PASSED |
+| TC-FR09-BVA-03 | B1 SAVE10 min | `SAVE10`, subtotal 300 000 ₫ | C1,C2,C4,C5 hold | Apply | Accept: −30 000 → final 270 000 (proves `>=`, not `>`) | **400** at exactly 300 000 (M2) → FR09-BUG-02 | FAILED |
+| TC-FR09-BVA-04 | B1 SAVE10 min+ | `SAVE10`, subtotal 300 001 ₫ | C1,C2,C4,C5 hold | Apply | Accept | 200 accept (M3; gate OK — money math covered by FR09-BUG-01) | PASSED |
+| TC-FR09-BVA-05 | B1 BIGBUY min− | `BIGBUY`, subtotal 499 999 ₫ | C1,C2,C4,C5 hold | Apply | Rejected | 400 (M4) | PASSED |
+| TC-FR09-BVA-06 | B1 BIGBUY min | `BIGBUY`, subtotal 500 000 ₫ | C1,C2,C4,C5 hold | Apply | Accept: −50 000 → 450 000 | **400** at exactly 500 000 (M5) → FR09-BUG-02 | FAILED |
+| TC-FR09-BVA-07 | B1 BIGBUY min+ | `BIGBUY`, subtotal 500 001 ₫ | C1,C2,C4,C5 hold | Apply | Accept | 200, −50 000 → 450 001 (M6) | PASSED |
+| TC-FR09-BVA-08 | B1 VIP100 min− | `VIP100`, subtotal 299 999 ₫ | C1,C2,C4,C5 hold | Apply | Rejected | 400 (M7) | PASSED |
+| TC-FR09-BVA-09 | B1 VIP100 min | `VIP100`, subtotal 300 000 ₫ | C1,C2,C4,C5 hold | Apply | Accept: −100 000 → 200 000 | **400** at exactly 300 000 (M8) → FR09-BUG-02 | FAILED |
+| TC-FR09-BVA-10 | B1 VIP100 min+ | `VIP100`, subtotal 300 001 ₫ | C1,C2,C4,C5 hold | Apply | Accept | 200, −100 000 → 200 001 (M9) | PASSED |
+| TC-FR09-BVA-11 | B2 used=0 | `VIP100`, qualifying cart, fresh user | C1–C4 hold | 1st order with code | Success, used → 1 | used 0→1 (Q1) | PASSED |
+| TC-FR09-BVA-12 | B2 used=1 (at max) | `VIP100`, same user | C1–C4 hold, used = 1 | 2nd order | Success (at max, proves `< max+1` i.e. 2 allowed) | used 1→2 (Q2) | PASSED |
+| TC-FR09-BVA-13 | B2 max+ (used=2) | `VIP100`, same user | C1–C4 hold, used = 2 | 3rd order | Rejected (quota exhausted) | 400 quota (Q3) | PASSED |
+| TC-FR09-BVA-14 | B2 increment timing ★ | `VIP100`, qualifying cart | used = 0 | Validate/apply on cart ×3 WITHOUT checkout, then place 1 order | Quota intact until checkout (used = 1 after order); apply-only must NOT consume uses | used 0→0 after 3 apply-only (N1) — holds trivially: nothing consumes on apply (see FR09-BUG-06) | PASSED |
+| TC-FR09-BVA-15 | B3 T−1s | Fixture coupon exp T, qualifying cart | C1,C3–C5 hold | Apply 1s before T | Accept (max−) | 200 (E1) | PASSED |
+| TC-FR09-BVA-16 | B3 exactly T ★ | Same fixture | C1,C3–C5 hold | Apply at second T | Probe: record accept/reject (`<` vs `<=`) | 400 at T+17ms skew (E2) — post-expiry reject correct; exact-T operator per code `expiry < now` = accept | PASSED |
+| TC-FR09-BVA-17 | B3 T+1s | Same fixture | C1,C3–C5 hold | Apply 1s after T | Rejected (max+) | 400 (E3) | PASSED |
+| TC-FR09-BVA-18 | B4 discount−1 | Fixture FIX200 (fixed 200 000, min 0), subtotal 199 999 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 0 (floor) — negative total = bug | Final **−1** (Z1) → FR09-BUG-07 | FAILED |
+| TC-FR09-BVA-19 | B4 discount=subtotal | Same fixture, subtotal 200 000 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 0 exactly | Final 0 (Z2) | PASSED |
+| TC-FR09-BVA-20 | B4 discount+1 | Same fixture, subtotal 200 001 ₫ | C1,C2,C4,C5 hold | Apply + checkout | Final = 1 ₫ | Final 1 (Z3) | PASSED |
 
 FR-09 total: 17 DOM + 20 BVA + 11 GAP = **48 TCs**.
 
@@ -435,23 +435,39 @@ FR-09 total: 17 DOM + 20 BVA + 11 GAP = **48 TCs**.
 
 #### 3.4.3 Supplementary white-box test cases
 
-| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) |
-| :--- | :--- | :--- | :--- |
-| TC-FR09-GAP-01 | Equality `>` bug (M1) | SAVE10 on exactly 300 000 ₫ | Accept, −30 000 (proves `>=`) |
-| TC-FR09-GAP-02 | Percent math (M2) | SAVE10 on 4 000 000 ₫, inspect math | Discount 400 000, final 3 600 000 |
-| TC-FR09-GAP-03 | Guest apply (M3) | No token, no `user_id`, valid code + total | Rejected (C4 login required) |
-| TC-FR09-GAP-04 | Omitted `user_id` (M7) | Exhausted user, apply WITHOUT `user_id` | Still rejected (C5 must hold regardless) |
-| TC-FR09-GAP-05 | Foreign `user_id` (M3) | Exhausted user, apply with ANOTHER fresh user's id | Rejected (quota is per-caller, server-known) |
-| TC-FR09-GAP-06 | Tampered total via API (M5) | Auth'd `POST /api/checkout` with `total_amount = 1` | Rejected/recomputed — never a 1 ₫ order |
-| TC-FR09-GAP-07 | Usage never recorded (M4) | Checkout with SAVE10, skip `/api/coupon-usage`, reuse SAVE10 | 2nd use rejected (server-side quota) |
-| TC-FR09-GAP-08 | Double usage record (M4) | One order → call `/api/coupon-usage` twice | 2nd record rejected (idempotent, 1 use per order) |
-| TC-FR09-GAP-09 | UI editable total (M5) | Set checkout total input to 1 ₫ → checkout | Total not user-editable; server recomputes |
-| TC-FR09-GAP-10 | Last-quota race (M4) | VIP100 at used = 1 → two PARALLEL applies | At most one succeeds (atomic check-and-reserve) |
-| TC-FR09-GAP-11 | API stacking (single-code std) | SAVE10 then BIGBUY via API, same cart | 2nd apply overwrites or errors (max 1 code/order) |
+| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR09-GAP-01 | Equality `>` bug (M1) | SAVE10 on exactly 300 000 ₫ | Accept, −30 000 (proves `>=`) | 400 at equality (M2) → FR09-BUG-02 | FAILED |
+| TC-FR09-GAP-02 | Percent math (M2) | SAVE10 on 4 000 000 ₫, inspect math | Discount 400 000, final 3 600 000 | −36 000 000 → 40 000 000 (H1) → FR09-BUG-01 | FAILED |
+| TC-FR09-GAP-03 | Guest apply (M3) | No token, no `user_id`, valid code + total | Rejected (C4 login required) | 200 quote; 200 with foreign id (V5/V7) → FR09-BUG-03 | FAILED |
+| TC-FR09-GAP-04 | Omitted `user_id` (M7) | Exhausted user, apply WITHOUT `user_id` | Still rejected (C5 must hold regardless) | 200 (Q7) → FR09-BUG-04 | FAILED |
+| TC-FR09-GAP-05 | Foreign `user_id` (M3) | Exhausted user, apply with ANOTHER fresh user's id | Rejected (quota is per-caller, server-known) | 200 (Q8) → FR09-BUG-03 | FAILED |
+| TC-FR09-GAP-06 | Tampered total via API (M5) | Auth'd `POST /api/checkout` with `total_amount = 1` | Rejected/recomputed — never a 1 ₫ order | Order #4 stored `total_amount = 1` (T1) → FR09-BUG-05 | FAILED |
+| TC-FR09-GAP-07 | Usage never recorded (M4) | Checkout with SAVE10, skip `/api/coupon-usage`, reuse SAVE10 | 2nd use rejected (server-side quota) | Reuse 200, used = 0 (Q4) → FR09-BUG-06 | FAILED |
+| TC-FR09-GAP-08 | Double usage record (M4) | One order → call `/api/coupon-usage` twice | 2nd record rejected (idempotent, 1 use per order) | used = 2 for one order (Q5) → FR09-BUG-06 | FAILED |
+| TC-FR09-GAP-09 | UI editable total (M5) | Set checkout total input to 1 ₫ → checkout | Total not user-editable; server recomputes | Editable input exists; server accepts any total (screenshot + T1) → FR09-BUG-09/05 | FAILED |
+| TC-FR09-GAP-10 | Last-quota race (M4) | VIP100 at used = 1 → two PARALLEL applies | At most one succeeds (atomic check-and-reserve) | Both 200 (R1) → FR09-BUG-10 | FAILED |
+| TC-FR09-GAP-11 | API stacking (single-code std) | SAVE10 then BIGBUY via API, same cart | 2nd apply overwrites or errors (max 1 code/order) | Both 200 (K1) → FR09-BUG-08 | FAILED |
 
 ### 3.5 Execution & Bugs
 
-> TODO.
+> Executed 16/10/2026, 48/48 TCs. **28 PASSED, 20 FAILED → 10 bugs** (details: `Bug_Reports.md` §FR-09; screenshots: `screenshots/FR09_UI_CHECKOUT.png`, `screenshots/FR09_API_EVIDENCE.png`; raw transcript: `scripts/exec_fr09_results.json`; runner: `scripts/exec_fr09.js`).
+> Fixtures TIMEB1/FIX200/INACT1 created via admin endpoint and deleted afterwards (seeds = 4 verified). Test accounts `cpn*` + usage rows left in DB (documented).
+
+| Bug ID | Title | Severity | Evidence | Related TCs |
+| :--- | :--- | :--- | :--- | :--- |
+| FR09-BUG-01 | Percent formula `total×(1−value)` → negative discount, final = 10× total | Critical | API evidence PNG (H1/H4) + server.js:398-421 | DOM-01/17, GAP-02 |
+| FR09-BUG-02 | C3 strict `>` rejects subtotal == min (spec `>=`) | High | API evidence PNG (M2/M5/M8) + server.js:379 | BVA-03/06/09, GAP-01 |
+| FR09-BUG-03 | `POST /api/apply-coupon` has no auth; `user_id` client-supplied (quota impersonation) | High | API evidence PNG (V5/V7/Q8) + server.js:363-391 | DOM-08, GAP-03/05 |
+| FR09-BUG-04 | Usage check skipped when `user_id` omitted (`if (user_id)`) | High | API evidence PNG (Q7) + server.js:386 | GAP-04 |
+| FR09-BUG-05 | Checkout trusts any client `total_amount`, ignores coupon (1 ₫ order stored) | Critical | API evidence PNG (T1, order #4) + server.js:297-309 | GAP-06 |
+| FR09-BUG-06 | Quota = voluntary post-checkout client call: unlimited reuse, double-count, no linkage | High | API evidence PNG (Q4/Q5/N1) + server.js:443-454 | BVA-14, GAP-07/08 |
+| FR09-BUG-07 | No zero floor: fixed > subtotal → negative `final_amount` (−1 ₫) | Medium | API evidence PNG (Z1) + server.js:406 | BVA-18 |
+| FR09-BUG-08 | No server-side single-code rule: stacking + repeat apply via API | Medium | API evidence PNG (K1/K2) + server.js:363-441 | DOM-15/16, GAP-11 |
+| FR09-BUG-09 | Checkout total is an editable input (FR-08 UI violation) | Medium | UI screenshot + Checkout.jsx:14,91-103 | GAP-09 |
+| FR09-BUG-10 | Last-quota race: parallel applies both pass (no transaction) | Medium | API evidence PNG (R1) + server.js:386-395 | GAP-10 |
+
+GitHub Issues: to be filed on the group repo with the PNGs attached (links added here after filing).
 
 ---
 
@@ -513,10 +529,10 @@ FR-09 total: 17 DOM + 20 BVA + 11 GAP = **48 TCs**.
 | Feature | Designed | Executed | Passed | Failed | Not executed | Bugs |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
-| FR-09 | 48 | 0 | 0 | 0 | 48 | 0 |
+| FR-09 | 48 | 48 | 28 | 20 | 0 | 10 |
 | FR-16 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **85** | **37** | **13** | **24** | **48** | **10** |
+| **Total** | **85** | **85** | **41** | **44** | **0** | **20** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 
