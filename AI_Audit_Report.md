@@ -112,7 +112,7 @@ Student review decisions (16/10/2026), applied to `Main_Report.md` §2.2:
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before Gap Analysis).** Every ordered variable has an explicit step unit; each edge tests a concrete operator hypothesis (`>=3` vs `>3`, `<30` vs `<=30`); BVA TCs reference rather than duplicate DOM coverage (0/1 fails, 0s, empty stay in DOM).
+**VALID — reviewed and approved by student, 16/10/2026.** Step-2 design holds: every ordered variable has an explicit step unit and each edge probes a concrete operator hypothesis. Two student decisions recorded: (a) ±1s timing tolerance accepted, with ms-precision server/DB timestamps required for operator conclusions; (b) BVA-11 (7-char) and BVA-12 (1000-char) probes kept to detect Register-rule leakage (`minlength=8`) and overflow/500 faults.
 
 #### (4) Reasoning
 
@@ -120,7 +120,35 @@ Per ISTQB CTFL v4.0 §4.2 (boundary value analysis: test at and immediately eith
 
 #### (5) Student Fix
 
-- Student to review at next gate: confirm timing tolerance (±1s) for BVA-05…09, confirm 7-char/1000-char probes, then approve opening source code for Step 3 (Gap Analysis).
+- Student review decisions (16/10/2026): (a) ±1s tolerance accepted for BVA-05…09, execution must log ms-precision timestamps for operator conclusions; (b) BVA-11 and BVA-12 probes kept (Register-rule leakage + overflow check). No TC changes required; student approved opening source code for Step 3 (Gap Analysis).
+
+---
+
+### Artifact 3: FR-02 white-box inspection + AI Gap Analysis (G9.3 Analyse)
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~11:20 16/10/2026 (UTC+07)
+- **Full Prompt (user):** Chặng 3A — open EShop backend + frontend-web source; diff actual login/lockout logic (counter storage, comparison operators, expiry reset, 4th-while-locked, trim/lowercase) against the 28 black-box TCs; root-cause each miss (spec gap / LLM assumption / dev bug); add `TC-FR02-GAP-*` where needed; write `Main_Report.md` §2.4; finalize Artifact 2; log Artifact 3; commit `docs(FR-02): complete white-box inspection and AI gap analysis`.
+
+#### (2) AI Output
+
+- `Main_Report.md` §2.4: implementation table (11 rows with file:line refs), 8 misses M1–M8 with root causes, 9 supplementary TCs `TC-FR02-GAP-01…09`.
+- Headline findings: `+2` increment (server.js:54), 180s lock (server.js:57), lock-on-2nd-fail, stale-counter relock, plaintext password in login response + storage, `type="text"` email/password inputs, swallowed 403 in UI. Two black-box hedges (SP3.1/SP4.1) confirmed correct.
+- No execution performed yet; no Actual/Status filled.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before execution).** Every claim cites exact file:line; misses are classified into the three requested root-cause buckets; GAP TCs map 1:1 to misses M1–M8.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.3 (white-box/structural perspective complements black-box) and the course Gap-Analysis rubric (miss → why → human-added coverage): the analysis separates implementation facts (§2.4.1) from technique critique (§2.4.2) so the LLM's blind spots (response-shape domain, GUI-spec cross-check) are visible as process lessons, not just bug lists.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm bug severity assignments and GAP TC wording, then approve Chặng 3B (execution).
 
 ---
 

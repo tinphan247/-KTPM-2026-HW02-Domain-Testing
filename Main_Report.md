@@ -191,7 +191,55 @@ FR-02 total: 15 DOM + 13 BVA = **28 TCs**. Timing TCs (BVA-05…09) require stop
 
 ### 2.4 AI Gap Analysis & Human Review
 
-> TODO: black-box (spec-only) vs white-box (code + runtime) comparison; missed cases; root cause (prompt quality / tool limit / feature complexity); added TCs.
+> White-box sources: `eshop-sut/backend/server.js:32-66` (login route), `backend/database.js:50-61,91-94` (users table + seeds), `frontend-web/src/pages/Login.jsx`, `frontend-web/src/context/AuthContext.jsx:26-35`.
+
+#### 2.4.1 How the code actually implements login/lockout
+
+| Spec question | Code answer | File:line |
+| :--- | :--- | :--- |
+| Counter storage | DB column `users.login_attempts` (+ `locked_until`); persists across restarts | database.js:56-57 |
+| Increment per fail | **+2, not +1** (`user.login_attempts + 2`) | server.js:54 |
+| Lock threshold | `newAttempts >= 3` — with +2 steps, lock fires on the **2nd** consecutive fail (0→2→4) | server.js:56 |
+| Lock duration | `Date.now() + 180000` = **180s (3 min), not 30s** | server.js:57 |
+| Expiry operator | `new Date() < new Date(locked_until)` → locked while `now < until`; exactly at `until` = unlocked (`<` semantics) | server.js:40 |
+| Reset on success | Yes: `login_attempts = 0, locked_until = NULL` | server.js:47-50 |
+| Reset on expiry | **None** — stale counter survives; first wrong attempt after expiry re-arms lock immediately (4+2=6) | server.js:54-62 |
+| Submit while locked | Early 403 return, DB untouched (no sliding-window extension) | server.js:40-44 |
+| Email normalization | **None** — exact `WHERE email = ?`, no `trim()`/`toLowerCase()` (SQLite BINARY match) | server.js:35 |
+| Empty password | Counted as a fail (**+2**) — no validation | server.js:46-54 |
+| Unknown vs wrong-pwd | Both 401 `"Invalid email or password"` — uniform, good | server.js:37-38,63 |
+| Locked response | Distinct 403 `"Tài khoản đã bị khóa..."` — reveals locked state | server.js:40-44 |
+| Login success body | Returns **full `user` row including plaintext `password`**; passwords stored plaintext (seed + register raw insert) | server.js:52, database.js:92-93, server.js:20-30 |
+| JWT | No `expiresIn`, hardcoded `SECRET_KEY` in source | server.js:9,51 |
+| Login form | Email `type="text"` (spec: `type="email"`); password `type="text"` (spec: `type="password"`, FR-22); heading `"Đăng Ký"` in `<h2>` (FR-21: one `<h1>`); label `Username`, button `Sign In` (FR-21: Vietnamese); error rendered **below** form (FR-22: above submit); submit has `tabIndex={1}` (FR-21 tab order); UI swallows 403 into generic `"Đăng nhập thất bại..."` so users never see lockout state | Login.jsx:24,28-46,53-59,61-66; AuthContext.jsx:27-33 |
+| Cross-FR note (for FR-03 phase) | Forgot-password OTP is **4-digit** (`1000+random*9000`) vs FR-03 spec 6-digit | server.js:72 |
+
+#### 2.4.2 What the 28 black-box TCs missed or assumed differently
+
+| # | Miss / clash | Root cause |
+| :--- | :--- | :--- |
+| M1 | Assumed +1 increment (DOM-05/07, BVA-01/13) — code uses +2 | **Dev bug** contradicting explicit spec ("đúng 1 đơn vị"); LLM assumed spec-faithful implementation |
+| M2 | Assumed 30s lock (DOM-08/10, BVA-05…09) — code uses 180s | **Dev bug** (wrong constant `180000`); black-box timing TCs all shift |
+| M3 | Assumed lock on 3rd fail (BVA-02) — code locks on 2nd | Derived from M1; **LLM never questioned the increment operator** |
+| M4 | Assumed expiry starts a fresh window (BVA-09) — stale counter re-arms lock instantly | **Dev bug** (no reset-on-expiry); LLM assumed symmetric state machine |
+| M5 | Never probed response-body shape — plaintext password leak missed | **LLM blind spot**: output-domain analysis stopped at status/message, ignored payload fields |
+| M6 | Never cross-checked GUI spec (FR-21/22) on the login form — `type=text`, wrong heading, error placement missed | **LLM blind spot**: treated FR-02 as API-only, skipped form-level requirements stated in the same spec |
+| M7 | Empty-password counting (DOM-06) — code counts +2, no validation | **Dev bug** (missing validation); student review decision already flagged the right expectation |
+| M8 | Correctly hedged via SP3.1/SP4.1 — code confirms no normalization | **Spec gap** (spec silent); black-box hedging was the right call, now confirmed as usability defect vs normalization standard |
+
+#### 2.4.3 Supplementary white-box test cases
+
+| TC_ID | Discovery | Steps (high level) | Expected (spec/standard) |
+| :--- | :--- | :--- | :--- |
+| TC-FR02-GAP-01 | Early lock (M1+M3) | Fresh account → wrong pwd ×2 | 2nd fail must NOT lock (counter = 2) |
+| TC-FR02-GAP-02 | Duration (M2) | Lock account → read `locked_until − now` (ms) | ≈ 30 000 ms, not ≈ 180 000 ms |
+| TC-FR02-GAP-03 | Empty-pwd count (M7) | Fresh account → submit empty password via API | Validation error, counter unchanged |
+| TC-FR02-GAP-04 | Stale-counter relock (M4) | Lock → expire (or simulate) → 1 wrong attempt | Fresh-window fail #1 (counter = 1), no instant relock |
+| TC-FR02-GAP-05 | Password leak (M5) | Successful login → inspect response body | No `password` field in response; no plaintext storage (SEC-01) |
+| TC-FR02-GAP-06 | Case sensitivity (M8) | `TEST@ESHOP.COM` + correct pwd | Accept (case-insensitive standard) |
+| TC-FR02-GAP-07 | Whitespace (M8) | `␣test@eshop.com␣` + correct pwd | Accept (auto-trim standard) |
+| TC-FR02-GAP-08 | Form input types (M6) | Inspect login form fields | Email `type="email"`, password `type="password"` |
+| TC-FR02-GAP-09 | Form feedback/i18n (M6) | Inspect headings, labels, error placement, tab order; trigger lockout in UI | Vietnamese `<h1>` title, error above submit, natural tab order, visible lockout state |
 
 ### 2.5 Execution & Bugs
 
@@ -282,11 +330,11 @@ FR-02 total: 15 DOM + 13 BVA = **28 TCs**. Timing TCs (BVA-05…09) require stop
 
 | Feature | Designed | Executed | Passed | Failed | Not executed | Bugs |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| FR-02 | 28 | 0 | 0 | 0 | 28 | 0 |
+| FR-02 | 37 | 0 | 0 | 0 | 37 | 0 |
 | FR-09 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-16 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **28** | **0** | **0** | **0** | **28** | **0** |
+| **Total** | **37** | **0** | **0** | **0** | **37** | **0** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 
