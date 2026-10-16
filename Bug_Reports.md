@@ -29,7 +29,7 @@ Related TCs: <TC IDs>
 
 Runner: `scripts/exec_fr02.js` → transcript `scripts/exec_fr02_results.json` (25 steps).
 Screenshots: `screenshots/FR02_UI_LOGIN_PAGE.png` (real page), `screenshots/FR02_API_EVIDENCE.png` (rendered from measured output — method disclosed).
-GitHub Issue links: TODO — file on group repo with PNGs attached.
+GitHub Issues (filed): FR02 issues #1-10 (filed 16/10/2026, PNGs attached) — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ### FR02-BUG-01 — [Critical] Fail counter increments by +2, lockout fires on 2nd fail (spec: +1, lock on 3rd)
 - **Environment:** backend localhost:3000 (commit: eshop-sut main 16/10/2026), `scripts/exec_fr02.js` accounts `exec*`
@@ -39,67 +39,77 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** +2 per fail; locked on 2nd fail. Root: `server.js:54` (`login_attempts + 2`).
 - **Severity/Priority:** Critical / P1 (legit users locked after 2 typos; brute-force math broken)
 - **Attachments:** `screenshots/FR02_API_EVIDENCE.png` (A1/A2/F2). **Related TCs:** DOM-05/07/08/12, BVA-01/02/04/13, GAP-01.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/1
 
 ### FR02-BUG-02 — [High] Lockout lasts ~180s instead of spec 30s
 - **Steps:** lock account (2 wrongs) → read `locked_until − now` = **179 377 ms**; correct-pwd probes at 15/29/30/31s all → 403 (G1–G4).
 - **Expected:** 30s lockout (demo env).
 - **Actual:** ~180s. Root: `server.js:57` (`Date.now() + 180000`).
 - **Severity:** High. **Attachments:** `FR02_API_EVIDENCE.png`. **Related TCs:** DOM-08/10, BVA-05…09, GAP-02.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/2
 
 ### FR02-BUG-03 — [High] Empty password counted as failed attempt (+2)
 - **Steps:** fresh account (attempts 2) → POST empty password → 401, attempts 2→4 (C3).
 - **Expected (student-confirmed):** validation error, counter unchanged.
 - **Actual:** counted toward lockout. Root: no validation, `server.js:46-54`.
 - **Severity:** High. **Related TCs:** DOM-06, GAP-03.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/3
 
 ### FR02-BUG-04 — [High] Stale counter: first wrong attempt after expiry instantly re-arms lock
 - **Steps:** lock → simulate expiry (DB `locked_until` → past, disclosed) → POST wrong pwd → 401, attempts 4→**6**, `locked_until` re-armed (B1).
 - **Expected:** fresh-window fail #1 (counter = 1).
 - **Actual:** instant relock; counter never resets except on success. Root: `server.js:54-62`.
 - **Severity:** High. **Related TCs:** BVA-09, GAP-04.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/4
 
 ### FR02-BUG-05 — [Critical/Security] Plaintext password in login + /users/me responses; plaintext storage (SEC-01)
 - **Steps:** successful login → response JSON contains `"password":"Cx123456!"` (A5); `GET /api/users/me` also returns `password` (A6); DB stores raw passwords (seed `Test1234!`, register inserts raw).
 - **Expected:** never return/store plaintext passwords.
 - **Actual:** leaked in two endpoints + stored plaintext. Root: `server.js:52`, `server.js:20-30`, `database.js:92-93`.
 - **Severity:** Critical (Security — credential exposure enables account takeover at scale). **Related TCs:** GAP-05.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/5
 
 ### FR02-BUG-06 — [Medium] No email normalization — uppercase / spaced emails rejected
 - **Steps:** `TEST@ESHOP.COM` + correct pwd → 401 (D1); `␣test@eshop.com␣` → 401 (D2).
 - **Expected (student standard):** case-insensitive + auto-trim accept.
 - **Actual:** exact-match only (`WHERE email = ?`, `server.js:35`).
 - **Severity:** Medium (usability; spec-silent → spec gap + defect). **Related TCs:** DOM-13/14, GAP-06/07.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/6
 
 ### FR02-BUG-07 — [High] Login form uses `type="text"` for email AND password (password visible)
 - **Steps:** open `/login` → inspect inputs.
 - **Expected:** email `type="email"` (FR-02), password `type="password"` (FR-22).
 - **Actual:** both `type="text"` (`Login.jsx:30,40`).
 - **Severity:** High (plaintext password on screen — shoulder-surfing; plus no HTML5 email validation). **Attachments:** `FR02_UI_LOGIN_PAGE.png`. **Related TCs:** GAP-08.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/7
 
 ### FR02-BUG-08 — [Medium] Login page i18n/structure/feedback violations + lockout state swallowed
 - **Steps:** open `/login` (see screenshot); trigger lockout → UI always shows generic `"Đăng nhập thất bại..."`.
 - **Expected:** Vietnamese `<h1>` title, error above submit (FR-22), natural tab order (FR-21), visible lockout state.
 - **Actual:** heading `"Đăng Ký"` in `<h2>`, labels `Username` / button `Sign In` (EN), error div below form, submit `tabIndex={1}`, 403 detail swallowed (`Login.jsx:24,53-66`).
 - **Severity:** Medium (hides FR-02 lockout state from users — functional impact beyond cosmetics). **Attachments:** `FR02_UI_LOGIN_PAGE.png`. **Related TCs:** GAP-09.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/8
 
 ### FR02-BUG-09 — [Medium/Security] JWT never expires + hardcoded secret in source
 - **Steps:** code inspection; decode login JWT → no `exp` claim.
 - **Expected:** expiring tokens, secret out of source.
 - **Actual:** `jwt.sign({id, role}, SECRET_KEY)`, `SECRET_KEY = "super_secret_key_that_should_not_be_here"` (`server.js:9,51`).
 - **Severity:** Medium (Security). **Related TCs:** — (inspection).
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/9
 
 ### FR02-BUG-10 — [Medium] Lost update: two concurrent fails collapse 0→2
 - **Steps:** fresh account → two parallel wrong-password POSTs → DB `attempts = 2` instead of 4 (F1).
 - **Expected:** each fail counted (≥ +1 each under any increment rule).
 - **Actual:** read-modify-write race + fire-and-forget `db.run` (`server.js:54-62`).
 - **Severity:** Medium (robustness; weakens lockout under double-click/attacker parallelism). **Related TCs:** BVA-13.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/10
 
 ## FR-09 — Coupons (executed 16/10/2026, 48 TCs: 28 passed / 20 failed → 10 bugs)
 
 Runner: `scripts/exec_fr09.js` → transcript `scripts/exec_fr09_results.json` (44 steps).
 Screenshots: `screenshots/FR09_UI_CHECKOUT.png` (real page: editable total + coupon box), `screenshots/FR09_API_EVIDENCE.png` (rendered from measured output — method disclosed).
 Fixtures TIMEB1/FIX200/INACT1 removed afterwards (`F9-restore: seeds=4`). Test accounts `cpn*` + usage rows remain (documented).
-GitHub Issue links: TODO — file on group repo with PNGs attached.
+GitHub Issues (filed): FR09 issues #11-20 (filed 16/10/2026, PNGs attached) — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ### FR09-BUG-01 — [Critical] Percent formula `total×(1−value)` → negative discount, final = 10× total
 - **Environment:** backend localhost:3000, `scripts/exec_fr09.js`
@@ -109,24 +119,28 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** `discount_amount = -36 000 000`, `final_amount = 40 000 000` (H1). Root: `server.js:398-421` (`Math.floor(total_amount * (1 - coupon.discount_value))`).
 - **Severity/Priority:** Critical / P1 (every percent coupon overcharges ~10×; message even claims "Giảm 10%").
 - **Attachments:** `screenshots/FR09_API_EVIDENCE.png` (H1/H4). **Related TCs:** DOM-01/17, GAP-02.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/11
 
 ### FR09-BUG-02 — [High] C3 strict `>` rejects subtotal == min (spec `>=`)
 - **Steps:** SAVE10 @300 000 → 400 (M2); BIGBUY @500 000 → 400 (M5); VIP100 @300 000 → 400 (M8); min−1 correctly 400; min+1 correctly 200.
 - **Expected:** equality accepted (`total >= min_order_amount`).
 - **Actual:** equality rejected. Root: `server.js:379` (`total_amount > coupon.min_order_amount`).
 - **Severity:** High. **Related TCs:** BVA-03/06/09, GAP-01.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/12
 
 ### FR09-BUG-03 — [High] `POST /api/apply-coupon` has no auth; `user_id` is client-supplied
 - **Steps:** guest (no token, no user_id) apply SAVE10 → 200 with full discount quote (V5); guest + stranger's `user_id` → 200 (V7); quota-exhausted user + fresh user's id → 200 (Q8).
 - **Expected (C4):** login required; quota evaluated for the authenticated caller.
 - **Actual:** C4 unenforced; anyone's quota usable by anyone. Root: missing `authenticateToken` + body `user_id` (`server.js:363-391`).
 - **Severity:** High (Security). **Related TCs:** DOM-08, GAP-03/05.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/13
 
 ### FR09-BUG-04 — [High] Usage check skipped when `user_id` omitted
 - **Steps:** SAVE10-exhausted user applies WITHOUT `user_id` → 200 (Q7).
 - **Expected:** C5 evaluated unconditionally.
 - **Actual:** `if (user_id)` bypasses the whole quota branch (`server.js:386`).
 - **Severity:** High. **Related TCs:** GAP-04.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/14
 
 ### FR09-BUG-05 — [Critical] Checkout trusts any client `total_amount`, ignores coupon (FR-08)
 - **Steps:** auth'd POST /api/checkout `{total_amount: 1, shipping_address}` → 200, order #4; `GET /api/orders/my-orders` shows stored `total_amount = 1` (T1).
@@ -134,43 +148,49 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** arbitrary price stored; `coupon_id` accepted but ignored. Root: `server.js:297-309`.
 - **Severity/Priority:** Critical / P1 (1 ₫ orders; payment integrity broken).
 - **Attachments:** `screenshots/FR09_API_EVIDENCE.png` (T1). **Related TCs:** GAP-06.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/15
 
 ### FR09-BUG-06 — [High] Quota = voluntary post-checkout client call (unlimited reuse + double count)
 - **Steps:** checkout with SAVE10, skip `/api/coupon-usage` → reuse 200, `used = 0` (Q4); one order + two usage calls → `used = 2` (Q5); 3 apply-only (no checkout) → `used = 0` (N1).
 - **Expected:** server-side atomic quota (consume at most once per order; reuse blocked).
 - **Actual:** no linkage between order and usage; quota purely honor-system. Root: `server.js:443-454` + Checkout.jsx:53-59.
 - **Severity:** High. **Related TCs:** BVA-14, GAP-07/08.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/16
 
 ### FR09-BUG-07 — [High] No zero floor: fixed discount > subtotal → negative final
 - **Steps:** FIX200 (fixed 200 000, min 0) @199 999 → 200, `final = -1` (Z1); @200 000 → 0 (Z2); @200 001 → 1 (Z3).
 - **Expected:** floor at 0, never negative.
 - **Actual:** negative totals possible. Root: `server.js:406` (no `Math.max(0, …)`).
 - **Severity:** High (financial data integrity — negative order totals must never persist). **Related TCs:** BVA-18.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/17
 
 ### FR09-BUG-08 — [Medium] No server-side single-code rule (stacking + repeat via API)
 - **Steps:** SAVE10 then BIGBUY → 200 + 200 (K1); SAVE10 twice → 200 + 200 (K2).
 - **Expected (student standard):** max 1 code/order (overwrite or error; no double discount).
 - **Actual:** unlimited applies (UI single-slot only by accident of `couponResult` state).
 - **Severity:** Medium. **Related TCs:** DOM-15/16, GAP-11.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/18
 
 ### FR09-BUG-09 — [High] Checkout total is a user-editable input (FR-08 UI)
 - **Steps:** open `/checkout` → "Tổng tiền thanh toán (VND)" is a free number input.
 - **Expected:** auto-computed, non-editable total.
 - **Actual:** editable (`Checkout.jsx:14,91-103`); edits only reset coupon state, and server accepts any value (see BUG-05).
 - **Severity:** High (direct in-browser price-tampering surface feeding BUG-05). **Attachments:** `screenshots/FR09_UI_CHECKOUT.png`. **Related TCs:** GAP-09.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/19
 
 ### FR09-BUG-10 — [Medium] Last-quota race: parallel applies both pass
 - **Steps:** VIP100 at `used = 1` (max 2) → two parallel applies → 200 + 200 (R1), no transaction/lock.
 - **Expected:** at most one succeeds (atomic check-and-reserve).
 - **Actual:** check-then-act race; overspend possible. Root: `server.js:386-395` (no transaction).
 - **Severity:** Medium. **Related TCs:** GAP-10.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/20
 
 ## FR-16 — CSV Import (executed 16/10/2026, 52 TCs: 19 passed / 33 failed → 10 bugs)
 
 Runner: `scripts/exec_fr16.js` → transcript `scripts/exec_fr16_results.json` (45 steps, incl. UI-parser replication per App.jsx:367-403).
 Screenshots: `screenshots/FR16_UI_ADMIN.png` (admin login gate — fresh browser, no session; import section evidenced via code refs), `screenshots/FR16_API_EVIDENCE.png` (rendered from measured output — method disclosed).
 Cleanup: `T16*` rows + `"Áo*` + iPhone-duplicate removed; whitespace-name leftover (id 17) removed manually; count verified back to 5 seeds.
-GitHub Issue links: TODO — file on group repo with PNGs attached.
+GitHub Issues (filed): FR16 issues #21-30 (filed 16/10/2026, PNGs attached) — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ### FR16-BUG-01 — [Critical] No atomicity: any bad row → half-commit (valid prefix stays)
 - **Environment:** backend localhost:3000, admin JWT, `scripts/exec_fr16.js`
@@ -180,67 +200,77 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** valid prefixes persist. Root: per-row INSERTs, no transaction (`server.js:206-241`).
 - **Severity/Priority:** Critical / P1 (spec's core guarantee broken; silent data pollution).
 - **Attachments:** `screenshots/FR16_API_EVIDENCE.png`. **Related TCs:** DOM-11/17/18, BVA-06…09/14, GAP-01.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/21
 
 ### FR16-BUG-02 — [Critical] Validation = name-only (price 0/negative/text/NULL, ghost FK, blank names all stored)
 - **Steps:** rows with price `0` / `-5000` / `"abc"` / missing (= NULL), `category_id = 9999`, name `"␣␣"` → all 200, inserted, 0 errors (D07/D11b/D12…D15, B10/B11). DB shows `"abc"` stored as TEXT, NULL price, whitespace name (leftover id 17).
 - **Expected:** `price > 0` numeric, existing FK, non-blank names; violations → rollback + cited reasons.
 - **Actual:** only `!row.name` checked. Root: `server.js:214-224`.
 - **Severity:** Critical (core data-quality gate missing — invalid prices, ghost FKs and blank names persist in catalog). **Related TCs:** DOM-07/11…15, BVA-10/11/15, GAP-02…05/07.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/22
 
 ### FR16-BUG-03 — [High] No role check: customer JWT can bulk-import (FR-12)
 - **Steps:** valid payload + `test@eshop.com` (role user) JWT → 200, imported (D04). Guest (no token) → 401 (D05 holds).
 - **Expected:** 403 admin-only.
 - **Actual:** any login imports. Root: `authenticateToken` only (`server.js:199`; same pattern on all admin/product/category mutations).
 - **Severity:** High (Security). **Related TCs:** DOM-04, GAP-06.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/23
 
 ### FR16-BUG-04 — [High] Naive `split(",")` parser: no RFC4180 (quoted commas → garbage rows)
 - **Steps:** replicate UI parse of `"Áo, thun",100000,…` → `{name:'"Áo', price:'thun"',…}` → POST → 200, garbage row stored (D09); escaped quotes likewise (D10).
 - **Expected:** single-field parse per RFC4180.
 - **Actual:** misaligned inserts. Root: `App.jsx:367-377` (no CSV library).
 - **Severity:** High (data corruption on real-world Vietnamese catalogs). **Related TCs:** DOM-09/10, GAP-11.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/24
 
 ### FR16-BUG-05 — [Medium] No file-type gate: any file parsed as CSV
 - **Steps:** code inspection — `<input type="file">` with no `accept`/validation; FileReader parses whatever bytes arrive (`App.jsx:356-384`); backend never sees a file.
 - **Expected:** `.csv`-only gate.
 - **Actual:** `.txt`/binary accepted into the pipeline (binary → garbage rows → partial import).
 - **Severity:** Medium. **Related TCs:** DOM-03.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/25
 
 ### FR16-BUG-06 — [Medium] Silent `||` defaults mask bad data (`price→0`, `category→1`, `""`)
 - **Steps:** UI maps missing price → `0`, bad category (`parseInt→NaN→null`) → backend `|| 1`, missing texts → `""` (`App.jsx:390-403`, `server.js:221-223`); all accepted without warnings (D07/D15).
 - **Expected:** missing/invalid fields → cited errors.
 - **Actual:** silently coerced and stored.
 - **Severity:** Medium. **Related TCs:** DOM-07/15, GAP-07.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/26
 
 ### FR16-BUG-07 — [Medium] Mid-file blank lines become error rows (+ partial commit)
 - **Steps:** UI-equivalent parse of file with blank line between rows → all-`""` row → missing-name error + valid rows still imported (B14).
 - **Expected (student standard):** blank lines skipped.
 - **Actual:** error row + half-commit (compounds BUG-01).
 - **Severity:** Medium. **Related TCs:** BVA-14.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/27
 
 ### FR16-BUG-08 — [Medium] `products: [null]` → 500 TypeError HTML (must be 400)
 - **Steps:** POST `{products: [null]}` → 500 `TypeError: Canno…` HTML page (G08).
 - **Expected:** 400 JSON error.
 - **Actual:** unhandled throw (`server.js:213-214`).
 - **Severity:** Medium (unhandled exception → 500 HTML page; must be 400 JSON). **Related TCs:** GAP-08.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/28
 
 ### FR16-BUG-09 — [Low] Duplicate product names allowed (observational vs FR-15)
 - **Steps:** second `iPhone 15 Pro Max` row → 200, new row (D16).
 - **Expected:** record-only (spec silent) — noted vs FR-15 consistency.
 - **Actual:** duplicates allowed (no UNIQUE).
 - **Severity:** Low. **Related TCs:** DOM-16, GAP-09.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/29
 
 ### FR16-BUG-10 — [Low] 256–1000-char names accepted (FR-15 max-255 inconsistency)
 - **Steps:** 256- and 1000-char names → 200, inserted (B19a/b); 1- and 255-char → 200 (B17/18 hold).
 - **Expected:** reject + rollback beyond 255 (FR-15 consistency).
 - **Actual:** no length cap (schema has none).
 - **Severity:** Low. **Related TCs:** BVA-19, GAP-10.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/30
 
 ## FR-20 — Mobile (executed 16/10/2026, 38 TCs: 24 passed / 14 failed → 8 bugs)
 
 Runner: `scripts/exec_fr20.js` → transcript `scripts/exec_fr20_results.json` (25 steps; users mobA/B/C/D; test orders deleted, F9 = 0 left).
 Screenshot: `screenshots/FR20_API_EVIDENCE.png` (measured lifecycle evidence + code-ref panel for mobile UI claims).
 Mobile UI not booted (Expo-web declined: SUT lacks react-native-web/react-dom and hardcodes unreachable 192.168.10.13) — UI verdicts rest on exact App.js line refs; re-shoot on device for demo video.
-GitHub Issue links: TODO — file on group repo with PNG attached.
+GitHub Issues (filed): FR02 issues #1-10 (filed 16/10/2026, PNGs attached) — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ### FR20-BUG-01 — [Critical] User cancel from `shipping` allowed (+ race TOCTOU amplifier)
 - **Environment:** backend localhost:3000, `scripts/exec_fr20.js`
@@ -250,6 +280,7 @@ GitHub Issue links: TODO — file on group repo with PNG attached.
 - **Actual:** allowed; code comment admits the gate should be pending/confirmed-only. Root: `server.js:328-342`.
 - **Severity/Priority:** Critical / P1 (shipped goods cancellable by buyer; state machine breached + race amplifier).
 - **Attachments:** `screenshots/FR20_API_EVIDENCE.png`. **Related TCs:** DOM-04, BVA-02/03, GAP-01/06.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/31
 
 ### FR20-BUG-02 — [High] Cancel does not refund coupon usage (stays consumed)
 - **Steps:** VIP100 order (`used` 0→1 via /api/coupon-usage) → user cancel → 200 → `used` still 1 (D15).
@@ -257,39 +288,46 @@ GitHub Issue links: TODO — file on group repo with PNG attached.
 - **Actual:** no compensation logic at all (single UPDATE). Root: `server.js:333-340`. (No stock system exists — verified via schema.)
 - **Severity:** High (paid discount lost on every canceled coupon order).
 - **Related TCs:** DOM-15, GAP-02.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/32
 
 ### FR20-BUG-03 — [Medium] Mobile cancel has no confirmation dialog (tap → PUT)
 - **Steps:** code inspection — `onPress={() => cancelOrder(o.id)}` fires PUT immediately; only post-hoc success/error Alerts.
 - **Expected:** confirm dialog before destructive cancel (FR-24).
 - **Actual:** one accidental tap cancels the order. Root: `App.js:312-329,961-968`.
 - **Severity:** Medium. **Related TCs:** DOM-09, GAP-04.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/33
 
 ### FR20-BUG-04 — [Medium] Mobile order statuses have no color coding (FR-11)
 - **Steps:** code inspection — status rendered as plain `<Text>`; Vietnamese labels exist but zero color rules.
 - **Expected:** clearly distinguished colors per status (FR-11).
 - **Actual:** monochrome list. Root: `App.js:960,1240-1248`.
 - **Severity:** Medium. **Related TCs:** DOM-03/13, GAP-08.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/34
 
 ### FR20-BUG-05 — [Low] Empty order history is text-only, no illustration (FR-24 partial)
 - **Steps:** code inspection — `orders.length === 0` renders bare text `"Bạn chưa có đơn hàng nào."`.
 - **Expected:** illustration/icon + friendly message.
 - **Actual:** message text holds; illustration missing. Root: `App.js:947-949`.
 - **Severity:** Low. **Related TCs:** DOM-12, GAP-09.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/35
 
 ### FR20-BUG-06 — [Low] No loading indicator on mobile cancel
 - **Steps:** code inspection — `cancelOrder` has no loading state (contrast: checkout flow has `checkoutLoading`).
 - **Expected:** loading feedback during the async cancel (FR-24).
 - **Actual:** silent tap → delayed Alert. Root: `App.js:312-329`.
 - **Severity:** Low. **Related TCs:** DOM-11.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/36
 
 ### FR20-BUG-07 — [Low] History cards omit item lines; logout labeled `"Thoát"` (FR-23)
 - **Steps:** code inspection — order card shows id/date/total/status + cancel button, no product lines; profile logout button reads `"Thoát"`.
 - **Expected:** item lines per order (FR-08-style completeness); `"Đăng xuất"` label (FR-23).
 - **Actual:** neither. Root: `App.js:940-968`.
 - **Severity:** Low. **Related TCs:** DOM-13, GAP-10.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/37
 
 ### FR20-BUG-08 — [Low] Mobile API base hardcoded to LAN IP (env portability)
 - **Steps:** code inspection — `const API_URL = "http://192.168.10.13:3000/api"`; this machine has no such interface, so the app cannot reach any backend off that LAN.
 - **Expected:** configurable base (env/flavor).
 - **Actual:** hardcoded IP. Root: `App.js:16`.
 - **Severity:** Low. **Related TCs:** GAP-10.
+**GitHub Issue:** https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/38

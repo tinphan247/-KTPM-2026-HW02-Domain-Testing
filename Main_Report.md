@@ -259,7 +259,7 @@ FR-02 total: 15 DOM + 13 BVA + 9 GAP = **37 TCs**. Executed 16/10/2026 via `scri
 | FR02-BUG-09 | JWT never expires (`no expiresIn`) + hardcoded `SECRET_KEY` in source | Medium (Security) | server.js:9,51 | — (code inspection) |
 | FR02-BUG-10 | Lost update: two concurrent fails collapse 0→2 (read-modify-write + fire-and-forget `db.run`) | Medium | API evidence PNG (F1) + server.js:54-62 | BVA-13 |
 
-GitHub Issues: to be filed on the group repo with the PNGs attached (links added here after filing).
+GitHub Issues (filed 16/10/2026): FR-02 issues #1–#10 with PNGs attached — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ---
 
@@ -467,7 +467,7 @@ FR-09 total: 17 DOM + 20 BVA + 11 GAP = **48 TCs**.
 | FR09-BUG-09 | Checkout total is an editable input (FR-08 UI violation) | High | UI screenshot + Checkout.jsx:14,91-103 | GAP-09 |
 | FR09-BUG-10 | Last-quota race: parallel applies both pass (no transaction) | Medium | API evidence PNG (R1) + server.js:386-395 | GAP-10 |
 
-GitHub Issues: to be filed on the group repo with the PNGs attached (links added here after filing).
+GitHub Issues (filed 16/10/2026): FR-09 issues #11–#20 with PNGs attached — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ---
 
@@ -690,7 +690,7 @@ FR-16 total: 21 DOM + 20 BVA + 11 GAP = **52 TCs**.
 | FR16-BUG-09 | Duplicate product names allowed (observational vs FR-15) | Low | API evidence PNG (D16) + schema (no UNIQUE) | DOM-16, GAP-09 |
 | FR16-BUG-10 | 256–1000-char names accepted (FR-15 max 255 inconsistency) | Low | API evidence PNG (B19a/b) + schema (no cap) | BVA-19, GAP-10 |
 
-GitHub Issues: to be filed on the group repo with the PNGs attached (links added here after filing).
+GitHub Issues (filed 16/10/2026): FR-16 issues #21–#30 with PNGs attached — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ---
 
@@ -882,7 +882,7 @@ FR-20 total: 18 DOM + 10 BVA + 10 GAP = **38 TCs**.
 | FR20-BUG-07 | History cards omit item lines; logout labeled `"Thoát"` (FR-23) | Low | App.js:940-968 | DOM-13, GAP-10 |
 | FR20-BUG-08 | Mobile API base hardcoded to LAN IP (env portability) | Low | App.js:16 | GAP-10 |
 
-GitHub Issues: to be filed on the group repo with the PNG attached (links added here after filing).
+GitHub Issues (filed 16/10/2026): FR-02 issues #1–#10 with PNGs attached — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ---
 
@@ -898,7 +898,7 @@ GitHub Issues: to be filed on the group repo with the PNG attached (links added 
 
 Demo videos: [TODO: Insert YouTube Video Demo Link — Unlisted, skill end-to-end on one full feature].
 
-GitHub Issues (38 total): [TODO: Insert 38 GitHub Issue Links — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing].
+GitHub Issues (38 total, filed 16/10/2026): FR-02 #1–10 · FR-09 #11–20 · FR-16 #21–30 · FR-20 #31–38 — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ---
 
@@ -933,4 +933,4 @@ GitHub Issues (38 total): [TODO: Insert 38 GitHub Issue Links — https://github
 
 **AI Critique (243 words):** *"Across four features, the AI proved a fast but credulous assistant: fluent at structuring partitions, boundaries, and tables, yet systematically over-trusting. Its signature failure was assuming a sane implementation behind every spec sentence. It never questioned the increment operator (missed the +2 lockout counter), the lockout constant (missed 180 seconds versus 30), comparison operators (missed strict greater-than on coupon minima), or arithmetic itself (missed a percent formula that inflated totals tenfold). Every miss shares one root cause: the model interpolates the most plausible implementation instead of treating code as an independent, possibly hostile witness — which is precisely why the black-box-first, white-box-second discipline of this assignment matters. Second, the AI stopped at status codes and messages while ignoring response shapes and trust boundaries. It never probed what else a 200 response carries (plaintext passwords), whether the server recomputes client-supplied totals (it stored a 1-dong order), or whether quota enforcement survives a skipped client call (it does not). Third, it framed each feature as API-only, skipping interface requirements stated in the same specification: text-type password fields, wrong headings, missing status colors. The collaboration principle I take away: use AI for breadth and bookkeeping — partitions, edge enumeration, audit trails — but reserve every verdict for measured evidence, namely file-and-line citations, millisecond timestamps, and database recounts. The spec corrections recorded in this report (coupon minima, confirmed-cancel validity) show the human's real job: the AI drafts, the tester verifies, and only measurements close a test case."*
 
-**Mandatory Disclosure:** test cases/boundaries/gap analyses initially drafted with Muse Spark 1.3 Free (via OpenCode); student reviewed all artifacts, corrected operators/thresholds/severities, decided verdicts from measured execution. Group Issues: [TODO: Insert 38 GitHub Issue Links]. Demo video: [TODO: Insert YouTube Video Demo Link]. *Phan Trung Tin — 23120372 — 16/10/2026.*
+**Mandatory Disclosure:** test cases/boundaries/gap analyses initially drafted with Muse Spark 1.3 Free (via OpenCode); student reviewed all artifacts, corrected operators/thresholds/severities, decided verdicts from measured execution. Group Issues: filed 16/10/2026 (#1–38) — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues. Demo video: [TODO: Insert YouTube Video Demo Link]. *Phan Trung Tin — 23120372 — 16/10/2026.*

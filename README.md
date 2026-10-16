@@ -20,7 +20,7 @@
 
 Target grade: **095** (`23120372_HW02_AI_DomainTesting_095.zip`). Deductions: −3 Feature D (no on-device UI screenshots; Expo needs physical device), −2 Skills (demo video pending student recording). All other criteria fully evidenced in-archive.
 
-Group GitHub Issues (38 total): [TODO: Insert 38 GitHub Issue Links — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing].
+Group GitHub Issues (38 total, filed 16/10/2026): FR-02 #1–10 · FR-09 #11–20 · FR-16 #21–30 · FR-20 #31–38 — https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues.
 
 ---
 
