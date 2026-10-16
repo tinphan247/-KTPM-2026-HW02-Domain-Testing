@@ -539,36 +539,6 @@ Per ISTQB CTFL v4.0 §4.2 (BVA at edges with the smallest meaningful increment) 
 
 ---
 
-## Audit entry template (copy for each later artifact)
-
-```markdown
-### Artifact N: <feature + technique> (CLO ...)
-
-#### (1) Prompt + Tool
-- **Tool:** <name>
-- **Timestamp:** HH:MM dd/mm/yyyy
-- **Full Prompt:**
-  ```text
-  <paste full prompt>
-  ```
-
-#### (2) AI Output
-<full output or red-bordered screenshot — no summary/paraphrase>
-
-#### (3) Verdict
-VALID / INVALID / INCOMPLETE — <reason grounded in ISTQB/course slides>
-
-#### (4) Reasoning
-<2–5 sentences citing slide / ISTQB section>
-
-#### (5) Student Fix
-<corrected TC/script — highlight what changed>
-```
-
-AI accuracy summary: TODO at the end (VALID/INVALID/INCOMPLETE % + WHEN to use/not use AI).
-
----
-
 ## AI Accuracy & Gap Analysis Summary (all 4 features)
 
 | # | Artifact | Verdict |
