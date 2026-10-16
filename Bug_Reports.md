@@ -181,11 +181,11 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Severity/Priority:** Critical / P1 (spec's core guarantee broken; silent data pollution).
 - **Attachments:** `screenshots/FR16_API_EVIDENCE.png`. **Related TCs:** DOM-11/17/18, BVA-06…09/14, GAP-01.
 
-### FR16-BUG-02 — [High] Validation = name-only (price 0/negative/text/NULL, ghost FK, blank names all stored)
+### FR16-BUG-02 — [Critical] Validation = name-only (price 0/negative/text/NULL, ghost FK, blank names all stored)
 - **Steps:** rows with price `0` / `-5000` / `"abc"` / missing (= NULL), `category_id = 9999`, name `"␣␣"` → all 200, inserted, 0 errors (D07/D11b/D12…D15, B10/B11). DB shows `"abc"` stored as TEXT, NULL price, whitespace name (leftover id 17).
 - **Expected:** `price > 0` numeric, existing FK, non-blank names; violations → rollback + cited reasons.
 - **Actual:** only `!row.name` checked. Root: `server.js:214-224`.
-- **Severity:** High. **Related TCs:** DOM-07/11…15, BVA-10/11/15, GAP-02…05/07.
+- **Severity:** Critical (core data-quality gate missing — invalid prices, ghost FKs and blank names persist in catalog). **Related TCs:** DOM-07/11…15, BVA-10/11/15, GAP-02…05/07.
 
 ### FR16-BUG-03 — [High] No role check: customer JWT can bulk-import (FR-12)
 - **Steps:** valid payload + `test@eshop.com` (role user) JWT → 200, imported (D04). Guest (no token) → 401 (D05 holds).
@@ -217,11 +217,11 @@ GitHub Issue links: TODO — file on group repo with PNGs attached.
 - **Actual:** error row + half-commit (compounds BUG-01).
 - **Severity:** Medium. **Related TCs:** BVA-14.
 
-### FR16-BUG-08 — [Low] `products: [null]` → 500 TypeError HTML (must be 400)
+### FR16-BUG-08 — [Medium] `products: [null]` → 500 TypeError HTML (must be 400)
 - **Steps:** POST `{products: [null]}` → 500 `TypeError: Canno…` HTML page (G08).
 - **Expected:** 400 JSON error.
 - **Actual:** unhandled throw (`server.js:213-214`).
-- **Severity:** Low (robustness). **Related TCs:** GAP-08.
+- **Severity:** Medium (unhandled exception → 500 HTML page; must be 400 JSON). **Related TCs:** GAP-08.
 
 ### FR16-BUG-09 — [Low] Duplicate product names allowed (observational vs FR-15)
 - **Steps:** second `iPhone 15 Pro Max` row → 200, new row (D16).

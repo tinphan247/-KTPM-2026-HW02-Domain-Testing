@@ -680,13 +680,13 @@ FR-16 total: 21 DOM + 20 BVA + 11 GAP = **52 TCs**.
 | Bug ID | Title | Severity | Evidence | Related TCs |
 | :--- | :--- | :--- | :--- | :--- |
 | FR16-BUG-01 | No atomicity: any bad row → half-commit (valid prefix stays) | Critical | API evidence PNG (D17/D18/B06…B09) + server.js:206-241 | DOM-11/17/18, BVA-06…09/14, GAP-01 |
-| FR16-BUG-02 | Validation = name-only: price 0/negative/`"abc"`/NULL, ghost FK, blank names all stored | High | API evidence PNG (D07/D11b/D12…D15) + server.js:214-224 | DOM-07/11…15, BVA-10/11/15, GAP-02…05/07 |
+| FR16-BUG-02 | Validation = name-only: price 0/negative/`"abc"`/NULL, ghost FK, blank names all stored | Critical | API evidence PNG (D07/D11b/D12…D15) + server.js:214-224 | DOM-07/11…15, BVA-10/11/15, GAP-02…05/07 |
 | FR16-BUG-03 | No role check: customer JWT can bulk-import (FR-12) | High | API evidence PNG (D04) + server.js:199 | DOM-04, GAP-06 |
 | FR16-BUG-04 | Naive `split(",")` parser: no RFC4180 — quoted commas misparse into garbage rows | High | API evidence PNG (D09/D10) + App.jsx:367-377 | DOM-09/10, GAP-11 |
 | FR16-BUG-05 | No file-type gate: any file parsed as CSV (binary → garbage rows) | Medium | App.jsx:356-384 (no accept/check) | DOM-03 |
 | FR16-BUG-06 | Silent `\|\|` defaults mask bad data (`price→0`, `category→1`, `""`) | Medium | App.jsx:390-403 + server.js:221-223 | DOM-07/15, GAP-07 |
 | FR16-BUG-07 | Mid-file blank lines become error rows (+ partial commit) instead of skipped | Medium | API evidence PNG (B14) + App.jsx:370-377 | BVA-14 |
-| FR16-BUG-08 | `products: [null]` → 500 TypeError HTML (must be 400) | Low | API evidence PNG (G08) + server.js:213-214 | GAP-08 |
+| FR16-BUG-08 | `products: [null]` → 500 TypeError HTML (must be 400) | Medium | API evidence PNG (G08) + server.js:213-214 | GAP-08 |
 | FR16-BUG-09 | Duplicate product names allowed (observational vs FR-15) | Low | API evidence PNG (D16) + schema (no UNIQUE) | DOM-16, GAP-09 |
 | FR16-BUG-10 | 256–1000-char names accepted (FR-15 max 255 inconsistency) | Low | API evidence PNG (B19a/b) + schema (no cap) | BVA-19, GAP-10 |
 
@@ -701,9 +701,68 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 - Full flows: view products, register, login, logout, cart, checkout, profile, order history.
 - Cancel obeys FR-10 state machine: only `pending`/`confirmed` cancellable; `shipping` user-cancel forbidden (admin only); `delivered`/`canceled` terminal.
 
-### 5.2 Domain Testing
+### 5.2 Domain Testing (skill Step 1 — black-box, spec-only)
 
-> TODO: `FR20-DT-*`.
+> Method: `skills/domain-bva-tester/SKILL.md` Step 1. Sources: SRS v2.0 §FR-20 + §FR-10 (state machine) + §FR-11 (own-orders) + §FR-21–24 (mobile GUI/form/nav/feedback).
+> Mobile + order code was NOT inspected (preserved for Gap Analysis).
+> **Transition correction (verified against FR-10 diagram + FR-20 text):** cancel is VALID from **`pending` AND `confirmed`** (user or admin); user-cancel from `shipping` forbidden; `delivered`/`canceled` terminal. The brief's grouping of `confirmed` with invalid states is corrected here — `confirmed → canceled` stays a valid-transition TC.
+> Mobile UI execution needs Expo Go on the same Wi-Fi; lifecycle TCs are API-executable via order endpoints. Exact timing/double-tap edges deferred to §5.3 BVA.
+
+#### 5.2.1 Domain variables (state machine + mobile interaction)
+
+| # | Variable | Type | Spec constraint (FR-10/11/20–24) |
+| :--- | :--- | :--- | :--- |
+| V1 | `order_current_status` | enum | `pending` / `confirmed` / `shipping` / `delivered` / `canceled` |
+| V2 | `user_action` | enum | `Cancel Order` / `View Detail` / `Re-order`(+)/ `Track Order`(+) — (+) = presence verified at execution |
+| V3 | `order_ownership` | boolean | Own order vs another user's order (FR-11: own only) |
+| V4 | `auth_state` | enum | Logged-in user / guest |
+| V5 | `cancel_reason` | SP string | No spec field — record if a reason input exists (valid/empty/spaces/long) |
+| V6 | `network_feedback` | UX state | Loading indicator during async cancel (FR-24); confirm dialog before destructive cancel; success/error toast after |
+
+#### 5.2.2 Equivalence partitions + transition matrix
+
+| From \ action | Cancel (user) | View Detail | Re-order / Track (+) |
+| :--- | :--- | :--- | :--- |
+| `pending` | ✅ VP → `canceled` (DOM-01) | ✅ list/detail of own (DOM-03/13) | SP record (DOM-14) |
+| `confirmed` | ✅ VP → `canceled` (DOM-02) | ✅ | SP record |
+| `shipping` | ❌ IP → reject, unchanged (DOM-04) | ✅ | SP record |
+| `delivered` | ❌ IP → reject, terminal (DOM-05) | ✅ | SP record |
+| `canceled` | ❌ IP → reject, idempotent (DOM-06) | ✅ (history shows it) | SP restore? (DOM-14) |
+
+| Variable | ID | Class | Partition description | Representative value |
+| :--- | :--- | :--- | :--- | :--- |
+| V3 ownership | VP3.1 | Valid | Own order | own `pending` order |
+| | IP3.1 | Invalid | Another user's order | user B's `pending` order id |
+| V4 auth | VP4.1 | Valid | Logged-in session | `test@eshop.com` mobile session |
+| | IP4.1 | Invalid | Guest | no token |
+| V5 reason | SP5.1–5.3 | Spec-silent | Field absent / optional / required; empty / spaces / 500-char handling | — |
+| V6 feedback | VP6.1 | Valid | Confirm dialog → confirm → success toast; dismiss → unchanged | — |
+| | IP6.1 | Invalid | No confirm / no loading / silent fail | — |
+
+#### 5.2.3 Domain test cases
+
+| TC_ID | Partition / combination | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR20-DOM-01 | Valid: pending→cancel | Own `pending` order, logged in | Order exists, status `pending` | Cancel → confirm dialog → Confirm | `canceled`; success toast; history updated | — | Pending Execution |
+| TC-FR20-DOM-02 | Valid: confirmed→cancel | Own `confirmed` order, logged in | Status `confirmed` | Cancel → Confirm | `canceled` (spec-valid transition) | — | Pending Execution |
+| TC-FR20-DOM-03 | Own-history listing | Logged in, ≥2 own orders mixed states | Orders seeded | Open Order History | Only own orders; code/date/total/status in Vietnamese + colors | — | Pending Execution |
+| TC-FR20-DOM-04 | Invalid: shipping→cancel | Own `shipping` order, logged in (user, not admin) | Status `shipping` | Attempt Cancel | Rejected with message; status stays `shipping` | — | Pending Execution |
+| TC-FR20-DOM-05 | Invalid: delivered→cancel | Own `delivered` order | Status `delivered` | Attempt Cancel | Rejected (terminal); unchanged | — | Pending Execution |
+| TC-FR20-DOM-06 | Invalid: canceled→cancel | Own `canceled` order | Status `canceled` | Attempt Cancel again | Rejected/idempotent; unchanged, clear message | — | Pending Execution |
+| TC-FR20-DOM-07 | Cross-user cancel ★ | User B's `pending` order id, acting as user A | Two users; B's order `pending` | A attempts cancel of B's order | Rejected (403/404); B's order unchanged | — | Pending Execution |
+| TC-FR20-DOM-08 | Guest history/cancel | No session | — | Open history / call cancel | Login required | — | Pending Execution |
+| TC-FR20-DOM-09 | Confirm dialog gate | Own `pending` order | — | Tap Cancel | Confirmation dialog appears BEFORE any state change | — | Pending Execution |
+| TC-FR20-DOM-10 | Dismiss dialog | Own `pending` order | Dialog open | Dismiss/Back | No state change; still `pending` | — | Pending Execution |
+| TC-FR20-DOM-11 | Loading feedback | Own `pending` order, normal network | — | Confirm cancel | Loading indicator during request; then success/error toast | — | Pending Execution |
+| TC-FR20-DOM-12 | Empty history | Fresh user, 0 orders | No orders | Open Order History | Illustration + friendly empty message (FR-24) | — | Pending Execution |
+| TC-FR20-DOM-13 | Detail view | Own order (any state) | — | Open order detail | Items, totals, Vietnamese status shown correctly | — | Pending Execution |
+| TC-FR20-DOM-14 | SP restore/re-order | Own `canceled` order | Status `canceled` | Look for restore / Re-order action | Record: restore offered? re-order creates NEW order? nothing? | — | Pending Execution |
+| TC-FR20-DOM-15 | SP coupon refund | Canceled order placed WITH coupon | Order used `VIP100`, used = 1 | Cancel the order | Record: usage refunded (used 1→0) or consumed forever? | — | Pending Execution |
+| TC-FR20-DOM-16 | SP stock restore | Canceled order (any items) | — | Cancel | Record: stock restored / no stock system? | — | Pending Execution |
+| TC-FR20-DOM-17 | SP double-tap ★ | Own `pending` order | — | Tap Cancel-Confirm twice rapidly | Single cancel; 2nd harmless (idempotent), no error/duplicate | — | Pending Execution |
+| TC-FR20-DOM-18 | SP reason field | Cancel flow | — | If reason input exists: submit empty / spaces / 500-char | Record: absent / optional / required + handling | — | Pending Execution |
+
+FR-20 total so far: **18 TCs** (timing/double-tap edges + status-text exactness in §5.3 BVA / Step 3).
 
 ### 5.3 Boundary Value Analysis
 
@@ -728,8 +787,8 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
 | FR-09 | 48 | 48 | 28 | 20 | 0 | 10 |
 | FR-16 | 52 | 52 | 19 | 33 | 0 | 10 |
-| FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **137** | **137** | **60** | **77** | **0** | **30** |
+| FR-20 | 18 | 0 | 0 | 0 | 18 | 0 |
+| **Total** | **155** | **137** | **60** | **77** | **18** | **30** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 

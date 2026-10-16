@@ -355,6 +355,7 @@ Per ISTQB CTFL v4.0 §4.3 and the Gap-Analysis rubric: the analysis separates th
 #### (5) Student Fix
 
 - Student to review at next gate: confirm GAP TC wording and cross-FR deferrals, then approve Chặng 3B (execution).
+- Execution confirms Artifact 11 in full (16/10/2026): 10 bugs FR16-BUG-01…10 filed; runtime extras (NULL-price acceptance, whitespace leftover id 17, 100-row 1684ms timing) recorded.
 - Execution confirms Artifact 11 in full (16/10/2026): 10 bugs FR16-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §4.5. Runtime extras beyond white-box reading: (a) NULL-price acceptance (missing key → NULL, not just unvalidated values); (b) whitespace-name leftover id 17 (cleanup gap closed manually, script hardened with `TRIM(name) = ''`); (c) 100-row batch in 1684ms (no perf issue — scale TC passes).
 
 ---
@@ -375,7 +376,7 @@ Per ISTQB CTFL v4.0 §4.3 and the Gap-Analysis rubric: the analysis separates th
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before FR-20).** Statuses derive from measured transcript values and DB recounts (quoted verbatim); every FAILED maps to a filed bug; file-layer TCs without an API equivalent are proven via byte-identical UI-parser replication (code-cited), never assumed; cleanup verified (5 seeds), leftovers disclosed.
+**VALID — reviewed and approved by student, 16/10/2026.** Statuses derive from measured transcript values and DB recounts (quoted verbatim); every FAILED maps to a filed bug; file-layer TCs proven via UI-parser replication (code-cited); cleanup verified (5 seeds), leftovers disclosed. Review decisions: BUG-02→Critical, BUG-08→Medium.
 
 #### (4) Reasoning
 
@@ -383,7 +384,37 @@ Per ISTQB CTFL v4.0 §5 and HW02 bug-reporting rules: atomicity verdicts rest on
 
 #### (5) Student Fix
 
-- Student to review at next gate: confirm severity set (esp. BUG-05/06/07 Medium calls, BUG-08/09/10 Low calls), file the 10 issues on the group repo and paste links, then approve Pool D (FR-20 Mobile).
+- Student to review at next gate: confirm severity set (esp. BUG-05/06/07 Medium calls, BUG-08/09/10 Low calls), file the 10 issues on the group repo and paste links, then approve Pool D (FR-20 Mobile). *(Review done 16/10: BUG-02→Critical, BUG-08→Medium applied; GitHub links pending; FR-20 Step 1 approved — mobile/backend source stays closed.)*
+
+---
+
+### Artifact 13: FR-20 Domain Testing black-box (G9.2 Apply) — via domain-bva-tester Step 1
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~15:00 16/10/2026 (UTC+07)
+- **Full Prompt (user):** severity tune (BUG-01/02 Critical, BUG-03/04 High, BUG-05/06/07 + BUG-08 Medium, BUG-09/10 Low) + run skill Step 1 Domain black-box for FR-20: FR-20 + FR-10 + FR-21–24 only, no mobile/backend source; state-machine + form variables (status, action, ownership, cancel-reason, network/feedback); EP (valid/invalid transitions, cross-user, SP: restore? stock/coupon refund? double-tap); 18 TCs `TC-FR20-DOM-*` with transition matrix; update summaries; finalize Artifacts 11–12; log Artifact 13; commit `feat(FR-20): add black-box Domain Testing partitions and test cases`.
+
+#### (2) AI Output
+
+- Severity updates applied in `Bug_Reports.md` + `Main_Report.md` §4.5 (counts unchanged, still 10 bugs).
+- `Main_Report.md` §5.2: 6 variables (V1–V6, FR-10/11/20–24), full 5×3 transition matrix, EP table (VP/IP + 4 SP), 18 TCs `TC-FR20-DOM-01…18` — pending/confirmed cancel-valid, shipping/delivered/canceled reject, cross-user ★, guest gate, dialog/dismiss/loading/empty-state/detail, 5 SP record-as-is (restore, coupon refund, stock restore, double-tap ★, reason field).
+- **Transition correction:** brief grouped `confirmed` with invalid cancels — corrected per FR-10/FR-20 (`confirmed → canceled` VALID, own TC DOM-02); banner placed at §5.2 head.
+- Summaries: FR-20 Designed = 18; Total 155 / Executed 137 / Passed 60 / Failed 77 / Bugs 30.
+- No mobile/backend source inspected; all Status = Pending Execution.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before BVA).** The transition matrix makes every (state × action) cell explicit so no transition is untested-by-omission; cross-user and guest TCs isolate the auth dimension from the state dimension; SP TCs stay record-as-is where the spec is silent (restore/refund/reason) instead of inventing requirements.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.3 (state-transition testing: valid transitions + invalid transitions + state coverage) and the domain single-fault principle: DOM-01…08 walk each matrix row exactly once with ownership/auth held constant, so a failure maps unambiguously to its transition; correcting the brief's `confirmed` grouping before designing (rather than after execution) prevents a full set of false failures.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm transition matrix (esp. confirmed→cancel VALID), SP record-as-is stance, Expo-dependence note for UI TCs, then approve BVA step.
 - Execution confirms Artifact 11 in full (16/10/2026): 10 bugs FR16-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §4.5. Runtime extras beyond white-box reading: (a) NULL-price acceptance (missing key → NULL, not just unvalidated values); (b) whitespace-name leftover id 17 (cleanup gap closed manually, script hardened with `TRIM(name) = ''`); (c) 100-row batch in 1684ms (no perf issue — scale TC passes).
 
 ---
