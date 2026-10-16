@@ -72,7 +72,7 @@ Per ISTQB CTFL v4.0 §1.4 (test planning before design) and HW02 guiding princip
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before BVA).** Partitions are disjoint, cover the FR-02 spec domain (format, existence, correctness, fail-counter state, lock state), and representatives use the real seed account. Two spec-silent partitions (case, whitespace) are correctly flagged rather than assumed.
+**VALID — reviewed and approved by student, 16/10/2026.** Partitions are disjoint, cover the FR-02 spec domain (format, existence, correctness, fail-counter state, lock state), and representatives use the real seed account. Two spec-silent partitions (case, whitespace) are correctly flagged rather than assumed.
 
 #### (4) Reasoning
 
@@ -80,7 +80,47 @@ Per ISTQB CTFL v4.0 §4.2 (equivalence partitioning: divide input domain into pa
 
 #### (5) Student Fix
 
-- Student to review at next gate: confirm representatives, confirm DOM-06 expectation (empty password = fail-count vs validation), confirm DOM-11/DOM-12 reset interpretation of "consecutive", then approve BVA step.
+Student review decisions (16/10/2026), applied to `Main_Report.md` §2.2:
+1. **DOM-06 (empty password):** expectation fixed to validation error (HTTP 400 / form block) with NO counter increment; counting it toward lockout at runtime = defect.
+2. **DOM-11/DOM-12 ("consecutive"):** confirmed expectation that a 3rd-try success resets `failed_attempts` to 0; marked ★ Gap-analysis focus for code/execution cross-check.
+3. **SP3.1/SP4.1:** kept spec-silent classification, but student standard set to normalization (case-insensitive + auto-trim accept); actual behavior to be recorded at execution.
+
+---
+
+### Artifact 2: FR-02 BVA black-box (G9.2 Apply) — via domain-bva-tester Step 2
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~11:00 16/10/2026 (UTC+07)
+- **Full Prompt (user):**
+  ```text
+  Kích hoạt domain-bva-tester, thực hiện Step 2 BVA cho FR-02 (vẫn black-box, chưa mở source):
+  boundaries + step unit cho failed_attempts (ngưỡng 3, step 1: mốc 0/1/2/3/4),
+  lockout_elapsed (ngưỡng 30s, step 1s: 0/1/15/29/30/31s, làm rõ <30 vs <=30),
+  độ dài input (rỗng/1 ký tự/7-8-9 ký tự/255-256+), biên kết hợp
+  (lần 3 đúng pass; hết 30s lại sai pass); bảng phân tích BVA 6/7-point + lý do từng điểm;
+  TCs TC-FR02-BVA-01... không trùng DOM; cập nhật Main_Report + Summary;
+  log Artifact 2 + chốt Artifact 1; commit "feat(FR-02): add Boundary Value Analysis (BVA) points and test cases".
+  ```
+
+#### (2) AI Output
+
+- `Main_Report.md` §2.2: review decisions applied (DOM-06 validation-expectation, DOM-11/12 ★ focus, SP3.1/SP4.1 normalization standard).
+- `Main_Report.md` §2.3: 5 boundaries with step units (B1 count T=3/u=1; B2 time T=30s/u=1s; B3 length u=1 char; B4 +1 exactness; B5/B6 multi-variable), 6/7-point analysis tables mapping each point to DOM or BVA TC, 13 BVA TCs `TC-FR02-BVA-01…13` (threshold crossing, no-extension at 4th, correct-at-3rd, 29/30/31s edges, nom 15s, wrong-at-expiry, 1-char, 7-char, 1000-char, double-submit).
+- Summary: FR-02 Designed 15 → 28. No code inspected; all Status = Pending Execution.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before Gap Analysis).** Every ordered variable has an explicit step unit; each edge tests a concrete operator hypothesis (`>=3` vs `>3`, `<30` vs `<=30`); BVA TCs reference rather than duplicate DOM coverage (0/1 fails, 0s, empty stay in DOM).
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.2 (boundary value analysis: test at and immediately either side of partition edges, including the 7-point min-/min/min+/nom/max-/max/max+ set) and the skill's step-unit rule: the 30s edge TC (BVA-06) is designed as an operator-determination probe rather than a pass/fail assertion, which is the correct black-box treatment when the spec leaves `<` vs `<=` undefined.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm timing tolerance (±1s) for BVA-05…09, confirm 7-char/1000-char probes, then approve opening source code for Step 3 (Gap Analysis).
 
 ---
 

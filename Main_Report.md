@@ -106,22 +106,88 @@ Group non-duplication: confirmed with group members (to be listed in final versi
 | TC-FR02-DOM-03 | IP1.3 + IP5.2 empty | `` / `` | Active account | Submit login | Rejected, required-field handling | — | Pending Execution |
 | TC-FR02-DOM-04 | IP2.1 unregistered | `nouser999@eshop.com` / `Any123!x` | Email not in DB | Submit login | Generic error only — indistinguishable from wrong-password message (no existence leak) | — | Pending Execution |
 | TC-FR02-DOM-05 | VP2.1 + IP5.1 first fail | `test@eshop.com` / `Wrong123!` | 0 prior fails | Submit login | Generic error; `failed_attempts` = 1 | — | Pending Execution |
-| TC-FR02-DOM-06 | IP5.2 empty password | `test@eshop.com` / `` | 0 prior fails | Submit login | Rejected (treated as failed attempt or validation error — record which) | — | Pending Execution |
+| TC-FR02-DOM-06 | IP5.2 empty password | `test@eshop.com` / `` | 0 prior fails | Submit login | Validation error (HTTP 400 / blocked at form); `failed_attempts` NOT incremented — if backend counts it as a fail toward lockout, log as defect (student decision 16/10) | — | Pending Execution |
 | TC-FR02-DOM-07 | VP6.2 below threshold | `test@eshop.com` / `Wrong123!` | 1 prior consecutive fail | Submit login | Generic error; counter = 2; account still NOT locked | — | Pending Execution |
 | TC-FR02-DOM-08 | IP6.1 threshold reached | `test@eshop.com` / `Wrong123!` | 2 prior consecutive fails | Submit login (3rd fail) | Account locked for 30s; lockout message | — | Pending Execution |
 | TC-FR02-DOM-09 | IP8.1 + IP7.1 locked, correct creds | `test@eshop.com` / `Test1234!` | Account just locked | Submit immediately | Still rejected — lock takes precedence over correct password | — | Pending Execution |
 | TC-FR02-DOM-10 | VP7.1 lock expired | `test@eshop.com` / `Test1234!` | Locked, then wait 60s | Submit after wait | Login success (lock lifted) | — | Pending Execution |
-| TC-FR02-DOM-11 | Counter reset on success | `test@eshop.com` / `Test1234!` | 2 prior consecutive fails | Submit correct creds | Success AND consecutive-fail counter resets ("consecutive" per spec) | — | Pending Execution |
-| TC-FR02-DOM-12 | Post-reset threshold | `test@eshop.com` / `Wrong123!` ×2 | Right after DOM-11 success | Fail twice | Generic errors, counter = 2, NOT locked (proves reset) | — | Pending Execution |
-| TC-FR02-DOM-13 | SP3.1 case variant | `TEST@ESHOP.COM` / `Test1234!` | Active account | Submit login | Spec-silent — record accept/reject as-is | — | Pending Execution |
-| TC-FR02-DOM-14 | SP4.1 surrounding spaces | `␣test@eshop.com␣` / `Test1234!` | Active account | Submit login | Spec-silent — record accept/reject/trim behavior | — | Pending Execution |
+| TC-FR02-DOM-11 | Counter reset on success ★ Gap-analysis focus | `test@eshop.com` / `Test1234!` | 2 prior consecutive fails | Submit correct creds | Success AND consecutive-fail counter resets to 0 ("consecutive" per spec — student-confirmed 16/10) | — | Pending Execution |
+| TC-FR02-DOM-12 | Post-reset threshold ★ Gap-analysis focus | `test@eshop.com` / `Wrong123!` ×2 | Right after DOM-11 success | Fail twice | Generic errors, counter = 2, NOT locked (proves reset) | — | Pending Execution |
+| TC-FR02-DOM-13 | SP3.1 case variant | `TEST@ESHOP.COM` / `Test1234!` | Active account | Submit login | Student standard: expect case-insensitive accept; record actual at execution | — | Pending Execution |
+| TC-FR02-DOM-14 | SP4.1 surrounding spaces | `␣test@eshop.com␣` / `Test1234!` | Active account | Submit login | Student standard: expect auto-trim accept; record actual at execution | — | Pending Execution |
 | TC-FR02-DOM-15 | Message uniformity (O-domain) | wrong-pwd vs unregistered-email | Clean state | Run DOM-04 vs DOM-05, compare responses | Both responses identical in text + HTTP status (no cause leak) | — | Pending Execution |
 
 Deferred to BVA (§2.3): fail-count edges 2/3/4, lockout timing 29s/30s/31s, counter-increment exactness (+1, no double-count on double-click), email max-length (spec-silent).
 
-### 2.3 Boundary Value Analysis (skill — Step 2+3)
+### 2.3 Boundary Value Analysis (skill Step 2 — black-box, spec-only)
 
-> TODO: boundaries — fail-count {2,3,4}, lockout time {29s,30s,31s}, email/password length edges, BVA TCs `FR02-BVA-01...` with min/min+/nom/max-/max/max+ and step-unit justification.
+> Method: `skills/domain-bva-tester/SKILL.md` Step 2. Thresholds from SRS: lock at `failed_attempts >= 3`, lock duration 30s.
+> Login code still NOT inspected. Points already covered by DOM TCs are referenced, not duplicated.
+
+#### 2.3.1 Boundaries and step units
+
+| # | Boundary | Threshold | Step unit (u) | Operator under test |
+| :--- | :--- | :--- | :--- | :--- |
+| B1 | Consecutive-fail count | T = 3 | u = 1 attempt | `>= 3` vs `> 3` vs `>= 2` (off-by-one) |
+| B2 | Lockout elapsed time | T = 30s | u = 1s | `< 30` vs `<= 30` (expiry edge) |
+| B3 | Input string length | 0 / 8* | u = 1 char | empty vs min+; hidden client pre-check? (*8 borrowed from FR-01 policy — FR-02 states none) |
+| B4 | Counter increment size | +1 | u = 1 | exactly +1 per fail (no double-count on double-submit) |
+| B5/B6 | Multi-variable | B1×correctness, B2×correctness | — | threshold × credential-correctness interaction |
+
+#### 2.3.2 BVA point analysis
+
+**B1 — fail count (T=3, u=1):**
+
+| Point | Value | Role | Rationale | Covered by |
+| :--- | ---: | :--- | :--- | :--- |
+| below | 0–1 | interior | No boundary significance | DOM-01/05 |
+| max- | 2 | just below threshold | Guards `>= 2` bug (would lock one fail early) | BVA-01 |
+| min (threshold) | 3 | transition | Decides `>= 3` vs `> 3` (latter locks only at 4) | BVA-02 |
+| max+ | 4 | just above threshold | Lock persists; counter must not extend lock window | BVA-03 |
+
+**B2 — lockout elapsed (T=30s, u=1s):**
+
+| Point | Value | Role | Rationale | Covered by |
+| :--- | ---: | :--- | :--- | :--- |
+| min | 0s | just locked | Lock effective immediately | DOM-09 |
+| min+ | 1s | inside window | No early release | (implied; DOM-09) |
+| nom | 15s | mid-window sanity | Monotonic hold, guards timer bugs | BVA-08 |
+| max- | 29s | just before expiry | Still locked; guards `< 29`/`<= 29` bug | BVA-05 |
+| edge | 30s | expiry instant | Decides `< 30` vs `<= 30` — record actual | BVA-06 |
+| max+ | 31s | just after expiry | Lock definitely lifted | BVA-07 |
+
+**B3 — input length (u=1 char):**
+
+| Point | Value | Role | Rationale | Covered by |
+| :--- | ---: | :--- | :--- | :--- |
+| min | 0 chars | empty | Validation, no counter increment (per DOM-06 decision) | DOM-03/06 |
+| min+ | 1 char | shortest non-empty | Format/length rejection path | BVA-10 |
+| min- (vs 8) | 7-char password | below FR-01 minimum | Probes hidden client pre-check; FR-02 expects server-processed generic error | BVA-11 |
+| max+ | 1000 chars | extreme length | Graceful rejection, no 500/hang/truncation login | BVA-12 |
+
+**B4 — increment exactness:** double-submit of one wrong attempt must yield +1, not +2 (BVA-13).
+
+**Multi-variable:** count=3 × correct password → success, no lock (BVA-04); time=30s × wrong password → fresh-window fail #1, not instant relock (BVA-09).
+
+#### 2.3.3 BVA test cases
+
+| TC_ID | Boundary / point | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR02-BVA-01 | B1 max- (2 fails) | `test@eshop.com` / `Wrong123!` | 1 prior consecutive fail | Submit (2nd fail) | Generic error; counter = 2; NOT locked | — | Pending Execution |
+| TC-FR02-BVA-02 | B1 threshold (3rd fail) | `test@eshop.com` / `Wrong123!` | 2 prior consecutive fails | Submit (3rd fail) | Locked 30s (proves `>= 3`, not `> 3`) | — | Pending Execution |
+| TC-FR02-BVA-03 | B1 max+ (4th submit, locked) | `test@eshop.com` / `Test1234!` | Just locked | Submit twice more | Still rejected; lock window NOT extended (no sliding-window relock) | — | Pending Execution |
+| TC-FR02-BVA-04 | B1×correct (3rd try correct) ★ | `test@eshop.com` / `Test1234!` | 2 prior consecutive fails | Submit correct creds | Success, no lock (threshold counts fails only), counter reset | — | Pending Execution |
+| TC-FR02-BVA-05 | B2 max- (29s) | correct creds | Locked 29s ago | Submit at 29s | Still rejected (locked) | — | Pending Execution |
+| TC-FR02-BVA-06 | B2 edge (30s) ★ | correct creds | Locked 30s ago | Submit at 30s | Operator determination: record accept/reject (`< 30` vs `<= 30`) | — | Pending Execution |
+| TC-FR02-BVA-07 | B2 max+ (31s) | correct creds | Locked 31s ago | Submit at 31s | Success (lock lifted) | — | Pending Execution |
+| TC-FR02-BVA-08 | B2 nom (15s) | correct creds | Locked 15s ago | Submit at 15s | Still rejected (mid-window hold) | — | Pending Execution |
+| TC-FR02-BVA-09 | B2×wrong (fail at 30s) ★ | `test@eshop.com` / `Wrong123!` | Lock just expired (~30s) | Submit wrong creds | Generic error as fresh-window fail #1 (counter = 1), NOT instant relock | — | Pending Execution |
+| TC-FR02-BVA-10 | B3 min+ (1 char) | `a` / `b` | Active account | Submit | Rejected (format/length); record counter behavior | — | Pending Execution |
+| TC-FR02-BVA-11 | B3 min- (7-char pwd) | `test@eshop.com` / `Abc123!` (7) | Active account | Submit | Generic wrong-password error (no length rule in FR-02); any client-side block recorded as extra-spec behavior | — | Pending Execution |
+| TC-FR02-BVA-12 | B3 max+ (1000 chars) | 1000-char email / 1000-char password | Active account | Submit | Graceful rejection, no 500/timeout/partial login | — | Pending Execution |
+| TC-FR02-BVA-13 | B4 increment exactness | `test@eshop.com` / `Wrong123!` | 0 prior fails | Double-click submit rapidly for ONE attempt | Counter = 1 (exactly +1, no double-count) | — | Pending Execution |
+
+FR-02 total: 15 DOM + 13 BVA = **28 TCs**. Timing TCs (BVA-05…09) require stopwatch control (±1s tolerance noted at execution).
 
 ### 2.4 AI Gap Analysis & Human Review
 
@@ -216,11 +282,11 @@ Deferred to BVA (§2.3): fail-count edges 2/3/4, lockout timing 29s/30s/31s, cou
 
 | Feature | Designed | Executed | Passed | Failed | Not executed | Bugs |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| FR-02 | 15 | 0 | 0 | 0 | 15 | 0 |
+| FR-02 | 28 | 0 | 0 | 0 | 28 | 0 |
 | FR-09 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-16 | 0 | 0 | 0 | 0 | 0 | 0 |
 | FR-20 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **Total** | **15** | **0** | **0** | **0** | **15** | **0** |
+| **Total** | **28** | **0** | **0** | **0** | **28** | **0** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 
