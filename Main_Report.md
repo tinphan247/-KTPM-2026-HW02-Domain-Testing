@@ -757,16 +757,63 @@ GitHub Issues: to be filed on the group repo with the PNGs attached (links added
 | TC-FR20-DOM-12 | Empty history | Fresh user, 0 orders | No orders | Open Order History | Illustration + friendly empty message (FR-24) | — | Pending Execution |
 | TC-FR20-DOM-13 | Detail view | Own order (any state) | — | Open order detail | Items, totals, Vietnamese status shown correctly | — | Pending Execution |
 | TC-FR20-DOM-14 | SP restore/re-order | Own `canceled` order | Status `canceled` | Look for restore / Re-order action | Record: restore offered? re-order creates NEW order? nothing? | — | Pending Execution |
-| TC-FR20-DOM-15 | SP coupon refund | Canceled order placed WITH coupon | Order used `VIP100`, used = 1 | Cancel the order | Record: usage refunded (used 1→0) or consumed forever? | — | Pending Execution |
-| TC-FR20-DOM-16 | SP stock restore | Canceled order (any items) | — | Cancel | Record: stock restored / no stock system? | — | Pending Execution |
-| TC-FR20-DOM-17 | SP double-tap ★ | Own `pending` order | — | Tap Cancel-Confirm twice rapidly | Single cancel; 2nd harmless (idempotent), no error/duplicate | — | Pending Execution |
+| TC-FR20-DOM-15 | SP coupon refund | Canceled order placed WITH coupon | Order used `VIP100`, used = 1 | Cancel the order | Student standard (16/10): successful cancel MUST refund the coupon (`used − 1`); consuming quota on a canceled order = business bug | — | Pending Execution |
+| TC-FR20-DOM-16 | SP stock restore | Canceled order (any items) | — | Cancel | Student standard (16/10): MUST restore stock (+quantity); no restore = business bug (or record verified absence of a stock system) | — | Pending Execution |
+| TC-FR20-DOM-17 | SP double-tap ★ | Own `pending` order | — | Tap Cancel-Confirm twice rapidly | Student standard (16/10): client debounce + strict server state check — exactly-once side effects; double stock/coupon adjust or 500 = bug | — | Pending Execution |
 | TC-FR20-DOM-18 | SP reason field | Cancel flow | — | If reason input exists: submit empty / spaces / 500-char | Record: absent / optional / required + handling | — | Pending Execution |
 
 FR-20 total so far: **18 TCs** (timing/double-tap edges + status-text exactness in §5.3 BVA / Step 3).
 
-### 5.3 Boundary Value Analysis
+### 5.3 Boundary Value Analysis (skill Step 2 — black-box, spec-only)
 
-> TODO: cancel at each state transition, form edges (phone 9/10/11/12 digits, password 7/8 chars), `FR20-BVA-*`.
+> Method: `skills/domain-bva-tester/SKILL.md` Step 2. FR-20 scoped to order lifecycle + history + feedback (form-field edges belong to FR-01/04 phases, not this feature).
+> Step units: state **u = 1 transition** · race window **Δt in ms** (double-tap 0–300 ms) · ownership **u = 1 id** (adjacent `±1`) · list size **u = 1 order** (0 / 1 / many) · token validity (valid/expired/absent).
+> Race/double-tap TCs need ms-precision request timing at execution. Mobile source still NOT inspected.
+
+#### 5.3.1 Boundaries and step units
+
+| # | Boundary | Threshold | Step unit | Operator under test |
+| :--- | :--- | :--- | :--- | :--- |
+| B1 | Last-valid vs first-invalid cancel | `confirmed` ✅ / `shipping` ❌ | u = 1 transition | validity edge of the state machine |
+| B2 | Re-cancel after `canceled` | terminal state | Δt → 0 (immediate) vs 5 s | idempotent reject (400/409) vs swallowed/double-effects |
+| B3 | Cancel ∥ ship race | in-flight transition | Δt ≈ 0 ms (parallel) | exactly-one-winner, no 500, no mixed state |
+| B4 | Double-tap confirm | single intent | Δt 0–300 ms | exactly-once side effects (debounce + server guard) |
+| B5 | Order-id ownership | own id | u = 1 id (`±1`, 0, garbage) | 403/404 per id, no IDOR, no 500 |
+| B6 | History list size | 0 / 1 / many | u = 1 order | empty-state / single / scroll-paginate rendering |
+| B7 | Token validity at cancel | valid session | valid → expired → absent | 401 vs 403 vs success mapping |
+
+#### 5.3.2 BVA point analysis
+
+**B1 — validity edge:** `confirmed` = last cancellable state (DOM-02 holds the functional case; boundary recency covered by race TCs); `shipping` = first forbidden state — cancel seconds after admin ships must still reject (BVA-02).
+
+**B2 — re-cancel:** immediate (≤1 s) second cancel → 400/409, side effects exactly once (BVA-01 ★); delayed (5 s) second cancel → clean 400 already-canceled (BVA-05); both must leave stock/coupon counters untouched twice.
+
+**B3 — race:** user Cancel ∥ admin ship-confirmed→shipping in flight → exactly one terminal outcome (`canceled` XOR `shipping`), no 500, no torn state (BVA-03 ★).
+
+**B4 — double-tap:** two confirms Δt ≤ 300 ms → single cancel, stock/coupon adjusted once (BVA-04 ★).
+
+**B5 — ownership:** own id → success (DOM-01 baseline); id±1 of another user + 0/−1/999999/`"abc"` → 403/404, victim unchanged, never 500 (BVA-06/07).
+
+**B6 — list size:** 0 → empty state (DOM-12 holds it); exactly 1 → single-item render (BVA-08); 15 → full, ordered, no dupes/truncation (BVA-09).
+
+**B7 — token:** expired/invalid token → 401, order unchanged (BVA-10); absent → login-required (DOM-08 holds it).
+
+#### 5.3.3 BVA test cases
+
+| TC_ID | Boundary / point | Input data | Pre-conditions | Steps | Expected output | Actual Result | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| TC-FR20-BVA-01 | B2 immediate re-cancel ★ | Just-canceled own order | Status `canceled` ≤1 s ago | 2nd Cancel immediately | 400/409 already-canceled; stock/coupon adjusted exactly once total | — | Pending Execution |
+| TC-FR20-BVA-02 | B1 fresh-shipping | Own order shipped seconds ago | Status just → `shipping` | Cancel at once | Rejected; stays `shipping` (validity edge holds at recency) | — | Pending Execution |
+| TC-FR20-BVA-03 | B3 cancel ∥ ship race ★ | Own `confirmed` order; admin ships same instant | Status `confirmed` | Fire user-Cancel + admin-ship in parallel | Exactly one winner (`canceled` XOR `shipping`); no 500; counters consistent with winner | — | Pending Execution |
+| TC-FR20-BVA-04 | B4 double-tap ★ | Own `pending` order | — | Two Cancel-Confirms, Δt ≤ 300 ms | Single cancel; stock/coupon adjusted once; 2nd harmless (debounce/server guard) | — | Pending Execution |
+| TC-FR20-BVA-05 | B2 delayed re-cancel | Own `canceled` order (5 s+) | Status `canceled` | Cancel again | Clean 400 already-canceled; unchanged | — | Pending Execution |
+| TC-FR20-BVA-06 | B5 adjacent ids | User B's order ids around own (`±1`) | Two users; B has orders | A cancels B's `id±1` | 403/404 each; B's orders unchanged (no IDOR) | — | Pending Execution |
+| TC-FR20-BVA-07 | B5 garbage ids | `0`, `-1`, `999999`, `"abc"` as order id | Logged in | Cancel each | 400/404; never 500; nothing changes | — | Pending Execution |
+| TC-FR20-BVA-08 | B6 exactly-1 list | User with precisely 1 order | 1 order | Open history | Single item rendered fully (code/date/total/status) | — | Pending Execution |
+| TC-FR20-BVA-09 | B6 many (15) | User with 15 orders | 15 orders seeded | Open history, scroll | All 15 listed, newest-first, no dupes/truncation | — | Pending Execution |
+| TC-FR20-BVA-10 | B7 bad token | Own `pending` order + expired/invalid token | — | Cancel with bad token | 401; order unchanged | — | Pending Execution |
+
+FR-20 total: 18 DOM + 10 BVA = **28 TCs**.
 
 ### 5.4 AI Gap Analysis & Human Review
 
@@ -787,8 +834,8 @@ FR-20 total so far: **18 TCs** (timing/double-tap edges + status-text exactness 
 | FR-02 | 37 | 37 | 13 | 24 | 0 | 10 |
 | FR-09 | 48 | 48 | 28 | 20 | 0 | 10 |
 | FR-16 | 52 | 52 | 19 | 33 | 0 | 10 |
-| FR-20 | 18 | 0 | 0 | 0 | 18 | 0 |
-| **Total** | **155** | **137** | **60** | **77** | **18** | **30** |
+| FR-20 | 28 | 0 | 0 | 0 | 28 | 0 |
+| **Total** | **165** | **137** | **60** | **77** | **28** | **30** |
 
 Demo videos: TODO (YouTube Unlisted links for skill end-to-end demo).
 

@@ -406,7 +406,7 @@ Per ISTQB CTFL v4.0 §5 and HW02 bug-reporting rules: atomicity verdicts rest on
 
 #### (3) Verdict
 
-**VALID (provisional — pending student review before BVA).** The transition matrix makes every (state × action) cell explicit so no transition is untested-by-omission; cross-user and guest TCs isolate the auth dimension from the state dimension; SP TCs stay record-as-is where the spec is silent (restore/refund/reason) instead of inventing requirements.
+**VALID — reviewed and approved by student, 16/10/2026.** The matrix leaves no (state × action) cell untested; cross-user/guest TCs isolate auth from state; SP TCs stay record-as-is where silent. Review decisions: `confirmed→cancel` correction confirmed (banner kept); SP upgraded to normative (stock +quantity AND coupon used−1 on cancel; debounce + strict server guard for double-tap); hybrid execution approved (API/concurrency via script + mobile UI via Expo-web/headless viewport, no physical phone).
 
 #### (4) Reasoning
 
@@ -415,6 +415,36 @@ Per ISTQB CTFL v4.0 §4.3 (state-transition testing: valid transitions + invalid
 #### (5) Student Fix
 
 - Student to review at next gate: confirm transition matrix (esp. confirmed→cancel VALID), SP record-as-is stance, Expo-dependence note for UI TCs, then approve BVA step.
+- Review done 16/10: matrix confirmed; DOM-15/16/17 upgraded to normative (refund + restore + debounce); hybrid execution plan approved. Artifact 13 verdict confirmed VALID.
+
+---
+
+### Artifact 14: FR-20 BVA black-box (G9.2 Apply) — via domain-bva-tester Step 2
+
+#### (1) Prompt + Tool
+
+- **Tool:** Muse Spark 1.3 Free (via OpenCode agent, Build Mode)
+- **Timestamp:** ~15:20 16/10/2026 (UTC+07)
+- **Full Prompt (user):** BVA for FR-20 (still black-box): state edges (last-valid `confirmed`, first-invalid `shipping`, immediate re-cancel), time/race (ship-vs-cancel window, double-tap 0–300 ms), ownership edges (own vs `±1`/garbage ids), list edges (0/1/many); BVA table + `TC-FR20-BVA-*` into §5.3; summaries; finalize Artifact 13; log Artifact 14; commit `feat(FR-20): add Boundary Value Analysis (BVA) points and test cases`.
+
+#### (2) AI Output
+
+- `Main_Report.md` §5.2: DOM-15/16/17 upgraded to normative (refund + restore + debounce/guard).
+- `Main_Report.md` §5.3: 7 boundaries (B1 validity edge · B2 re-cancel timing · B3 race · B4 double-tap · B5 ownership u=1 id · B6 list 0/1/many · B7 token), point analysis, 10 BVA TCs `TC-FR20-BVA-01…10` — immediate (≤1 s) vs delayed (5 s) re-cancel, fresh-shipping recency, parallel cancel∥ship ★, Δt≤300 ms double-tap ★, id±1 sweep, garbage ids (never-500), exactly-1 vs 15-order lists, bad-token 401. Duplicates of DOM avoided (0-list stays DOM-12, guest stays DOM-08, confirmed-cancel stays DOM-02).
+- Summaries: FR-20 Designed 18 → 28; Total 165 / Executed 137 / Passed 60 / Failed 77 / Bugs 30.
+- No mobile/backend source inspected; all Status = Pending Execution.
+
+#### (3) Verdict
+
+**VALID (provisional — pending student review before Gap Analysis).** Race/double-tap TCs demand ms-precision timing (the only way to test TOCTOU at black-box level); ownership edges sweep adjacent and garbage ids (IDOR + robustness in one family); list edges cover 0/1/many without re-testing DOM-held cells.
+
+#### (4) Reasoning
+
+Per ISTQB CTFL v4.0 §4.2–4.3 (boundary + state-transition techniques compose: edges of validity, timing edges, and input-shape edges each get their own TCs) and the skill's step-unit rule: re-cancel is split into immediate vs delayed because the implementation could guard on state alone (both reject) or on state+idempotency-token (immediate double-tap slips through) — only the timing pair distinguishes them.
+
+#### (5) Student Fix
+
+- Student to review at next gate: confirm race/double-tap timing demands, ownership sweep, list edges, then approve opening mobile/order source for Step 3 (Gap Analysis).
 - Execution confirms Artifact 11 in full (16/10/2026): 10 bugs FR16-BUG-01…10 filed in `Bug_Reports.md` + `Main_Report.md` §4.5. Runtime extras beyond white-box reading: (a) NULL-price acceptance (missing key → NULL, not just unvalidated values); (b) whitespace-name leftover id 17 (cleanup gap closed manually, script hardened with `TRIM(name) = ''`); (c) 100-row batch in 1684ms (no perf issue — scale TC passes).
 
 ---
