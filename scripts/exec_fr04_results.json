@@ -1,0 +1,27 @@
+{
+  "feature": "FR-04 Mobile: Quản lý Hồ sơ cá nhân (Profile Management)",
+  "timestamp": "2026-10-17T15:25:31.136Z",
+  "steps": [
+    {
+      "step": "FR04_PHONE_REGEX_EVALUATION",
+      "bugId": "BUG-FR04-01",
+      "title": "Regex kiểm tra số điện thoại bắt buộc bắt đầu bằng [1-9] và từ chối số 0 ở đầu, đảo ngược hoàn toàn đặc tả",
+      "severity": "High",
+      "evidence": "App.js:287 sử dụng /^[1-9][0-9]{8,9}$/, cấm số 0 ở đầu và chỉ nhận 9-10 số, khiến mọi số điện thoại hợp lệ theo đặc tả (\"bắt đầu bằng 0, 10-11 chữ số\") đều bị từ chối!"
+    },
+    {
+      "step": "FR04_PRIVILEGE_ESCALATION_BUG",
+      "bugId": "BUG-FR04-02",
+      "title": "Lỗ hổng leo quyền nghiêm trọng: Người dùng tự thăng cấp thành Admin qua PUT /api/users/me (CWE-269)",
+      "severity": "Critical",
+      "evidence": "server.js:124-127 cho phép nhận trường role từ body request và cập nhật trực tiếp vào CSDL, vi phạm đặc tả: \"Người dùng không thể tự thay đổi thuộc tính role\"."
+    },
+    {
+      "step": "FR04_FIELD_MISMATCH_SHIPPING_ADDRESS",
+      "bugId": "BUG-FR04-03",
+      "title": "Lệch pha đặt tên trường giữa Mobile và Backend: Cập nhật địa chỉ bị xóa trắng (null)",
+      "severity": "High",
+      "evidence": "frontend-mobile/App.js:302 gửi { shippingAddress } nhưng server.js:119 lại bóc tách { shipping_address }, dẫn đến trường này luôn bị ghi đè thành NULL/undefined trong CSDL!"
+    }
+  ]
+}
