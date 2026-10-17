@@ -1,4 +1,6 @@
-﻿c6ea47e - tvquang0511, 2026-10-18 : docs(summary): finalize master README with self-assessment table and completed plan progress
+﻿de1d331 - tvquang0511, 2026-10-18 : docs(readme): add youtube demo video link for domain-bva-tester skill
+2abee6b - tvquang0511, 2026-10-18 : chore(git): export final git commit log for HW02 submission
+c6ea47e - tvquang0511, 2026-10-18 : docs(summary): finalize master README with self-assessment table and completed plan progress
 39ae484 - tvquang0511, 2026-10-18 : docs(ai): complete AI gap analysis, 275-word AI critique, and 7-step authentic AI audit report
 c7a7153 - tvquang0511, 2026-10-18 : chore(issues): sync and embed screenshots for all 21 GitHub issues across all features
 0a0904f - tvquang0511, 2026-10-18 : docs(reports): complete comprehensive domain testing, BVA matrices, and bug catalog for all 4 features
