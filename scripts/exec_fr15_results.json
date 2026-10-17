@@ -1,0 +1,41 @@
+{
+  "feature": "FR-15: Quản lý Sản phẩm (Product CRUD)",
+  "timestamp": "2026-10-17T15:25:30.874Z",
+  "steps": [
+    {
+      "step": "FR15_SEC_NO_AUTH_PRODUCT_CREATE",
+      "bugId": "BUG-FR15-01",
+      "title": "API POST/PUT/DELETE /api/products không yêu cầu xác thực Admin, cho phép người dùng ẩn danh thao tác (CWE-306)",
+      "severity": "Critical",
+      "evidence": "Anonymous request tới POST /api/products trả về HTTP 200 và tạo sản phẩm thành công với ID=9. Thiếu middleware authenticateToken và checkAdmin theo yêu cầu FR-12."
+    },
+    {
+      "step": "FR15_BVA_NEGATIVE_PRICE_ACCEPTED",
+      "bugId": "BUG-FR15-02",
+      "title": "Backend chấp nhận thêm sản phẩm có giá âm (-50,000 ₫), thiếu xác thực số dương theo đặc tả",
+      "severity": "High",
+      "evidence": "server.js:167-177 không kiểm tra price > 0, chấp nhận ghi giá âm vào CSDL với ID=10."
+    },
+    {
+      "step": "FR15_EMPTY_NAME_ACCEPTED",
+      "bugId": "BUG-FR15-03",
+      "title": "Backend chấp nhận sản phẩm có tên rỗng, vi phạm ràng buộc bắt buộc (CWE-20)",
+      "severity": "Medium",
+      "evidence": "server.js:167-177 chèn trực tiếp chuỗi rỗng vào cột name của bảng products (ID=11)."
+    },
+    {
+      "step": "FR15_TYPE_INCONSISTENCY_PRICE",
+      "bugId": "BUG-FR15-04",
+      "title": "API GET /api/products/:id trả về kiểu dữ liệu price không nhất quán (String cho ID chẵn, Number cho ID lẻ)",
+      "severity": "Medium",
+      "evidence": "server.js:162 cố tình ép kiểu row.id % 2 === 0 => row.price = row.price.toString(), dẫn đến lỗi xử lý phép tính và hiển thị trên frontend."
+    },
+    {
+      "step": "FR15_ADMIN_UI_MASS_UPDATE_BUG",
+      "bugId": "BUG-FR15-05",
+      "title": "Lỗi giao diện Admin: Khi sửa 1 sản phẩm, toàn bộ danh sách sản phẩm trên UI bị đổi tên theo sản phẩm đó",
+      "severity": "High",
+      "evidence": "frontend-admin/src/App.jsx:110 map qua toàn bộ mảng products và gán name: productForm.name cho tất cả sản phẩm, vi phạm trực tiếp đặc tả: \"Khi Sửa một sản phẩm, chỉ sản phẩm đó bị thay đổi — các sản phẩm khác giữ nguyên\"."
+    }
+  ]
+}

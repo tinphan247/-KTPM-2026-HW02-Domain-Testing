@@ -1,0 +1,91 @@
+{
+  "feature": "FR-15 & Discovery: Quản lý Sản phẩm & Trải nghiệm Sản phẩm Toàn diện",
+  "timestamp": "2026-10-17T16:06:06.510Z",
+  "testsRun": 14,
+  "bugsDetected": [
+    {
+      "bugId": "BUG-FR15-01",
+      "title": "Broken Access Control trên API Tạo sản phẩm (CWE-306)",
+      "severity": "Critical",
+      "evidence": "POST /api/products không gửi Authorization header vẫn trả về HTTP 200 OK và tạo sản phẩm ID=13."
+    },
+    {
+      "bugId": "BUG-FR15-01B",
+      "title": "Thiếu kiểm tra quyền Admin: User thường có thể thêm/sửa/xóa sản phẩm",
+      "severity": "High",
+      "evidence": "Tài khoản role='user' gửi request POST /api/products vẫn được chấp nhận thành công (Kỳ vọng: 403 Forbidden)."
+    },
+    {
+      "bugId": "BUG-FR15-02",
+      "title": "Backend chấp nhận giá âm (-50,000 ₫), vi phạm đặc tả số dương",
+      "severity": "High",
+      "evidence": "POST /api/products với price = -50000 lưu thành công vào CSDL với ID=15."
+    },
+    {
+      "bugId": "BUG-FR15-02B",
+      "title": "Backend chấp nhận giá bằng 0 ₫, vi phạm đặc tả giá phải > 0",
+      "severity": "Medium",
+      "evidence": "POST /api/products với price = 0 được chấp nhận thành công với ID=16."
+    },
+    {
+      "bugId": "BUG-FR15-03",
+      "title": "Backend chấp nhận tên sản phẩm rỗng, thiếu validation (CWE-20)",
+      "severity": "Medium",
+      "evidence": "POST /api/products với name = \"\" lưu thành công vào CSDL với ID=17."
+    },
+    {
+      "bugId": "BUG-FR15-03B",
+      "title": "Backend không kiểm tra độ dài tối đa 255 ký tự của tên sản phẩm",
+      "severity": "Low",
+      "evidence": "Tên dài 300 ký tự được chèn thành công vào CSDL SQLite không hề có cảnh báo hay cắt ngắn."
+    },
+    {
+      "bugId": "BUG-FR15-03C",
+      "title": "Backend chấp nhận category_id không tồn tại, thiếu ràng buộc Khóa ngoại",
+      "severity": "Medium",
+      "evidence": "SQLite thiếu PRAGMA foreign_keys = ON, chấp nhận chèn category_id=99999 vào bảng products."
+    },
+    {
+      "bugId": "BUG-FR15-06",
+      "title": "Lỗ hổng SQL Injection nghiêm trọng trong API Tìm kiếm (CWE-89)",
+      "severity": "Critical",
+      "evidence": "server.js:144 nối chuỗi trực tiếp: SELECT * FROM products WHERE name LIKE '%[object Object]%'. Truy vấn search=' OR '1'='1 dump toàn bộ danh sách sản phẩm!"
+    },
+    {
+      "bugId": "BUG-FR15-04",
+      "title": "Lệch kiểu dữ liệu price (String vs Number) giữa ID chẵn và lẻ",
+      "severity": "Medium",
+      "evidence": "ID=1 trả về price dạng undefined, trong khi ID=2 trả về price dạng string. server.js:162 cố tình ép kiểu row.price.toString() khi ID chẵn."
+    },
+    {
+      "bugId": "BUG-FR15-10",
+      "title": "API trả về HTTP 200 OK với object rỗng {} khi sản phẩm không tồn tại (Thay vì HTTP 404)",
+      "severity": "Medium",
+      "evidence": "server.js:161 trả về res.status(200).json({}), khiến client tưởng sản phẩm tồn tại và gây lỗi render trắng trang."
+    },
+    {
+      "bugId": "BUG-FR15-05",
+      "title": "Lỗi logic giao diện Admin: Khi sửa 1 sản phẩm, toàn bộ sản phẩm trên UI bị đổi tên theo",
+      "severity": "High",
+      "evidence": "App.jsx:110 duyệt qua products.map và gán name: productForm.name cho toàn bộ danh sách."
+    },
+    {
+      "bugId": "BUG-FR15-07",
+      "title": "Lỗ hổng Reflected XSS nguy hiểm trên thanh tìm kiếm trang chủ (CWE-79)",
+      "severity": "High",
+      "evidence": "Home.jsx:64 render trực tiếp input search qua dangerouslySetInnerHTML, vi phạm đặc tả: \"Từ khóa tìm kiếm phải được hiển thị an toàn (không render HTML)\"."
+    },
+    {
+      "bugId": "BUG-FR15-08",
+      "title": "Lỗi nút Thêm vào giỏ hàng: Cố tình bỏ qua lượt click đầu tiên, bắt buộc Double-Click",
+      "severity": "Medium",
+      "evidence": "ProductDetail.jsx:22-25 chặn click lần đầu bằng if (clickCount === 0) return, gây trải nghiệm người dùng tệ hại và hiểu nhầm nút bị đơ."
+    },
+    {
+      "bugId": "BUG-FR15-09",
+      "title": "API Import CSV thiếu cơ chế Transaction Rollback (Không tuân thủ All-or-Nothing)",
+      "severity": "Medium",
+      "evidence": "server.js:199-241 chèn từng dòng độc lập, nếu có dòng lỗi thì các dòng trước vẫn được lưu vào DB, vi phạm đặc tả: \"Nếu có lỗi ở bất kỳ dòng nào, toàn bộ import phải được rollback\"."
+    }
+  ]
+}
