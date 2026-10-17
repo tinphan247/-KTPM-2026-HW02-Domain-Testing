@@ -1,0 +1,93 @@
+{
+  "feature": "FR-03: Quên mật khẩu & Đặt lại mật khẩu",
+  "timestamp": "2026-10-17T14:32:00.947Z",
+  "steps": [
+    {
+      "step": "A1_REQUEST_OTP_VALID",
+      "status": 200,
+      "resetToken": "1786",
+      "tokenLength": 4,
+      "bugFound": "BUG-FR03-02: OTP chỉ có 4 số thay vì 6 số theo đặc tả"
+    },
+    {
+      "step": "A2_REQUEST_OTP_NONEXISTENT",
+      "status": 404,
+      "response": {
+        "error": "User not found"
+      }
+    },
+    {
+      "step": "A3_RESET_WEAK_PASSWORD_BACKEND",
+      "status": 200,
+      "response": {
+        "message": "Password reset successfully"
+      },
+      "bugFound": "BUG-FR03-06: Backend chấp nhận mật khẩu \"123\", thiếu validate độ mạnh phía Server (CWE-602)"
+    },
+    {
+      "step": "A4_DB_INSPECTION_PLAINTEXT",
+      "user": {
+        "id": 2,
+        "email": "test@eshop.com",
+        "password": "123",
+        "role": "user"
+      },
+      "isPlaintext": true,
+      "bugFound": "BUG-FR03-07: Mật khẩu lưu dạng văn bản thô (Plaintext), vi phạm nghiêm trọng SEC-01"
+    },
+    {
+      "step": "A5_REGEX_EVALUATION",
+      "details": [
+        {
+          "password": "Eshop@2026",
+          "description": "Chuẩn đặc tả (hoa, thường, số, ký tự đặc biệt @)",
+          "regexPassed": false,
+          "status": "FAIL_FALSE_NEGATIVE"
+        },
+        {
+          "password": "Admin123!",
+          "description": "Chuẩn đặc tả (hoa, thường, số, ký tự đặc biệt !)",
+          "regexPassed": false,
+          "status": "FAIL_FALSE_NEGATIVE"
+        },
+        {
+          "password": "Eshop 2026",
+          "description": "Sai đặc tả (chứa dấu cách, không có ký tự đặc biệt)",
+          "regexPassed": true,
+          "status": "FAIL_FALSE_POSITIVE"
+        },
+        {
+          "password": "Admin 123",
+          "description": "Sai đặc tả (chứa dấu cách, không có ký tự đặc biệt)",
+          "regexPassed": true,
+          "status": "FAIL_FALSE_POSITIVE"
+        },
+        {
+          "password": "eshop@2026",
+          "description": "Thiếu chữ hoa",
+          "regexPassed": false,
+          "status": "FAIL_FALSE_NEGATIVE"
+        },
+        {
+          "password": "ESHOP@2026",
+          "description": "Thiếu chữ thường",
+          "regexPassed": false,
+          "status": "FAIL_FALSE_NEGATIVE"
+        },
+        {
+          "password": "Eshop@abcd",
+          "description": "Thiếu chữ số",
+          "regexPassed": false,
+          "status": "FAIL_FALSE_NEGATIVE"
+        },
+        {
+          "password": "Esh@12",
+          "description": "Độ dài ngắn (< 8)",
+          "regexPassed": false,
+          "status": "FAIL_FALSE_NEGATIVE"
+        }
+      ],
+      "bugFound": "BUG-FR03-03: Regex bắt buộc khoảng trắng (?=.*\\s) và cấm mọi ký tự đặc biệt [@$!%*?&]"
+    }
+  ]
+}

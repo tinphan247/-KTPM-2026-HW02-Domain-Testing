@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    background-color: #0d1117;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cascadia Code", monospace;
+    color: #e6edf3;
+    padding: 20px;
+    margin: 0;
+  }
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 24px;
+    width: 820px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #21262d;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  .bug-tag {
+    background: #da3633;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: monospace;
+  }
+  .title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-top: 6px;
+  }
+  .section-label {
+    font-size: 12px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 12px 0 6px 0;
+    font-weight: 600;
+  }
+  .code-box {
+    background: #090d13;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 14px;
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #79c0ff;
+  }
+  .highlight-error {
+    border: 2px solid #f85149;
+    background: rgba(248, 81, 73, 0.15);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #ff7b72;
+    font-weight: bold;
+    display: inline-block;
+  }
+  .arrow-callout {
+    color: #ff7b72;
+    font-weight: bold;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .green-tag { color: #3fb950; font-weight: bold; }
+  .red-tag { color: #f85149; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<!-- CARD 1: BUG-02 OTP 4 DIGITS -->
+<div id="card-bug02" class="card">
+  <div class="header">
+    <span class="bug-tag">BUG-FR03-02 (API EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">Endpoint: POST /api/forgot-password</span>
+  </div>
+  <div class="title">Backend & API chỉ sinh mã OTP gồm 4 chữ số (Vi phạm đặc tả 6 chữ số và SEC-07)</div>
+
+  <div class="section-label">1. Request Payload:</div>
+  <div class="code-box">POST http://localhost:3000/api/forgot-password<br>{"email": "test@eshop.com"}</div>
+
+  <div class="section-label">2. Measured Server Response:</div>
+  <div class="code-box">
+HTTP/1.1 200 OK<br>
+{<br>
+&nbsp;&nbsp;"message": "Mã đặt lại mật khẩu đã được tạo",<br>
+&nbsp;&nbsp;<span class="highlight-error">"resetToken": "1786"</span>&nbsp;&nbsp;&nbsp;&nbsp;&lt;--- [LỖI]: ĐỘ DÀI CHỈ CÓ 4 CHỮ SỐ (YÊU CẦU ĐẶC TẢ LÀ 6 SỐ!)<br>
+}
+  </div>
+
+  <div class="section-label">3. Mã nguồn Backend bị lỗi (backend/server.js:72):</div>
+  <div class="code-box">
+const { email } = req.body;<br>
+<span class="highlight-error">const resetToken = Math.floor(1000 + Math.random() * 9000).toString();</span><br>
+<span class="arrow-callout">&#8618; Lỗi: Math.random() * 9000 chỉ sinh số từ 1000 đến 9999 (4 chữ số), vi phạm SEC-07 (tối thiểu 6 chữ số entropy).</span>
+  </div>
+</div>
+
+<!-- CARD 2: BUG-03 REGEX FLAW -->
+<div id="card-bug03" class="card">
+  <div class="header">
+    <span class="bug-tag">BUG-FR03-03 (CODE & RUNTIME EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">File: frontend-web/src/pages/ForgotPassword.jsx:26</span>
+  </div>
+  <div class="title">Regex kiểm tra mật khẩu bị lỗi logic: Từ chối ký tự '@', bắt buộc khoảng trắng</div>
+
+  <div class="section-label">1. Đoạn code Regex trong ForgotPassword.jsx:</div>
+  <div class="code-box">
+const handleReset = async (e) =&gt; {<br>
+&nbsp;&nbsp;e.preventDefault();<br>
+&nbsp;&nbsp;<span class="highlight-error">const flawedStrongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\s)[A-Za-z\d\s]{8,}$/;</span<br>
+&nbsp;&nbsp;<span class="arrow-callout">&#8618; LỖI: Nhóm (?=.*\s) bắt buộc có KHOẢNG TRẮNG; [A-Za-z\d\s] CẤM HOÀN TOÀN KÝ TỰ ĐẶC BIỆT [@$!%*?&amp;]</span>
+  </div>
+
+  <div class="section-label">2. Kết quả đo lường thực tế (Runtime Evaluation):</div>
+  <div class="code-box">
+1. Mật khẩu chuẩn đặc tả: "Eshop@2026" (có @, 10 ký tự)<br>
+&nbsp;&nbsp;&nbsp;-&gt; regex.test("Eshop@2026") = <span class="red-tag">FALSE (BỊ TỪ CHỐI VỚI ALERT "Mật khẩu quá yếu!")</span><br><br>
+2. Mật khẩu có dấu cách: "Eshop 2026" (hoàn toàn không có ký tự đặc biệt)<br>
+&nbsp;&nbsp;&nbsp;-&gt; regex.test("Eshop 2026") = <span class="green-tag">TRUE (CHẤP NHẬN ĐỔI MẬT KHẨU THÀNH CÔNG!)</span>
+  </div>
+</div>
+
+<!-- CARD 3: BUG-06 BACKEND WEAK PASSWORD -->
+<div id="card-bug06" class="card">
+  <div class="header">
+    <span class="bug-tag">BUG-FR03-06 (BACKEND API EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">Endpoint: POST /api/reset-password</span>
+  </div>
+  <div class="title">Backend API hoàn toàn không validate độ mạnh mật khẩu, chấp nhận mật khẩu "123" (CWE-602)</div>
+
+  <div class="section-label">1. Request API Reset Password với mật khẩu cực yếu:</div>
+  <div class="code-box">
+POST http://localhost:3000/api/reset-password<br>
+{<br>
+&nbsp;&nbsp;"email": "test@eshop.com",<br>
+&nbsp;&nbsp;"resetToken": "1786",<br>
+&nbsp;&nbsp;<span class="highlight-error">"newPassword": "123"</span>&nbsp;&nbsp;&nbsp;&nbsp;&lt;--- [MẬT KHẨU CHỈ CÓ 3 KÝ TỰ, KHÔNG HOA, KHÔNG KÝ TỰ ĐẶC BIỆT]<br>
+}
+  </div>
+
+  <div class="section-label">2. Kết quả phản hồi từ Backend API:</div>
+  <div class="code-box">
+<span class="red-tag">HTTP/1.1 200 OK</span><br>
+{<br>
+&nbsp;&nbsp;<span class="highlight-error">"message": "Password reset successfully"</span><br>
+}<br>
+<span class="arrow-callout">&#8618; LỖI BẢO MẬT: Backend không có bất kỳ dòng validate nào phía Server, phó mặc hoàn toàn cho Client.</span>
+  </div>
+</div>
+
+<!-- CARD 4: BUG-07 PLAINTEXT PASSWORD -->
+<div id="card-bug07" class="card">
+  <div class="header">
+    <span class="bug-tag">BUG-FR03-07 (DATABASE EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">Database: SQLite database.sqlite (table: users)</span>
+  </div>
+  <div class="title">Mật khẩu sau khi đổi được lưu dưới dạng Plaintext thô vào CSDL (Vi phạm SEC-01)</div>
+
+  <div class="section-label">1. Mã nguồn truy vấn UPDATE mật khẩu (backend/server.js:90):</div>
+  <div class="code-box">
+app.post("/api/reset-password", (req, res) =&gt; {<br>
+&nbsp;&nbsp;const { email, resetToken, newPassword } = req.body;<br>
+&nbsp;&nbsp;<span class="highlight-error">db.run("UPDATE users SET password = ?, reset_token = NULL WHERE email = ? AND reset_token = ?",</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight-error">[newPassword, email, resetToken], function(err) { ... });</span><br>
+<span class="arrow-callout">&#8618; LỖI: newPassword được truyền thẳng vào SQL mà KHÔNG HỀ QUA HÀM BĂM (bcrypt.hash).</span>
+  </div>
+
+  <div class="section-label">2. Truy vấn trực tiếp vào CSDL SQLite sau khi đổi mật khẩu:</div>
+  <div class="code-box">
+sqlite&gt; SELECT id, email, password, role FROM users WHERE email = 'test@eshop.com';<br>
+┌────┬────────────────────┬──────────┬──────────┐<br>
+│ id │ email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ password │ role&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│<br>
+├────┼────────────────────┼──────────┼──────────┤<br>
+│ 2&nbsp;&nbsp;│ test@eshop.com&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;│ <span class="highlight-error">"123"</span>&nbsp;&nbsp;&nbsp;&nbsp;│ customer │<br>
+└────┴────────────────────┴──────────┴──────────┘<br>
+<span class="arrow-callout">&#8618; NGUY HIỂM: Mật khẩu lưu dạng văn bản thô "123" (Plaintext), vi phạm nghiêm trọng SEC-01!</span>
+  </div>
+</div>
+
+<!-- CARD 5: BUG-01 & BUG-04 UI CODE -->
+<div id="card-bug01" class="card">
+  <div class="header">
+    <span class="bug-tag">BUG-FR03-01 & BUG-04 (UI CODE EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">File: frontend-web/src/pages/ForgotPassword.jsx</span>
+  </div>
+  <div class="title">Thiếu trường Confirm Password trên form và thẻ input email dùng type="text"</div>
+
+  <div class="section-label">1. Form Bước 1 dùng type="text" thay vì type="email" (dòng 50):</div>
+  <div class="code-box">
+&lt;label className="block text-gray-700 mb-2"&gt;Nhập Email của bạn&lt;/label&gt;<br>
+<span class="highlight-error">&lt;input type="text" value={email} onChange={(e) =&gt; setEmail(e.target.value)} required /&gt;</span><br>
+<span class="arrow-callout">&#8618; Lỗi BUG-04: Không dùng type="email", mất tính năng validate email tự động của HTML5.</span>
+  </div>
+
+  <div class="section-label">2. Form Bước 2 thiếu trường "Xác nhận mật khẩu mới" (dòng 63-90):</div>
+  <div class="code-box">
+{step === 2 &amp;&amp; (<br>
+&nbsp;&nbsp;&lt;form onSubmit={handleReset}&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input type="text" value={resetToken} ... /&gt; &lt;!-- Mã OTP --&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;input type="password" value={newPassword} ... /&gt; &lt;!-- Mật khẩu mới --&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight-error">&lt;!-- HOÀN TOÀN THIẾU TRƯỜNG: &lt;input type="password" value={confirmPassword} /&gt; --&gt;</span><br>
+&nbsp;&nbsp;&lt;/form&gt;<br>
+)}<br>
+<span class="arrow-callout">&#8618; Lỗi BUG-01: Không có ô Xác nhận mật khẩu, vi phạm trực tiếp đặc tả FR-03.</span>
+  </div>
+</div>
+
+</body>
+</html>

@@ -15,6 +15,8 @@
 | **BUG-FR03-03** | Regex kiểm tra mật khẩu sai logic: Từ chối ký tự đặc biệt hợp lệ và bắt buộc chứa khoảng trắng | **Critical** | [Đang chờ mở Issue] |
 | **BUG-FR03-04** | Trường nhập Email dùng thẻ `type="text"` thay vì `type="email"` vi phạm chuẩn HTML5 và tiêu chuẩn GUI | **Medium** | [Đang chờ mở Issue] |
 | **BUG-FR03-05** | Giao diện quy trình 2 bước không có chỉ báo bước (Step Indicator "Bước 1 / 2") | **Low** | [Đang chờ mở Issue] |
+| **BUG-FR03-06** | Backend API thiếu hoàn toàn kiểm tra độ phức tạp mật khẩu, chấp nhận mật khẩu yếu "123" (CWE-602) | **High** | [Đang chờ mở Issue] |
+| **BUG-FR03-07** | Mật khẩu sau khi reset bị lưu dưới dạng văn bản thô (Plaintext) vào CSDL SQLite (Vi phạm nghiêm trọng SEC-01) | **Critical** | [Đang chờ mở Issue] |
 
 ---
 
@@ -36,8 +38,9 @@
   Giao diện Bước 2 chỉ có duy nhất 2 trường nhập: "Mã OTP (4 số)" và "Mật khẩu mới". Hoàn toàn không có trường "Xác nhận mật khẩu mới".
 * **Kết quả mong đợi (Expected Result)**:
   Phải có trường "Xác nhận mật khẩu mới" để người dùng nhập lại mật khẩu và hệ thống kiểm tra sự trùng khớp.
-* **Bằng chứng (Screenshot)**:
-  * Ảnh chụp màn hình: `screenshots/FR03_BUG01_MISSING_CONFIRM_PASSWORD.png`
+* **Bằng chứng (Screenshots)**:
+  * Ảnh chụp giao diện (thiếu ô Confirm Password): `screenshots/FR03_BUG01_MISSING_CONFIRM_PASSWORD.png`
+  * Ảnh chụp mã nguồn React (khoanh vùng thiếu ô input): `screenshots/FR03_BUG01_CODE_EVIDENCE.png`
 
 ---
 
@@ -56,8 +59,9 @@
   * Giao diện hiển thị nhãn: `"Mã OTP (4 số)"` và mã OTP chỉ có 4 số (ví dụ: `1619`).
 * **Kết quả mong đợi (Expected Result)**:
   Hệ thống phải sinh mã OTP ngẫu nhiên gồm đúng 6 chữ số (từ 100000 đến 999999).
-* **Bằng chứng (Screenshot)**:
-  * Ảnh chụp màn hình: `screenshots/FR03_BUG02_OTP_4DIGITS_INSTEAD_OF_6.png`
+* **Bằng chứng (Screenshots)**:
+  * Ảnh chụp giao diện: `screenshots/FR03_BUG02_OTP_4DIGITS_INSTEAD_OF_6.png`
+  * Ảnh chụp API Response & Code Backend (khoanh vùng lỗi 4 số): `screenshots/FR03_BUG02_API_EVIDENCE.png`
 
 ---
 
@@ -78,9 +82,10 @@
   Regex này sử dụng `(?=.*\s)` đòi hỏi phải có **khoảng trắng**, và tập ký tự cho phép chỉ gồm chữ và số và khoảng trắng `[A-Za-z\d\s]`, hoàn toàn không cho phép các ký tự đặc biệt `@, $, !, %, *, ?, &`! Nếu nhập mật khẩu có khoảng trắng như `Eshop 2026` thì lại pass.
 * **Kết quả mong đợi (Expected Result)**:
   Hệ thống phải chấp nhận mật khẩu có chứa các ký tự đặc biệt `@, $, !, %, *, ?, &` như `Eshop@2026`.
-* **Bằng chứng (Screenshot)**:
-  * Ảnh chụp từ chối mật khẩu hợp lệ: `screenshots/FR03_BUG03_REGEX_REJECTS_VALID_PASSWORD.png`
-  * Ảnh chụp chấp nhận mật khẩu sai logic (có dấu cách): `screenshots/FR03_BUG03_REGEX_ACCEPTS_SPACE_PASSWORD.png`
+* **Bằng chứng (Screenshots)**:
+  * Ảnh chụp giao diện từ chối mật khẩu hợp lệ: `screenshots/FR03_BUG03_REGEX_REJECTS_VALID_PASSWORD.png`
+  * Ảnh chụp giao diện chấp nhận mật khẩu có dấu cách: `screenshots/FR03_BUG03_REGEX_ACCEPTS_SPACE_PASSWORD.png`
+  * Ảnh chụp mã nguồn Regex & đo lường runtime (khoanh đỏ lỗi): `screenshots/FR03_BUG03_CODE_EVIDENCE.png`
 
 ---
 
@@ -94,8 +99,9 @@
   Tại `ForgotPassword.jsx` dòng 50, thẻ input khai báo là `type="text"`. Khi người dùng nhập chuỗi không đúng định dạng email (ví dụ: `testeshop.com`), trình duyệt không kích hoạt tính năng kiểm tra định dạng HTML5 có sẵn của trình duyệt.
 * **Kết quả mong đợi (Expected Result)**:
   Thẻ input phải là `<input type="email" ... />`.
-* **Bằng chứng (Screenshot)**:
-  * Ảnh chụp màn hình: `screenshots/FR03_BUG04_EMAIL_TYPE_TEXT.png`
+* **Bằng chứng (Screenshots)**:
+  * Ảnh chụp giao diện gửi email sai cú pháp: `screenshots/FR03_BUG04_EMAIL_TYPE_TEXT.png`
+  * Ảnh chụp mã nguồn thẻ input (khoanh đỏ): `screenshots/FR03_BUG04_CODE_EVIDENCE.png`
 
 ---
 
@@ -110,4 +116,43 @@
 * **Kết quả mong đợi (Expected Result)**:
   Hiển thị thanh chỉ báo bước (Step Indicator) trực quan.
 * **Bằng chứng (Screenshot)**:
-  * Ảnh chụp màn hình: `screenshots/FR03_BUG05_MISSING_STEP_INDICATOR.png`
+  * Ảnh chụp giao diện thiếu Step Indicator: `screenshots/FR03_BUG05_MISSING_STEP_INDICATOR.png`
+
+---
+
+### 6. BUG-FR03-06: Backend API thiếu hoàn toàn kiểm tra độ phức tạp mật khẩu (CWE-602)
+* **Mã Bug**: `BUG-FR03-06`
+* **Tính năng**: `FR-03: Quên mật khẩu & Đặt lại mật khẩu`
+* **Mức độ nghiêm trọng (Severity)**: **High**
+* **Đặc tả yêu cầu (Specification)**:
+  > *"Mật khẩu tối thiểu 8 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường, 1 chữ số và 1 ký tự đặc biệt (@, $, !, %, *, ?, &)."*
+* **Các bước tái hiện (Steps to Reproduce)**:
+  1. Gửi request HTTP `POST /api/reset-password` trực tiếp đến Backend với payload:
+     `{"email": "test@eshop.com", "resetToken": "<valid_token>", "newPassword": "123"}`
+* **Kết quả thực tế (Actual Result)**:
+  Backend trả về HTTP 200: `{"message": "Password reset successfully"}`. Backend hoàn toàn không có bất kỳ logic kiểm tra độ dài hay độ phức tạp của mật khẩu, phó mặc hoàn toàn cho Client-side validation (Lỗ hổng CWE-602).
+* **Kết quả mong đợi (Expected Result)**:
+  Backend phải validate lại độ mạnh mật khẩu và trả về lỗi HTTP 400 Bad Request nếu mật khẩu không đạt chuẩn.
+* **Bằng chứng (Screenshot)**:
+  * Ảnh chụp API Response chấp nhận mật khẩu "123" (khoanh đỏ): `screenshots/FR03_BUG06_API_EVIDENCE.png`
+
+---
+
+### 7. BUG-FR03-07: Mật khẩu lưu dạng văn bản thô (Plaintext) vào CSDL SQLite (Vi phạm SEC-01)
+* **Mã Bug**: `BUG-FR03-07`
+* **Tính năng**: `FR-03: Quên mật khẩu` & `SEC-01: Security Requirements`
+* **Mức độ nghiêm trọng (Severity)**: **Critical**
+* **Đặc tả yêu cầu (Specification)**:
+  > *"SEC-01: Mật khẩu KHÔNG được lưu dưới dạng plaintext."*
+* **Các bước tái hiện (Steps to Reproduce)**:
+  1. Tiến hành đặt lại mật khẩu thành công qua API hoặc UI.
+  2. Dùng script hoặc SQLite client truy vấn bảng `users`:
+     `SELECT id, email, password FROM users WHERE email = 'test@eshop.com';`
+* **Kết quả thực tế (Actual Result)**:
+  Mật khẩu mới được lưu dưới dạng chữ thô nguyên bản (`123` hoặc `Eshop 2026`) mà không hề được băm (hash) bằng bcrypt hay bất kỳ thuật toán băm an toàn nào (`server.js:90`: `UPDATE users SET password = ? ...`).
+* **Kết quả mong đợi (Expected Result)**:
+  Mật khẩu phải được hash trước khi lưu vào CSDL (ví dụ dùng `bcrypt.hash(newPassword, 10)`).
+* **Bằng chứng (Screenshot)**:
+  * Ảnh chụp truy vấn SQLite lưu mật khẩu Plaintext (khoanh đỏ): `screenshots/FR03_BUG07_DB_EVIDENCE.png`
+
+
