@@ -40,8 +40,30 @@ async function runTests() {
     steps: []
   };
 
+  // Step 0: Kiểm tra sự tồn tại của trường UI "Xác nhận mật khẩu" (Confirm Password)
+  console.log('[Step 0] Kiểm tra UI Component ForgotPassword.jsx đối với trường "Xác nhận mật khẩu"...');
+  const frontendPath = path.resolve(__dirname, '../../eshop-sut/frontend-web/src/pages/ForgotPassword.jsx');
+  const frontendSource = fs.readFileSync(frontendPath, 'utf8');
+  const hasConfirmPasswordState = /confirmPassword/i.test(frontendSource);
+  const hasConfirmPasswordInput = /xác nhận mật khẩu|confirm password/i.test(frontendSource);
+  const hasConfirmPasswordValidation = /newPassword\s*===?\s*confirm/i.test(frontendSource);
+  
+  console.log(`-> Có state confirmPassword: ${hasConfirmPasswordState}`);
+  console.log(`-> Có ô input Xác nhận mật khẩu trên UI: ${hasConfirmPasswordInput}`);
+  console.log(`-> Có kiểm tra khớp 2 mật khẩu: ${hasConfirmPasswordValidation}`);
+
+  const isMissingConfirmPasswordUI = !hasConfirmPasswordInput && !hasConfirmPasswordState;
+  results.steps.push({
+    step: 'A0_CHECK_CONFIRM_PASSWORD_UI',
+    hasState: hasConfirmPasswordState,
+    hasInput: hasConfirmPasswordInput,
+    hasValidation: hasConfirmPasswordValidation,
+    bugFound: isMissingConfirmPasswordUI 
+      ? 'BUG-FR03-01: Giao diện Bước 2 thiếu hoàn toàn trường input "Xác nhận mật khẩu", thiếu state và thiếu logic so khớp' 
+      : null
+  });
+
   // Step 1: Request OTP with valid email
-  console.log('[Step 1] Gửi yêu cầu OTP cho email hợp lệ (test@eshop.com)...');
   const step1 = await request('/api/forgot-password', { email: 'test@eshop.com' });
   const token = step1.data.resetToken;
   const is4Digits = token && token.length === 4;

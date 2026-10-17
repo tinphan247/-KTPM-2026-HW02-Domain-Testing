@@ -1,11 +1,18 @@
 {
   "feature": "FR-03: Quên mật khẩu & Đặt lại mật khẩu",
-  "timestamp": "2026-10-17T14:32:00.947Z",
+  "timestamp": "2026-10-17T15:25:30.404Z",
   "steps": [
+    {
+      "step": "A0_CHECK_CONFIRM_PASSWORD_UI",
+      "hasState": false,
+      "hasInput": false,
+      "hasValidation": false,
+      "bugFound": "BUG-FR03-01: Giao diện Bước 2 thiếu hoàn toàn trường input \"Xác nhận mật khẩu\", thiếu state và thiếu logic so khớp"
+    },
     {
       "step": "A1_REQUEST_OTP_VALID",
       "status": 200,
-      "resetToken": "1786",
+      "resetToken": "3053",
       "tokenLength": 4,
       "bugFound": "BUG-FR03-02: OTP chỉ có 4 số thay vì 6 số theo đặc tả"
     },

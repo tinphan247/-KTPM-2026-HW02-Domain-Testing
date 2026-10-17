@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  body {
+    background-color: #0d1117;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cascadia Code", monospace;
+    color: #e6edf3;
+    padding: 20px;
+    margin: 0;
+  }
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 24px;
+    width: 840px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+  }
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #21262d;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+  }
+  .bug-tag {
+    background: #da3633;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: monospace;
+  }
+  .badge-crit { background: #b62324; }
+  .badge-high { background: #d29922; color: #000; }
+  .badge-med { background: #1f6feb; }
+  .title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #f0f6fc;
+    margin-top: 6px;
+  }
+  .section-label {
+    font-size: 12px;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 12px 0 6px 0;
+    font-weight: 600;
+  }
+  .code-box {
+    background: #090d13;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 14px;
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #79c0ff;
+  }
+  .highlight-error {
+    border: 2px solid #f85149;
+    background: rgba(248, 81, 73, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #ff7b72;
+    font-weight: bold;
+    display: inline-block;
+  }
+  .arrow-callout {
+    color: #ff7b72;
+    font-weight: bold;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+  .green-tag { color: #3fb950; font-weight: bold; }
+  .red-tag { color: #f85149; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<!-- ==================== FR-07 CARDS ==================== -->
+
+<!-- CARD 1: FR07-BUG01 -->
+<div id="card-fr07-bug01" class="card">
+  <div class="header">
+    <span class="bug-tag badge-med">BUG-FR07-01 (CODE EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">Component: Cart.jsx & CartContext.jsx</span>
+  </div>
+  <div class="title">Thiếu nút (+/-) điều chỉnh số lượng và thiếu hàm updateQuantity trong CartContext</div>
+  <div class="section-label">1. Code render số lượng trong Cart.jsx (dòng 47):</div>
+  <div class="code-box">
+&lt;tbody&gt;<br>
+&nbsp;&nbsp;{cart.map((item, index) =&gt; (<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;tr key={index}&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;td&gt;{item.name}&lt;/td&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;td&gt;{Number(item.price).toLocaleString()} ₫&lt;/td&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight-error">&lt;td&gt;{item.quantity}&lt;/td&gt;</span> &lt;--- [LỖI]: CHỈ HIỂN THỊ CHỮ TĨNH, KHÔNG CÓ NÚT (+/-)!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;td&gt;{(Number(item.price) * item.quantity).toLocaleString()} ₫&lt;/td&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/tr&gt;<br>
+&nbsp;&nbsp;))}<br>
+&lt;/tbody&gt;
+  </div>
+  <div class="arrow-callout">⚠ VI PHẠM ĐẶC TẢ FR-07: "Số lượng (có nút +/- để chỉnh)". Người dùng không thể thay đổi số lượng trong giỏ hàng.</div>
+</div>
+
+<!-- CARD 2: FR07-BUG02 -->
+<div id="card-fr07-bug02" class="card">
+  <div class="header">
+    <span class="bug-tag badge-high">BUG-FR07-02 (CODE EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">File: frontend-web/src/context/CartContext.jsx:8-10</span>
+  </div>
+  <div class="title">Thêm cùng sản phẩm bị nhân bản dòng mới thay vì cộng dồn số lượng</div>
+  <div class="section-label">1. Logic hàm addToCart trong CartContext.jsx:</div>
+  <div class="code-box">
+const addToCart = (product, quantity) =&gt; {<br>
+&nbsp;&nbsp;<span class="highlight-error">setCart([...cart, { ...product, quantity }]);</span> &lt;--- [LỖI]: LUÔN TẠO PHẦN TỬ MỚI, KHÔNG KIỂM TRA TRÙNG PRODUCT.ID!<br>
+};
+  </div>
+  <div class="arrow-callout">⚠ VI PHẠM ĐẶC TẢ FR-07: "Thêm cùng một sản phẩm vào giỏ sẽ tăng số lượng, không tạo dòng mới".</div>
+</div>
+
+<!-- CARD 3: FR07-BUG03 -->
+<div id="card-fr07-bug03" class="card">
+  <div class="header">
+    <span class="bug-tag badge-med">BUG-FR07-03 (CODE EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">Component: Cart.jsx:50-55</span>
+  </div>
+  <div class="title">Nút Xóa sản phẩm thực hiện xóa tức thì, thiếu Confirmation Dialog</div>
+  <div class="section-label">1. Sự kiện click nút Xóa:</div>
+  <div class="code-box">
+&lt;button<br>
+&nbsp;&nbsp;<span class="highlight-error">onClick={() =&gt; removeFromCart(index)}</span> &lt;--- [LỖI]: GỌI HÀM XÓA NGAY LẬP TỨC, KHÔNG CÓ CONFIRM DIALOG!<br>
+&nbsp;&nbsp;className="text-red-500 hover:text-red-700"<br>
+&gt;<br>
+&nbsp;&nbsp;Xóa<br>
+&lt;/button&gt;
+  </div>
+  <div class="arrow-callout">⚠ VI PHẠM ĐẶC TẢ FR-07: "Nút Xóa sản phẩm phải có dialog xác nhận trước khi thực hiện".</div>
+</div>
+
+<!-- CARD 4: FR07-BUG06 -->
+<div id="card-fr07-bug06" class="card">
+  <div class="header">
+    <span class="bug-tag badge-crit">BUG-FR07-06 (API EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">Endpoint: POST /api/cart</span>
+  </div>
+  <div class="title">Backend API chấp nhận số lượng âm (quantity = -5) mà không validate (CWE-20)</div>
+  <div class="section-label">1. Request Payload:</div>
+  <div class="code-box">
+POST http://localhost:3000/api/cart<br>
+Authorization: Bearer &lt;JWT_TOKEN&gt;<br>
+{<br>
+&nbsp;&nbsp;"productId": 1,<br>
+&nbsp;&nbsp;"name": "Áo thun nam basic",<br>
+&nbsp;&nbsp;"price": 150000,<br>
+&nbsp;&nbsp;<span class="highlight-error">"quantity": -5</span> &lt;--- BVA GIÁ TRỊ ÂM NẰM NGOÀI MIỀN HỢP LỆ<br>
+}
+  </div>
+  <div class="section-label">2. Measured Server Response:</div>
+  <div class="code-box">
+<span class="highlight-error">HTTP/1.1 200 OK</span><br>
+{<br>
+&nbsp;&nbsp;<span class="highlight-error">"message": "Added to cart"</span><br>
+}<br>
+<span class="arrow-callout">🚨 LỖ HỔNG: Backend thiếu kiểm tra số nguyên dương (CWE-20), dẫn tới giỏ hàng bị trừ tiền bất hợp pháp!</span>
+  </div>
+</div>
+
+<!-- ==================== FR-15 CARDS ==================== -->
+
+<!-- CARD 5: FR15-BUG01 -->
+<div id="card-fr15-bug01" class="card">
+  <div class="header">
+    <span class="bug-tag badge-crit">BUG-FR15-01 (API EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">Endpoint: POST /api/products</span>
+  </div>
+  <div class="title">Broken Access Control: Người dùng ẩn danh không có Token vẫn thêm/sửa/xóa được sản phẩm (CWE-306)</div>
+  <div class="section-label">1. Request Payload (HOÀN TOÀN KHÔNG CÓ HEADER AUTHORIZATION):</div>
+  <div class="code-box">
+POST http://localhost:3000/api/products<br>
+(Headers: Không có Authorization Header)<br>
+{<br>
+&nbsp;&nbsp;"name": "Sản phẩm Hacker Test",<br>
+&nbsp;&nbsp;"price": 99000,<br>
+&nbsp;&nbsp;"category_id": 1<br>
+}
+  </div>
+  <div class="section-label">2. Measured Server Response:</div>
+  <div class="code-box">
+<span class="highlight-error">HTTP/1.1 200 OK</span><br>
+{<br>
+&nbsp;&nbsp;<span class="highlight-error">"message": "Product created", "id": 10</span><br>
+}<br>
+<span class="arrow-callout">🚨 LỖ HỔNG BẢO MẬT NGHIÊM TRỌNG: server.js:167 thiếu middleware authenticateToken và checkAdmin!</span>
+  </div>
+</div>
+
+<!-- CARD 6: FR15-BUG02 -->
+<div id="card-fr15-bug02" class="card">
+  <div class="header">
+    <span class="bug-tag badge-high">BUG-FR15-02 (API EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">Endpoint: POST /api/products</span>
+  </div>
+  <div class="title">Backend chấp nhận giá âm (-50,000 ₫), vi phạm đặc tả giá phải là số dương (&gt; 0)</div>
+  <div class="section-label">1. Request Payload:</div>
+  <div class="code-box">
+POST http://localhost:3000/api/products<br>
+{<br>
+&nbsp;&nbsp;"name": "Sản phẩm Giá Âm BVA",<br>
+&nbsp;&nbsp;<span class="highlight-error">"price": -50000</span> &lt;--- [LỖI BVA]: GIÁ ÂM &lt; 0<br>
+}
+  </div>
+  <div class="section-label">2. Measured Server Response:</div>
+  <div class="code-box">
+<span class="highlight-error">HTTP/1.1 200 OK</span><br>
+{"message": "Product created", "id": 11}<br>
+<span class="arrow-callout">⚠ VI PHẠM ĐẶC TẢ FR-15: "Giá: bắt buộc, phải là số dương (&gt; 0)".</span>
+  </div>
+</div>
+
+<!-- CARD 7: FR15-BUG05 -->
+<div id="card-fr15-bug05" class="card">
+  <div class="header">
+    <span class="bug-tag badge-high">BUG-FR15-05 (CODE EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">File: frontend-admin/src/App.jsx:109-115</span>
+  </div>
+  <div class="title">Lỗi hiển thị Admin: Sửa 1 sản phẩm làm toàn bộ sản phẩm trên UI bị đổi tên theo</div>
+  <div class="section-label">1. Mã nguồn hàm xử lý sửa sản phẩm:</div>
+  <div class="code-box">
+await axios.put(`${API_URL}/products/${productForm.id}`, productForm);<br>
+<span class="highlight-error">const fakeMassUpdatedProducts = products.map((p) =&gt; ({<br>
+&nbsp;&nbsp;...p,<br>
+&nbsp;&nbsp;name: productForm.name,<br>
+}));</span> &lt;--- [LỖI LOGIC]: GHI ĐÈ TÊN CỦA TOÀN BỘ SẢN PHẨM TRÊN GIAO DIỆN ADMIN!<br>
+setProducts(fakeMassUpdatedProducts);
+  </div>
+  <div class="arrow-callout">⚠ VI PHẠM ĐẶC TẢ FR-15: "Khi Sửa một sản phẩm, chỉ sản phẩm đó bị thay đổi — các sản phẩm khác giữ nguyên".</div>
+</div>
+
+<!-- ==================== FR-04 MOBILE CARDS ==================== -->
+
+<!-- CARD 8: FR04-BUG01 -->
+<div id="card-fr04-bug01" class="card">
+  <div class="header">
+    <span class="bug-tag badge-high">BUG-FR04-01 (CODE EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">File: frontend-mobile/App.js:287-293</span>
+  </div>
+  <div class="title">Regex Số điện thoại cấm số 0 ở đầu, từ chối toàn bộ số điện thoại hợp lệ của người dùng</div>
+  <div class="section-label">1. Mã nguồn validation SĐT trong App.js:</div>
+  <div class="code-box">
+const handleUpdateProfile = async () =&gt; {<br>
+&nbsp;&nbsp;<span class="highlight-error">if (!/^[1-9][0-9]{8,9}$/.test(phone)) {</span> &lt;--- [LỖI BẮT BUỘC BẮT ĐẦU BẰNG 1-9, CẤM SỐ 0!]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Alert.alert(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Lỗi",<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Số điện thoại không hợp lệ. Vui lòng nhập đúng 9-10 chữ số."<br>
+&nbsp;&nbsp;&nbsp;&nbsp;);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;return;<br>
+&nbsp;&nbsp;}
+  </div>
+  <div class="arrow-callout">⚠ VI PHẠM ĐẶC TẢ FR-04: "Số điện thoại hợp lệ: bắt đầu bằng số 0, từ 10–11 chữ số". Nhập "0901234567" luôn bị báo lỗi!</div>
+</div>
+
+<!-- CARD 9: FR04-BUG02 -->
+<div id="card-fr04-bug02" class="card">
+  <div class="header">
+    <span class="bug-tag badge-crit">BUG-FR04-02 (API EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">Endpoint: PUT /api/users/me</span>
+  </div>
+  <div class="title">Lỗ hổng leo quyền: Người dùng tự thăng cấp thành Admin qua body request (CWE-269)</div>
+  <div class="section-label">1. Request Payload:</div>
+  <div class="code-box">
+PUT http://localhost:3000/api/users/me<br>
+Authorization: Bearer &lt;USER_JWT_TOKEN&gt; (Role ban đầu: "user")<br>
+{<br>
+&nbsp;&nbsp;"name": "Quang Tester",<br>
+&nbsp;&nbsp;<span class="highlight-error">"role": "admin"</span> &lt;--- TỰ NÂNG QUYỀN LÀM QUẢN TRỊ VIÊN<br>
+}
+  </div>
+  <div class="section-label">2. Measured Server Response:</div>
+  <div class="code-box">
+<span class="highlight-error">HTTP/1.1 200 OK</span><br>
+{"message": "Profile updated"}<br>
+<span class="green-tag">GET /api/users/me =&gt; {"id": 2, "email": "test@eshop.com", "role": "admin"}</span><br>
+<span class="arrow-callout">🚨 LỖ HỔNG PRIVILEGE ESCALATION: server.js:124 nhận trực tiếp req.body.role và lưu vào CSDL!</span>
+  </div>
+</div>
+
+<!-- CARD 10: FR04-BUG03 -->
+<div id="card-fr04-bug03" class="card">
+  <div class="header">
+    <span class="bug-tag badge-high">BUG-FR04-03 (CODE EVIDENCE)</span>
+    <span style="color:#8b949e; font-size:12px;">File: frontend-mobile/App.js:302 vs backend/server.js:119</span>
+  </div>
+  <div class="title">Lệch pha tên trường camelCase vs snake_case khiến địa chỉ bị xóa trắng (null)</div>
+  <div class="section-label">1. Mobile gửi camelCase trong App.js dòng 302:</div>
+  <div class="code-box">
+body: JSON.stringify({ name, phone, <span class="highlight-error">shippingAddress</span> })
+  </div>
+  <div class="section-label">2. Backend server.js dòng 119 lại bóc tách snake_case:</div>
+  <div class="code-box">
+const { name, <span class="highlight-error">shipping_address</span>, phone, role } = req.body;<br>
+<span class="arrow-callout">⚠ KẾT QUẢ: req.body.shipping_address là undefined, CSDL bị lưu "null" và mất dữ liệu địa chỉ của user!</span>
+  </div>
+</div>
+
+</body>
+</html>
