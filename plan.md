@@ -53,13 +53,13 @@
 ---
 
 ### Phase 2: Phân Tích & Thiết Kế Test Feature A & B (50 điểm)
-- [ ] **Feature A (Pool A - 25 điểm)**:
-  - [ ] Bước 1: Dùng Agent Skill phân tích biến, ràng buộc, miền giá trị.
-  - [ ] Bước 2: Viết báo cáo áp dụng **Domain Testing** step-by-step.
-  - [ ] Bước 3: Viết báo cáo áp dụng **Boundary Value Analysis** step-by-step (bảng biên 2-value/3-value).
-  - [ ] Bước 4: Human Review – Tự rà soát và bổ sung các ca biên đặc thù (tiếng Việt, ký tự lạ, khoảng trắng...).
-  - [ ] Thực hiện Git commit: `test(pool-a): complete domain testing and bva for feature A`.
-- [ ] **Feature B (Pool B - 25 điểm)**:
+- [x] **Feature A (Pool A: FR-03 - 25 điểm)**:
+  - [x] Bước 1: Dùng Agent Skill phân tích biến, ràng buộc, miền giá trị.
+  - [x] Bước 2: Viết báo cáo áp dụng **Domain Testing** step-by-step.
+  - [x] Bước 3: Viết báo cáo áp dụng **Boundary Value Analysis** step-by-step (bảng biên 3-value).
+  - [x] Bước 4: Human Review – Tự rà soát, kiểm thử thực tế và bắt 5 bug thực tế.
+  - [x] Thực hiện Git commit: `feat(pool-a): complete domain testing, bva, and bug reports for FR-03`.
+- [ ] **Feature B (Pool B: FR-07 - 25 điểm)**:
   - [ ] Bước 1: Dùng Agent Skill phân tích logic giỏ hàng / checkout / coupon.
   - [ ] Bước 2: Báo cáo kỹ thuật **Domain Testing** (điều kiện phối hợp, quy tắc tính tiền).
   - [ ] Bước 3: Báo cáo kỹ thuật **Boundary Value Analysis** (biên tiền, biên số lượng, biên %).
