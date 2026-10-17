@@ -1,0 +1,55 @@
+{
+  "feature": "FR-07: Giỏ hàng (Shopping Cart)",
+  "timestamp": "2026-10-17T15:25:30.645Z",
+  "steps": [
+    {
+      "step": "FR07_CHECK_PLUS_MINUS_BUTTONS",
+      "bugId": "BUG-FR07-01",
+      "title": "Thiếu nút tăng/giảm (+/-) số lượng trực tiếp trong giỏ hàng",
+      "severity": "Medium",
+      "evidence": "Cart.jsx:47 chỉ render <td>{item.quantity}</td> dạng văn bản tĩnh, không có nút tương tác hay hàm updateQuantity trong CartContext."
+    },
+    {
+      "step": "FR07_CHECK_DUPLICATE_PRODUCT_MERGE",
+      "bugId": "BUG-FR07-02",
+      "title": "Thêm cùng sản phẩm vào giỏ bị nhân bản dòng mới thay vì cộng dồn số lượng",
+      "severity": "High",
+      "evidence": "CartContext.jsx:9 sử dụng setCart([...cart, { ...product, quantity }]) trực tiếp push vào mảng, vi phạm đặc tả: \"Thêm cùng một sản phẩm vào giỏ sẽ tăng số lượng, không tạo dòng mới\"."
+    },
+    {
+      "step": "FR07_CHECK_DELETE_CONFIRMATION",
+      "bugId": "BUG-FR07-03",
+      "title": "Nút \"Xóa\" sản phẩm thực hiện xóa tức thì mà không có hộp thoại xác nhận (Confirmation Dialog)",
+      "severity": "Medium",
+      "evidence": "Cart.jsx:51 gọi trực tiếp removeFromCart(index) khi click nút Xóa, vi phạm đặc tả: \"Nút Xóa sản phẩm phải có dialog xác nhận trước khi thực hiện\"."
+    },
+    {
+      "step": "FR07_CHECK_TOTAL_LABEL",
+      "bugId": "BUG-FR07-04",
+      "title": "Hiển thị sai nhãn tổng tiền (\"Tổng tạm tính\" thay vì \"Tổng cộng\")",
+      "severity": "Low",
+      "evidence": "Cart.jsx:63 hiển thị: \"Tổng tạm tính: ...\", vi phạm đặc tả: \"Tổng tiền hiển thị nhãn chính xác: Tổng cộng (không phải Tổng tạm tính)\"."
+    },
+    {
+      "step": "FR07_CHECK_EMPTY_CART_ILLUSTRATION",
+      "bugId": "BUG-FR07-05",
+      "title": "Trạng thái giỏ hàng trống chỉ có văn bản thô, thiếu hình ảnh minh họa theo đặc tả",
+      "severity": "Low",
+      "evidence": "Cart.jsx:20-27 chỉ render tiêu đề <h2> và link, hoàn toàn thiếu ảnh minh họa theo yêu cầu: \"Giỏ hàng trống phải có hình minh họa và thông báo rõ ràng\"."
+    },
+    {
+      "step": "FR07_API_NEGATIVE_QUANTITY_ACCEPTED",
+      "bugId": "BUG-FR07-06",
+      "title": "Backend API /api/cart chấp nhận số lượng âm (-5) mà không kiểm tra hợp lệ (CWE-20)",
+      "severity": "High",
+      "evidence": "POST /api/cart với quantity: -5 trả về HTTP 200 \"Added to cart\", cho phép làm giảm hoặc âm tổng tiền thanh toán."
+    },
+    {
+      "step": "FR07_BACKEND_DUPLICATE_ITEM_ROWS",
+      "bugId": "BUG-FR07-07",
+      "title": "Backend API /api/cart tạo 2 phần tử tách biệt cho cùng 1 sản phẩm thay vì gộp số lượng",
+      "severity": "Medium",
+      "evidence": "server.js:293 thực hiện userCarts[userId].push(req.body) mà không gộp theo productId, tạo nhiều dòng trùng lặp."
+    }
+  ]
+}
