@@ -1,4 +1,6 @@
-﻿01b3869 - tvquang0511, 2026-10-18 : docs(pdf): generate comprehensive PDF exports for all domain testing, bug, and AI reports
+﻿39885e1 - tvquang0511, 2026-10-18 : docs(meta): add student name Tran Vu Quang, MSSV 23120346, direct links and regenerate PDFs
+aac98a7 - tvquang0511, 2026-10-18 : chore(git): update final git commit log with PDF release
+01b3869 - tvquang0511, 2026-10-18 : docs(pdf): generate comprehensive PDF exports for all domain testing, bug, and AI reports
 23365e0 - tvquang0511, 2026-10-18 : chore(git): update final git commit log with youtube demo commit
 de1d331 - tvquang0511, 2026-10-18 : docs(readme): add youtube demo video link for domain-bva-tester skill
 2abee6b - tvquang0511, 2026-10-18 : chore(git): export final git commit log for HW02 submission
