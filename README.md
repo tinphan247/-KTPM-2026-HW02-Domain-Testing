@@ -1,9 +1,12 @@
 # HW02 – Domain Testing & Boundary Value Analysis on EShop
 
 > **Môn học**: Kiểm thử phần mềm (Software Testing)  
-> **Sinh viên thực hiện**: 23120346  
+> **Sinh viên thực hiện**: **Trần Vũ Quang**  
+> **Mã số sinh viên (MSSV)**: **23120346**  
 > **Repository GitHub**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing)  
-> **Nhánh làm việc cá nhân**: `hw02-23120346`  
+> **Nhánh nộp bài (Branch)**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346)  
+> **Danh sách 21 GitHub Issues**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues)  
+> **Video Demo Agent Skill**: [https://youtu.be/xnSp0y-6iDs](https://youtu.be/xnSp0y-6iDs)  
 > **Hệ thống kiểm thử (SUT)**: EShop E-Commerce System (Web Store, Admin Portal, Backend REST API, React Native Mobile App)
 
 ---

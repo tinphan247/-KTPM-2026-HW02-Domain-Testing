@@ -1,8 +1,10 @@
 # BÁO CÁO LỖI (DEFECT / BUG REPORT)
 ## Môn học: Kiểm thử phần mềm (HW02)
-> **Sinh viên thực hiện**: 23120346  
-> **Repository GitHub nhóm**: https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing  
-> **Hệ thống kiểm thử (SUT)**: EShop (Web & Backend)  
+> **Sinh viên thực hiện**: **Trần Vũ Quang**  
+> **Mã số sinh viên (MSSV)**: **23120346**  
+> **Repository GitHub**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing)  
+> **Branch**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346)  
+> **Hệ thống kiểm thử (SUT)**: EShop (Web, Admin, Mobile, Backend)
 
 ---
 

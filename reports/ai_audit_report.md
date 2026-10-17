@@ -1,7 +1,10 @@
 # Phụ Lục: Nhật Ký Tương Tác AI (AI Audit Report)
 
 > **Môn học**: Kiểm thử phần mềm (Software Testing)  
-> **Sinh viên thực hiện**: 23120346  
+> **Sinh viên thực hiện**: **Trần Vũ Quang**  
+> **Mã số sinh viên (MSSV)**: **23120346**  
+> **Repository GitHub**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing)  
+> **Branch**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346)  
 > **Đề tài**: HW02 – Domain Testing & Boundary Value Analysis on EShop  
 > **Cam kết liêm chính học thuật**: *"Tôi sử dụng AI như một công cụ trợ lực (Co-pilot) để hỗ trợ tính toán, định dạng và dựng khung; toàn bộ việc xác thực mã nguồn, kiểm thử trên giao diện thực tế và quyết định bắt bug đều do tôi trực tiếp thực hiện."*
 

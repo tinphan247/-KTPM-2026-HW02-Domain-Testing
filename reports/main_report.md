@@ -1,8 +1,10 @@
 # BÁO CÁO KIỂM THỬ: MAIN TEST REPORT (HW02)
 ## Môn học: Kiểm thử phần mềm (Software Testing)
-> **Sinh viên thực hiện**: 23120346  
+> **Sinh viên thực hiện**: **Trần Vũ Quang**  
+> **Mã số sinh viên (MSSV)**: **23120346**  
 > **Hệ thống kiểm thử (SUT)**: EShop E-Commerce System  
-> **Repository nhóm**: https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing  
+> **Repository GitHub**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing)  
+> **Branch**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346)
 
 ---
 

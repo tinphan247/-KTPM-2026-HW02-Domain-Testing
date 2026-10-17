@@ -1,6 +1,9 @@
 # BÁO CÁO PHÂN TÍCH KHOẢNG TRỐNG CỦA AI (AI GAP ANALYSIS)
 ## Môn học: Kiểm thử phần mềm (HW02)
-> **Sinh viên thực hiện**: 23120346  
+> **Sinh viên thực hiện**: **Trần Vũ Quang**  
+> **Mã số sinh viên (MSSV)**: **23120346**  
+> **Repository GitHub**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing)  
+> **Branch**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346)  
 > **Mục tiêu**: So sánh kết quả kiểm thử do AI sinh ra so với quá trình rà soát thực tế của con người (Human Review), phân tích nguyên nhân tại sao AI bỏ sót.
 
 ---

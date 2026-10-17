@@ -1,7 +1,8 @@
 # HW02 – Domain Testing on EShop: Tiến Độ & Kế Hoạch Thực Hiện
 
-> **Sinh viên**: 23120346  
-> **Repository nhóm**: https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing (Branch: `hw02-23120346`)  
+> **Sinh viên**: **Trần Vũ Quang** (MSSV: **23120346**)  
+> **Repository GitHub**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing)  
+> **Nhánh nộp bài**: [https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/tree/hw02-23120346)  
 > **Điểm tự đánh giá dự kiến**: 100/100  
 
 ---
