@@ -18,6 +18,9 @@ Khi yêu cầu AI sinh test case cho tính năng FR-03 chỉ dựa trên bản �
    * *Thực tế*: AI tự động thiết kế ca kiểm thử mật khẩu hợp lệ là `Eshop@2026` và kỳ vọng hệ thống sẽ chấp nhận. Tuy nhiên, khi chạy thực tế trên code thật, hệ thống lại từ chối mật khẩu này vì lập trình viên đã viết sai regex thành `(?=.*\s)` (đòi hỏi khoảng trắng). Con người phải trực tiếp kiểm tra mã nguồn (`ForgotPassword.jsx`) hoặc test thực tế mới phát hiện ra bug logic nghiêm trọng này.
 4. **AI bỏ sót việc kiểm tra loại thẻ HTML5 (`type="text"` thay vì `type="email"`)**:
    * *Thực tế*: AI chỉ tập trung vào việc gửi dữ liệu email sai để xem hệ thống có báo lỗi nghiệp vụ hay không, bỏ qua việc kiểm tra thuộc tính thẻ HTML5 theo chuẩn GUI Form của đề bài (FR-22).
+5. **AI HOÀN TOÀN BỎ SÓT LỖI TƯƠNG TÁC THỰC TẾ: Browser Autofill Misdirection (BUG-FR03-08)**:
+   * *Phát hiện của Sinh viên*: Khi người dùng test trên trình duyệt thực tế có lưu tài khoản, do form thiếu thuộc tính `autocomplete="off"`, trình duyệt tự động điền địa chỉ email cá nhân (`tvquang.working@gmail.com`) vào ô "Mã OTP" và điền mật khẩu lưu sẵn vào ô "Mật khẩu mới"!
+   * *Lý do AI bỏ sót*: AI chỉ chạy trong môi trường giả lập (Sandbox/Headless) không có hồ sơ người dùng thực và không có mật khẩu lưu sẵn. AI không trải nghiệm được hành vi thực tế của cơ chế Autofill Heuristics trên Chrome/Edge. Đây là minh chứng đắt giá nhất cho vai trò không thể thay thế của **Human Review** trong triết lý AI-First của bài tập này!
 
 ---
 

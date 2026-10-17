@@ -17,6 +17,7 @@
 | **BUG-FR03-05** | Giao diện quy trình 2 bước không có chỉ báo bước (Step Indicator "Bước 1 / 2") | **Low** | [Đang chờ mở Issue] |
 | **BUG-FR03-06** | Backend API thiếu hoàn toàn kiểm tra độ phức tạp mật khẩu, chấp nhận mật khẩu yếu "123" (CWE-602) | **High** | [Đang chờ mở Issue] |
 | **BUG-FR03-07** | Mật khẩu sau khi reset bị lưu dưới dạng văn bản thô (Plaintext) vào CSDL SQLite (Vi phạm nghiêm trọng SEC-01) | **Critical** | [Đang chờ mở Issue] |
+| **BUG-FR03-08** | **[AI BỎ SÓT - HUMAN FOUND]** Thiếu thuộc tính `autocomplete="off"` khiến trình duyệt tự động điền Email vào ô OTP và Mật khẩu lưu vào ô Mật khẩu mới | **Medium** | [Đang chờ mở Issue] |
 
 ---
 
@@ -154,5 +155,29 @@
   Mật khẩu phải được hash trước khi lưu vào CSDL (ví dụ dùng `bcrypt.hash(newPassword, 10)`).
 * **Bằng chứng (Screenshot)**:
   * Ảnh chụp truy vấn SQLite lưu mật khẩu Plaintext (khoanh đỏ): `screenshots/FR03_BUG07_DB_EVIDENCE.png`
+
+---
+
+### 8. BUG-FR03-08: [AI BỎ SÓT - HUMAN FOUND] Thiếu thuộc tính `autocomplete="off"` gây lỗi Browser Autofill Misdirection
+* **Mã Bug**: `BUG-FR03-08`
+* **Tính năng**: `FR-03: Quên mật khẩu & Đặt lại mật khẩu`
+* **Mức độ nghiêm trọng (Severity)**: **Medium**
+* **Nguồn phát hiện**: **Do Sinh viên (Human Tester) phát hiện thực tế khi trải nghiệm người dùng; AI hoàn toàn bỏ sót!**
+* **Đặc tả yêu cầu (Specification & UX Best Practice)**:
+  > *"Trường Mã OTP phải nhận chuỗi mã OTP xác thực tạm thời; không được để cơ chế tự động điền (Autofill) của trình duyệt ghi đè tài khoản cá nhân vào trường OTP."*
+* **Các bước tái hiện (Steps to Reproduce)**:
+  1. Người dùng sử dụng trình duyệt thông dụng (Chrome, Edge) có lưu sẵn tài khoản/mật khẩu cá nhân (ví dụ tài khoản Google hoặc tài khoản web bất kỳ).
+  2. Tại Bước 1, nhập email hợp lệ rồi bấm "Lấy mã OTP".
+  3. Khi hệ thống chuyển sang Bước 2.
+* **Kết quả thực tế (Actual Result)**:
+  Do trong `ForgotPassword.jsx`, lập trình viên đặt một `<form>` chứa một ô `<input type="text">` đi liền kề trước một ô `<input type="password">` mà **hoàn toàn không có thuộc tính `autocomplete="off"` hoặc `autocomplete="one-time-code"`**:
+  * Trình duyệt kích hoạt thuật toán Autofill Password Manager và lầm tưởng đây là một **Form Đăng Nhập bình thường**!
+  * Trình duyệt tự động điền địa chỉ email của người dùng (trong ảnh thực tế hiển thị email `tvquang.working@gmail.com`) vào ngay ô `"Mã OTP (4 số)"`, và tự động điền mật khẩu cũ lưu sẵn vào ô `"Mật khẩu mới"`!
+  * Hậu quả: Người dùng nếu không để ý mà bấm submit thì sẽ bị báo lỗi "Mã OTP không đúng", đồng thời phải tốn công xóa thủ công chuỗi email bị autofill nhầm.
+* **Kết quả mong đợi (Expected Result)**:
+  Ô nhập mã OTP phải có thuộc tính `autoComplete="off"` hoặc `autoComplete="one-time-code"`. Ô nhập mật khẩu mới phải có `autoComplete="new-password"` để ngăn chặn trình duyệt autofill sai mục đích.
+* **Bằng chứng (Screenshot)**:
+  * Ảnh chụp màn hình lỗi Autofill tài khoản cá nhân vào ô OTP: `screenshots/FR03_BUG08_BROWSER_AUTOFILL_MISDIRECTION.png`
+
 
 
