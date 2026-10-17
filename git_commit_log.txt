@@ -1,0 +1,12 @@
+﻿c6ea47e - tvquang0511, 2026-10-18 : docs(summary): finalize master README with self-assessment table and completed plan progress
+39ae484 - tvquang0511, 2026-10-18 : docs(ai): complete AI gap analysis, 275-word AI critique, and 7-step authentic AI audit report
+c7a7153 - tvquang0511, 2026-10-18 : chore(issues): sync and embed screenshots for all 21 GitHub issues across all features
+0a0904f - tvquang0511, 2026-10-18 : docs(reports): complete comprehensive domain testing, BVA matrices, and bug catalog for all 4 features
+58d6009 - tvquang0511, 2026-10-18 : feat(pool-d): add domain testing, BVA, and verified iPhone UI evidence for FR-04 Mobile Profile
+67f53b2 - tvquang0511, 2026-10-18 : feat(pool-c): add domain testing, BVA, extended API tests, and 8 bug reports for FR-15 Product CRUD
+00eb8ad - tvquang0511, 2026-10-18 : feat(pool-b): add domain testing, BVA, and verified bug reports for FR-07 Shopping Cart
+0414d1a - tvquang0511, 2026-10-17 : docs(bugs): add human-discovered BUG-FR03-08 browser autofill misdirection and update AI gap analysis
+747be14 - tvquang0511, 2026-10-17 : feat(pool-a): split bug evidence into dedicated paired screenshots with highlighted callouts
+6ce4e22 - tvquang0511, 2026-10-17 : docs(plan): mark Feature A FR-03 as completed
+eff9cbb - tvquang0511, 2026-10-17 : feat(pool-a): complete domain testing, bva, and bug reports for FR-03
+5b1e5c7 - 23120372, 2026-10-16 : hw02: evidence screenshots for 38 issue reports
