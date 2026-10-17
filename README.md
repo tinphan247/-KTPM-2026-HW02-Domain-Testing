@@ -104,5 +104,5 @@ Quét mã QR bằng ứng dụng **Expo Go** trên iOS/Android để trải nghi
 ---
 
 ## 🎥 Video Hướng Dẫn & Demo Agent Skill
-* **Link YouTube (Unlisted)**: `[Chèn link video demo tại đây khi nộp bài]`
+* **Link YouTube (Unlisted)**: [https://youtu.be/xnSp0y-6iDs](https://youtu.be/xnSp0y-6iDs)
 * **Nội dung video**: Giới thiệu Agent Skill `domain-bva-tester`, minh họa quy trình sinh test case, phát hiện lỗi và đối chiếu với thực tế SUT.
