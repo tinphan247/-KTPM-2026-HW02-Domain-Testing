@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BUG-FR01-08 Code Evidence</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0b0f19;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .vscode-window {
+    width: 100%;
+    max-width: 1040px;
+    background: #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    border: 1px solid #333333;
+  }
+  .titlebar {
+    background: #323233;
+    color: #cccccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid #252526;
+  }
+  .traffic-lights { display: flex; gap: 8px; }
+  .traffic-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .dot-red { background: #ff5f56; }
+  .dot-yellow { background: #ffbd2e; }
+  .dot-green { background: #27c93f; }
+  .title-center { color: #cccccc; font-weight: 500; font-family: monospace; }
+  .bug-tag {
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+  }
+  .tabbar {
+    background: #252526;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #1e1e1e;
+  }
+  .tab {
+    background: #1e1e1e;
+    color: #ffffff;
+    padding: 8px 18px;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: monospace;
+    border-top: 2px solid #007acc;
+  }
+  .tab .icon-jsx { color: #61dafb; font-weight: bold; }
+  .tab .icon-js { color: #f7df1e; font-weight: bold; }
+  .tab-path { color: #858585; font-size: 11.5px; margin-left: 14px; font-family: monospace; }
+  .editor {
+    display: flex;
+    background: #1e1e1e;
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 16px 0;
+  }
+  .line-numbers {
+    width: 50px;
+    text-align: right;
+    padding-right: 16px;
+    color: #6e7681;
+    user-select: none;
+    font-size: 12px;
+  }
+  .code-content {
+    flex: 1;
+    padding-right: 24px;
+    color: #d4d4d4;
+  }
+  .kw { color: #c586c0; font-weight: 600; }
+  .fn { color: #dcdcaa; }
+  .var { color: #9cdcfe; }
+  .str { color: #ce9178; }
+  .tag { color: #569cd6; }
+  .attr { color: #9cdcfe; }
+  .regex { color: #d16969; font-weight: 600; }
+  .comment { color: #6a9955; font-style: italic; }
+  .num { color: #b5cea8; }
+  .highlight-line {
+    background: rgba(239, 68, 68, 0.15);
+    border-left: 3px solid #ef4444;
+    padding: 1px 6px;
+    display: block;
+    margin: 2px 0;
+  }
+  .callout-box {
+    margin: 14px 0 16px 0;
+    background: #2b1111;
+    border: 1px solid #dc2626;
+    border-left: 4px solid #ef4444;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .callout-title {
+    color: #fca5a5;
+    font-weight: 700;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .callout-desc {
+    color: #fecaca;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .fix-box {
+    margin: 14px 0 6px 0;
+    background: #062b16;
+    border: 1px solid #16a34a;
+    border-left: 4px solid #22c55e;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .fix-title {
+    color: #86efac;
+    font-weight: 700;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .fix-code {
+    font-family: "Cascadia Code", Consolas, monospace;
+    color: #bbf7d0;
+    font-size: 12px;
+    background: #021a0c;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-top: 6px;
+    border: 1px solid #14532d;
+    line-height: 1.5;
+  }
+  .statusbar {
+    background: #007acc;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 16px;
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<div class="vscode-window">
+  <div class="titlebar">
+    <div class="traffic-lights">
+      <span class="traffic-dot dot-red"></span>
+      <span class="traffic-dot dot-yellow"></span>
+      <span class="traffic-dot dot-green"></span>
+    </div>
+    <div class="title-center">EShop SUT — server.js [Visual Studio Code]</div>
+    <div class="bug-tag">BUG-FR01-08: Lưu Mật Khẩu Dạng Plaintext (SEC-01)</div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab">
+      <span class="icon-js">⚛</span>
+      <span>server.js</span>
+    </div>
+    <div class="tab-path">backend/server.js</div>
+  </div>
+
+  <div class="editor">
+    <div class="line-numbers">
+      <div>20</div><div>21</div><div>22</div><div>23</div><div>24</div><div>25</div>
+    </div>
+    <div class="code-content">
+      <div><span class="kw">app</span>.<span class="fn">post</span>(<span class="str">"/api/register"</span>, (<span class="var">req</span>, <span class="var">res</span>) => {</div><div>&nbsp;&nbsp;<span class="kw">const</span> { <span class="var">name</span>, <span class="var">email</span>, <span class="var">password</span> } = <span class="var">req</span>.<span class="var">body</span>;</div><div>&nbsp;</div><div><span class="highlight-line">&nbsp;&nbsp;<span class="comment">// LỖ HỔNG CHÍ MẠNG: Lưu trực tiếp mật khẩu plaintext vào SQLite không qua bcrypt!</span></span></div><div><span class="highlight-line">&nbsp;&nbsp;<span class="var">db</span>.<span class="fn">run</span>(<span class="str">"INSERT INTO users (name, email, password) VALUES (?, ?, ?)"</span>, [<span class="var">name</span>, <span class="var">email</span>, <span class="var">password</span>], ...);</span></div><div>});</div>
+
+      <div class="callout-box">
+        <div class="callout-title">⚠️ ROOT CAUSE ANALYSIS — BUG-FR01-08</div>
+        <div class="callout-desc">Vi phạm nghiêm trọng tiêu chuẩn an toàn bảo mật SEC-01 và chuẩn OWASP A02: Mật khẩu người dùng được ghi thẳng xuống bảng <code>users</code> dạng văn bản thuần (Plaintext 100%). Bất kỳ ai có quyền truy cập vào file <code>database.sqlite</code> hoặc lỗi SQLi đều đọc được toàn bộ mật khẩu của khách hàng.</div>
+      </div>
+
+      <div class="fix-box">
+        <div class="fix-title">✓ RECOMMENDED FIX (PATCH)</div>
+        <div class="fix-code"><span class="kw">const</span> bcrypt = <span class="fn">require</span>(<span class="str">'bcrypt'</span>);<br><span class="kw">const</span> hashedPassword = <span class="kw">await</span> bcrypt.<span class="fn">hash</span>(password, <span class="num">10</span>);<br><span class="var">db</span>.<span class="fn">run</span>(<span class="str">"INSERT INTO users (name, email, password) VALUES (?, ?, ?)"</span>, [name, email, hashedPassword], ...);</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div>⎇ hw02-23120279 &nbsp; | &nbsp; UTF-8 &nbsp; | &nbsp; JavaScript React</div>
+    <div>FIT-HCMUS Software Testing • HW02 Defect Evidence</div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>BUG-FR01-07: GUI Style & Specification Violations</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: #f3f4f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 30px; }
+  .card { background: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); width: 100%; max-width: 520px; padding: 32px; border: 1px solid #e5e7eb; position: relative; }
+  .badge { display: inline-block; background: #fee2e2; color: #dc2626; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 9999px; margin-bottom: 12px; font-family: monospace; }
+  h2 { font-size: 22px; font-weight: 700; color: #111827; text-align: center; margin-bottom: 24px; }
+  .form-group { margin-bottom: 16px; position: relative; }
+  label { display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 6px; }
+  input { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; color: #111827; background: #ffffff; outline: none; }
+  .hint { font-size: 12px; color: #9ca3af; margin-top: 4px; }
+  
+  /* Defect Callouts */
+  .tag-violation { font-size: 10.5px; font-weight: 700; background: #fef2f2; color: #b91c1c; border: 1px solid #f87171; padding: 1px 6px; border-radius: 4px; font-family: monospace; }
+  .box-label-callout { border-left: 3px solid #ef4444; background: #fff5f5; padding: 6px 10px; margin-bottom: 6px; border-radius: 0 4px 4px 0; font-size: 11px; color: #991b1b; }
+  
+  .btn-submit { width: 100%; padding: 12px; background: #ef4444; color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 15px; cursor: pointer; margin-top: 10px; }
+  
+  .callout-red-btn { margin-top: 10px; border: 1.5px dashed #ef4444; background: #fef2f2; border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #7f1d1d; }
+  .callout-red-btn strong { color: #b91c1c; }
+  
+  .footer-meta { margin-top: 20px; padding-top: 14px; border-top: 1px solid #e5e7eb; display: flex; justify-content: space-between; font-size: 11px; color: #6b7280; font-family: monospace; }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="badge">SUT DEFECT EVIDENCE — BUG-FR01-07</div>
+  <h2>Đăng Ký Tài Khoản</h2>
+
+  <div class="box-label-callout">
+    ⚠️ <strong>LỖI 1 (FR-21):</strong> Thiếu ký hiệu dấu sao đỏ <code>*</code> ở tất cả các trường bắt buộc (Họ tên, Email, Mật khẩu).
+  </div>
+
+  <div class="form-group">
+    <label>Họ Tên <span class="tag-violation">THIẾU DẤU *</span></label>
+    <input type="text" placeholder="Nhập họ và tên">
+  </div>
+
+  <div class="form-group">
+    <label>Email <span class="tag-violation">THIẾU DẤU * & TYPE TEXT</span></label>
+    <input type="text" placeholder="Nhập địa chỉ email (thẻ type='text')">
+  </div>
+
+  <div class="form-group">
+    <label>Mật khẩu <span class="tag-violation">THIẾU DẤU *</span></label>
+    <input type="password" placeholder="Nhập mật khẩu">
+    <p class="hint">Yêu cầu: Tối thiểu 8 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt.</p>
+  </div>
+
+  <button class="btn-submit">Đăng Ký</button>
+
+  <div class="callout-red-btn">
+    ⚠️ <strong>LỖI 2 (FR-21 / FR-22): Nút bấm dùng sai màu quy định!</strong><br>
+    Đặc tả yêu cầu nút thao tác chính phải có màu <strong>XANH DƯƠNG</strong> (ví dụ <code>bg-blue-600</code>). Thực tế giao diện đang cài đặt nút màu <strong>ĐỎ RỰC</strong> (<code>class="bg-red-500"</code>), gây nhầm lẫn với hành động nguy hiểm/xóa dữ liệu.
+  </div>
+
+  <div class="footer-meta">
+    <span>Module: frontend-web/Register.jsx:72</span>
+    <span>SUT: EShop localhost:5173</span>
+  </div>
+</div>
+
+</body>
+</html>
