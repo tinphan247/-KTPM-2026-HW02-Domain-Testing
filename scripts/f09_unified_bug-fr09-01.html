@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BUG-FR09-01 Code Evidence</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0b0f19;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .vscode-window {
+    width: 100%;
+    max-width: 1040px;
+    background: #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    border: 1px solid #333333;
+  }
+  .titlebar {
+    background: #323233;
+    color: #cccccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid #252526;
+  }
+  .traffic-lights { display: flex; gap: 8px; }
+  .traffic-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .dot-red { background: #ff5f56; }
+  .dot-yellow { background: #ffbd2e; }
+  .dot-green { background: #27c93f; }
+  .title-center { color: #cccccc; font-weight: 500; font-family: monospace; }
+  .bug-tag {
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+  }
+  .tabbar {
+    background: #252526;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #1e1e1e;
+  }
+  .tab {
+    background: #1e1e1e;
+    color: #ffffff;
+    padding: 8px 18px;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: monospace;
+    border-top: 2px solid #007acc;
+  }
+  .tab .icon-jsx { color: #61dafb; font-weight: bold; }
+  .tab .icon-js { color: #f7df1e; font-weight: bold; }
+  .tab-path { color: #858585; font-size: 11.5px; margin-left: 14px; font-family: monospace; }
+  .editor {
+    display: flex;
+    background: #1e1e1e;
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 16px 0;
+  }
+  .line-numbers {
+    width: 50px;
+    text-align: right;
+    padding-right: 16px;
+    color: #6e7681;
+    user-select: none;
+    font-size: 12px;
+  }
+  .code-content {
+    flex: 1;
+    padding-right: 24px;
+    color: #d4d4d4;
+  }
+  .kw { color: #c586c0; font-weight: 600; }
+  .fn { color: #dcdcaa; }
+  .var { color: #9cdcfe; }
+  .str { color: #ce9178; }
+  .tag { color: #569cd6; }
+  .attr { color: #9cdcfe; }
+  .regex { color: #d16969; font-weight: 600; }
+  .comment { color: #6a9955; font-style: italic; }
+  .num { color: #b5cea8; }
+  .highlight-line {
+    background: rgba(239, 68, 68, 0.15);
+    border-left: 3px solid #ef4444;
+    padding: 1px 6px;
+    display: block;
+    margin: 2px 0;
+  }
+  .callout-box {
+    margin: 14px 0 16px 0;
+    background: #2b1111;
+    border: 1px solid #dc2626;
+    border-left: 4px solid #ef4444;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .callout-title {
+    color: #fca5a5;
+    font-weight: 700;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .callout-desc {
+    color: #fecaca;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .fix-box {
+    margin: 14px 0 6px 0;
+    background: #062b16;
+    border: 1px solid #16a34a;
+    border-left: 4px solid #22c55e;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .fix-title {
+    color: #86efac;
+    font-weight: 700;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .fix-code {
+    font-family: "Cascadia Code", Consolas, monospace;
+    color: #bbf7d0;
+    font-size: 12px;
+    background: #021a0c;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-top: 6px;
+    border: 1px solid #14532d;
+    line-height: 1.5;
+  }
+  .statusbar {
+    background: #007acc;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 16px;
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<div class="vscode-window">
+  <div class="titlebar">
+    <div class="traffic-lights">
+      <span class="traffic-dot dot-red"></span>
+      <span class="traffic-dot dot-yellow"></span>
+      <span class="traffic-dot dot-green"></span>
+    </div>
+    <div class="title-center">EShop SUT — server.js [Visual Studio Code]</div>
+    <div class="bug-tag">BUG-FR09-01: Toán Tử So Sánh Biên Sai (total > min)</div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab">
+      <span class="icon-js">JS</span>
+      <span>server.js</span>
+    </div>
+    <div class="tab-path">backend/server.js:379</div>
+  </div>
+
+  <div class="editor">
+    <div class="line-numbers">
+      <div>377</div><div>378</div><div>379</div><div>380</div><div>381</div><div>382</div><div>383</div><div>384</div>
+    </div>
+    <div class="code-content">
+      <div><span class="comment">// Dòng 379: Kiểm tra điều kiện đơn hàng tối thiểu</span></div><div><span class="highlight-line"><span class="kw">if</span> (<span class="var">total_amount</span> &gt; <span class="var">coupon</span>.<span class="var">min_order_amount</span>) {</span></div><div>&nbsp;&nbsp;<span class="kw">const</span> <span class="var">now</span> = <span class="kw">new</span> <span class="fn">Date</span>();</div><div>&nbsp;&nbsp;<span class="kw">const</span> <span class="var">expiry</span> = <span class="kw">new</span> <span class="fn">Date</span>(<span class="var">coupon</span>.<span class="var">expired_at</span>);</div><div>&nbsp;&nbsp;...</div><div>} <span class="kw">else</span> {</div><div><span class="highlight-line">&nbsp;&nbsp;<span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">400</span>).<span class="fn">json</span>({ <span class="attr">error</span>: <span class="str">`Đơn hàng chưa đủ giá trị tối thiểu ${coupon.min_order_amount.toLocaleString()} ₫ để áp dụng mã này`</span> });</span></div><div>}</div>
+
+      <div class="callout-box">
+        <div class="callout-title">⚠️ ROOT CAUSE ANALYSIS — BUG-FR09-01</div>
+        <div class="callout-desc">Lập trình viên sử dụng toán tử so sánh lớn hơn <code>&gt;</code> thay vì lớn hơn hoặc bằng <code>&gt;=</code>. Khi đơn hàng đạt giá trị đúng ngưỡng biên dưới ($LB = 300,000$ ₫), biểu thức trả về false khiến hệ thống từ chối áp dụng mã hợp lệ, vi phạm nghiêm trọng đặc tả BVA nghiệp vụ.</div>
+      </div>
+
+      <div class="fix-box">
+        <div class="fix-title">✓ RECOMMENDED FIX (PATCH)</div>
+        <div class="fix-code"><span class="kw">if</span> (total_amount &gt;= coupon.min_order_amount) {</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div>⎇ hw02-23120279 &nbsp; | &nbsp; UTF-8 &nbsp; | &nbsp; Node.js Express</div>
+    <div>FIT-HCMUS Software Testing • HW02 Defect Evidence</div>
+  </div>
+</div>
+
+</body>
+</html>
