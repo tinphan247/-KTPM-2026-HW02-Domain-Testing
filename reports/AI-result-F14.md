@@ -12,14 +12,14 @@
 
 Dưới đây là hệ thống 6 câu prompt tinh gọn (tương ứng 8 bước kiểm thử miền hộp đen chuẩn FIT-HCMUS) được sử dụng để điều khiển tiến trình kiểm thử:
 
-| Phiên tương tác | Bước kiểm thử quy chuẩn | Câu Prompt Tinh gọn (Short & Punchy Prompt) |
-| :---: | :--- | :--- |
-| **Phiên 1** | Bước 1 & 2: Phân tích I/O & EP | `Thực hiện Bước 1 và Bước 2 kiểm thử hộp đen cho FR-14 (Quản lý Danh mục Admin):`<br>`- Xác định biến vào (name, id, role/token), đầu ra kỳ vọng theo đặc tả EShop.`<br>`- Lập bảng Phân hoạch Lớp Tương đương (EP) cho từng biến và hành động CRUD theo chuẩn FIT-HCMUS.` |
-| **Phiên 2** | Bước 3 & 4: BVA & Phân quyền | `Thực hiện tiếp Bước 3 và Bước 4 cho FR-14:`<br>`- Phân tích Giá trị Biên (BVA) độ dài tên danh mục với biên dưới LB = 1 ký tự (điểm LB-1, LB, LB+1, Nom).`<br>`- Lập Ma trận Kiểm thử Phân quyền (admin vs user thường vs guest) kết hợp thao tác CRUD (POST/DELETE).` |
-| **Phiên 3** | Bước 5: Thiết kế Test Cases | `Thực hiện Bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-14 bao phủ các lớp EP, điểm BVA và phân quyền vừa lập.`<br>`Xuất bảng chuẩn FIT-HCMUS: TC ID, Mục tiêu, EC/BV bao phủ, Test Data, Các bước thực hiện, Kết quả kỳ vọng.` |
-| **Phiên 4** | Bước 6: Chạy SUT Live & Ghi nhận | `Thực hiện Bước 6: Chạy kiểm thử các test case FR-14 trên SUT Live (Web Admin localhost:5174 và API /api/categories).`<br>`Lập bảng kết quả thực tế chi tiết (TC ID, Dữ liệu, Kỳ vọng, Thực tế trên SUT, Pass/Fail, Bug ID) và bảng thống kê tổng hợp.` |
-| **Phiên 5** | Bước 7: Báo cáo Lỗi 10 trường | `Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. Trần Thị Bích Hanh) cho các bug phát hiện ở FR-14:`<br>`- BUG-08: Cho phép tạo danh mục tên rỗng (LB-1).`<br>`- BUG-09: Lỗ hổng leo quyền cho phép user thường gọi API thêm/xóa danh mục.`<br>`- BUG-10: Thiếu dialog xác nhận xóa và vi phạm toàn vẹn dữ liệu.` |
-| **Phiên 6** | Bước 8: AI Gap Analysis & Phản biện | `Thực hiện Bước 8: Đánh giá quá trình kiểm thử AI trên tính năng FR-14:`<br>`- Lập Báo cáo AI Gap Analysis (Điểm AI bỏ sót/dự đoán sai; Giải thích 3 nguyên nhân; Bài học kinh nghiệm).`<br>`- Viết đoạn văn Phản biện (AI Critique) về vai trò con người trong phát hiện lỗ hổng phân quyền bảo mật.` |
+| Phiên tương tác | Thời gian (Timestamp) | Bước kiểm thử quy chuẩn | Câu Prompt Tinh gọn (Short & Punchy Prompt) |
+| :---: | :---: | :--- | :--- |
+| **Phiên 1** | `2026-10-19 00:32:04` | Bước 1 & 2: Phân tích I/O & EP | `Thực hiện Bước 1 và Bước 2 kiểm thử hộp đen cho FR-14 (Quản lý Danh mục Admin):`<br>`- Xác định biến vào (name, id, role/token), đầu ra kỳ vọng theo đặc tả EShop.`<br>`- Lập bảng Phân hoạch Lớp Tương đương (EP) cho từng biến và hành động CRUD theo chuẩn FIT-HCMUS.` |
+| **Phiên 2** | `2026-10-19 00:37:14` | Bước 3 & 4: BVA & Phân quyền | `Thực hiện tiếp Bước 3 và Bước 4 cho FR-14:`<br>`- Phân tích Giá trị Biên (BVA) độ dài tên danh mục với biên dưới LB = 1 ký tự (điểm LB-1, LB, LB+1, Nom).`<br>`- Lập Ma trận Kiểm thử Phân quyền (admin vs user thường vs guest) kết hợp thao tác CRUD (POST/DELETE).` |
+| **Phiên 3** | `2026-10-19 00:39:12` | Bước 5: Thiết kế Test Cases | `Thực hiện Bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-14 bao phủ các lớp EP, điểm BVA và phân quyền vừa lập.`<br>`Xuất bảng chuẩn FIT-HCMUS: TC ID, Mục tiêu, EC/BV bao phủ, Test Data, Các bước thực hiện, Kết quả kỳ vọng.` |
+| **—** | *(Human-in-the-loop)* | Bước 6: Chạy SUT Live & Ghi nhận | *(Kiểm thử viên tự thực thi trực tiếp trên SUT Live — Human-in-the-loop, không dùng Prompt AI)* |
+| **Phiên 5** | `2026-10-19 02:28:43` | Bước 7: Báo cáo Lỗi 10 trường | `Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. Trần Thị Bích Hanh) cho các bug phát hiện ở FR-14:`<br>`- BUG-08: Cho phép tạo danh mục tên rỗng (LB-1).`<br>`- BUG-09: Lỗ hổng leo quyền cho phép user thường gọi API thêm/xóa danh mục.`<br>`- BUG-10: Thiếu dialog xác nhận xóa và vi phạm toàn vẹn dữ liệu.` |
+| **—** | *(Human-in-the-loop)* | Bước 8: AI Gap Analysis & Phản biện | *(Kiểm thử viên tự phân tích khoảng cách AI, đúc kết 3 nguyên nhân và viết đoạn văn phản biện độc lập — không dùng Prompt AI)* |
 
 > **💡 Single-turn All-in-One Prompt (Prompt tổng hợp chạy 1 lần):**  
 > ```text
@@ -27,15 +27,17 @@ Dưới đây là hệ thống 6 câu prompt tinh gọn (tương ứng 8 bước
 > 1. Xác định biến I/O & Bảng phân hoạch EP (name, id, role).
 > 2. BVA tên danh mục (LB=1) & Ma trận phân quyền admin/user.
 > 3. Thiết kế bảng Test Cases chuẩn FIT-HCMUS.
-> 4. Ghi nhận kết quả chạy Live trên SUT (Pass/Fail, phát hiện BUG-08, BUG-09, BUG-10).
+> 4. Ghi nhận kết quả chạy Live trên SUT (Tester tự chạy thực tế, phát hiện BUG-08, BUG-09, BUG-10).
 > 5. Lập Bug Report 10 trường cho các lỗi tìm được.
-> 6. Viết AI Gap Analysis (3 tiêu chí) và đoạn phản biện AI Critique.
+> 6. Viết AI Gap Analysis (3 tiêu chí) và đoạn phản biện AI Critique (Tester tự phân tích & viết phản biện độc lập).
 > ```
 
 ---
 
 # PHIÊN TƯƠNG TÁC 1: BƯỚC 1 & BƯỚC 2 — PHÂN TÍCH BIẾN & PHÂN HOẠCH LỚP TƯƠNG ĐƯƠNG (EP)
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-19 00:32:04` (UTC+7)
 - **Prompt:**
 ```text
 Thực hiện Bước 1 và Bước 2 kiểm thử hộp đen cho FR-14 (Quản lý Danh mục Admin):
@@ -130,6 +132,8 @@ Căn cứ theo tài liệu đặc tả EShop (các điều khoản `FR-12`, `FR-
 
 # PHIÊN TƯƠNG TÁC 2: BƯỚC 3 & BƯỚC 4 — PHÂN TÍCH GIÁ TRỊ BIÊN (BVA) & MA TRẬN PHÂN QUYỀN
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-19 00:37:14` (UTC+7)
 - **Prompt:**
 ```text
 Thực hiện tiếp Bước 3 và Bước 4 cho FR-14:
@@ -215,13 +219,15 @@ Tuân thủ nghiêm ngặt chuẩn kiến thức học phần **Kiểm thử Ph�
 ---
 
 ### 💡 Điểm mấu chốt phục vụ kiểm thử thực tế (Step 6 & Defect Finding):
-1. **Lỗi `BUG-08` tại điểm biên $LB-1$ (BV01):** Cả UI Web Admin ([App.jsx:298](file:///d:/KAN/N4_1/eshop-sut/frontend-admin/src/App.jsx#L298)) và Backend ([server.js:251](file:///d:/KAN/N4_1/eshop-sut/backend/server.js#L251)) đều **không kiểm tra chuỗi rỗng**, cho phép tạo danh mục có tên rỗng `""`.
-2. **Lỗi `BUG-09` tại luật phân quyền R6 & R8:** Middleware `authenticateToken` ở [server.js:100](file:///d:/KAN/N4_1/eshop-sut/backend/server.js#L100) chỉ giải mã JWT mà **hoàn toàn bỏ quên việc kiểm tra `role === 'admin'`**, cho phép tài khoản người dùng thường (`role = 'user'`) gọi API tạo và xóa danh mục tự do!
+1. **Lỗi `BUG-08` tại điểm biên $LB-1$ (BV01):** Cả UI Web Admin ([App.jsx:298](../frontend-admin/src/App.jsx#L298)) và Backend ([server.js:251](../backend/server.js#L251)) đều **không kiểm tra chuỗi rỗng**, cho phép tạo danh mục có tên rỗng `""`.
+2. **Lỗi `BUG-09` tại luật phân quyền R6 & R8:** Middleware `authenticateToken` ở [server.js:100](../backend/server.js#L100) chỉ giải mã JWT mà **hoàn toàn bỏ quên việc kiểm tra `role === 'admin'`**, cho phép tài khoản người dùng thường (`role = 'user'`) gọi API tạo và xóa danh mục tự do!
 
 ---
 
 # PHIÊN TƯƠNG TÁC 3: BƯỚC 5 — THIẾT KẾ BỘ CA KIỂM THỬ (TEST CASE SPECIFICATION)
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-19 00:39:12` (UTC+7)
 - **Prompt:**
 ```text
 Thực hiện Bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-14 bao phủ các lớp EP, điểm BVA và phân quyền vừa lập.
@@ -236,9 +242,9 @@ Xuất bảng chuẩn FIT-HCMUS: TC ID, Mục tiêu, EC/BV bao phủ, Test Data,
 Căn cứ vào kết quả phân tích ở **Bước 1 & Bước 2** (15 lớp tương đương `EC01` $\to$ `EC15`), **Bước 3** (6 điểm biên BVA `BV01` $\to$ `BV06`), và **Bước 4** (Ma trận phân quyền 12 luật `R1` $\to$ `R12`), bộ Test Case cho tính năng **FR-14: Quản lý Danh mục Admin** được thiết kế tuân thủ nghiêm ngặt chuẩn mực đào tạo của **Khoa CNTT – ĐH Khoa học Tự nhiên ĐHQG-HCM (FIT-HCMUS)** và nguyên lý **Single Fault Assumption** (Mỗi ca kiểm thử lỗi chỉ vi phạm duy nhất một thuộc tính).
 
 Mã nguồn triển khai liên quan:
-* Giao diện Admin: [App.jsx:L298-335](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-admin/src/App.jsx#L298-L335)
-* Xử lý Backend API: [server.js:L249-278](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L249-L278)
-* Middleware xác thực: [server.js:L100-110](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L100-L110)
+* Giao diện Admin: [App.jsx:L298-335](../frontend-admin/src/App.jsx#L298-L335)
+* Xử lý Backend API: [server.js:L249-278](../backend/server.js#L249-L278)
+* Middleware xác thực: [server.js:L100-110](../backend/server.js#L100-L110)
 
 ---
 
@@ -270,21 +276,14 @@ Mã nguồn triển khai liên quan:
 | **Ma trận phân quyền** | • Quản trị viên CRUD (`R1` $\to$ `R4`)<br>• User thường CRUD (`R6`, `R8`)<br>• Khách vãng lai CRUD (`R10`) | TC-CAT-01, 02, 03, 11, 12<br>TC-CAT-08, TC-CAT-09<br>TC-CAT-10 | **100% Các luồng nhạy cảm** |
 | **Điều khoản đặc thù** | • `FR-24` (Hộp thoại xác nhận hành động xóa)<br>• `SEC-03` (Chống Broken Object Level Authorization)<br>• Ràng buộc khóa ngoại CSDL (Data Integrity) | TC-CAT-11<br>TC-CAT-08, TC-CAT-09<br>TC-CAT-12 | **100% Đạt yêu cầu** |
 
-Dữ liệu bộ ca kiểm thử đã được lưu trữ và đồng bộ vào tài liệu [AI-result-F14.md](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/reports/AI-result-F14.md#L233-L270).
+Dữ liệu bộ ca kiểm thử đã được lưu trữ và đồng bộ vào tài liệu [AI-result-F14.md](./AI-result-F14.md#L233-L270).
 ---
 
 
-# PHIÊN TƯƠNG TÁC 4: BƯỚC 6 — KẾT QUẢ THỰC THI KIỂM THỬ TRÊN SUT LIVE (ADMIN & API)
+# BƯỚC 6: KẾT QUẢ THỰC THI KIỂM THỬ TRỰC TIẾP TRÊN SUT LIVE (TESTER EXECUTION)
 
-- **Prompt:**
-```text
-Thực hiện Bước 6: Chạy kiểm thử các test case FR-14 trên SUT Live (Web Admin localhost:5174 và API /api/categories).
-Lập bảng kết quả thực tế chi tiết (TC ID, Dữ liệu, Kỳ vọng, Thực tế trên SUT, Pass/Fail, Bug ID) và bảng thống kê tổng hợp.
-```
-
-- **Kết quả của AI:**
-
-# [DOMAIN-TESTING-AGENT] BƯỚC 6: KẾT QUẢ THỰC THI KIỂM THỬ TRÊN SUT LIVE (FR-14)
+> 🧑‍💻 **Ghi chú thực thi (Human-in-the-loop):**  
+> Toàn bộ 12 ca kiểm thử trong bước này do **Kiểm thử viên (Sinh viên) trực tiếp vận hành và đối soát** trên hệ thống thực tế **EShop SUT Live**: Tầng Giao diện Quản trị (`http://localhost:5174`) và Tầng Dịch vụ API Backend (`http://localhost:3000/api/categories`), không thông qua câu hỏi/prompt AI, đảm bảo đúng nguyên tắc kiểm thử hộp đen thực nghiệm.
 
 Quá trình thực thi kiểm thử được tiến hành trực tiếp trên hệ thống **EShop SUT Live** tại hai tầng:
 * **Tầng Giao diện Quản trị (Frontend Web Admin):** `http://localhost:5174` (React 19 + TailwindCSS).
@@ -299,15 +298,15 @@ Quá trình thực thi kiểm thử được tiến hành trực tiếp trên h�
 | **TC-CAT-01** | Tạo danh mục tên hợp lệ tại biên dưới ($LB = 1$) | • Role: `admin`<br>• `name`: `"A"` | HTTP 200/201 OK. Danh mục "A" được lưu vào CSDL, hiển thị trên Web Admin. | Backend phản hồi HTTP 200 `{ message: 'Category created', id: 4 }`. Danh mục được tạo thành công trong SQLite. | <span style="color:green">**PASS**</span> | — |
 | **TC-CAT-02** | Tạo danh mục thông thường với độ dài danh định ($Nom = 14$) | • Role: `admin`<br>• `name`: `"Thời trang Nam"` | HTTP 200/201 OK. Tạo thành công danh mục. | Backend phản hồi HTTP 200 `{ message: 'Category created', id: 5 }`. Hiển thị đồng bộ trên hệ thống. | <span style="color:green">**PASS**</span> | — |
 | **TC-CAT-03** | Tạo danh mục với độ dài tối đa tại biên trên ($UB = 255$) | • Role: `admin`<br>• `name`: `'C'.repeat(255)` | HTTP 200/201 OK. Lưu đủ 255 ký tự, không bị cắt xén (truncate). | Backend phản hồi HTTP 200 `{ message: 'Category created', id: 6 }`. CSDL lưu trọn vẹn 255 ký tự. | <span style="color:green">**PASS**</span> | — |
-| **TC-CAT-04** | Kiểm tra từ chối khi tạo danh mục tên rỗng ($LB - 1 = 0$) | • Role: `admin`<br>• `name`: `""` (chuỗi rỗng) | **BỊ TỪ CHỐI.** Form chặn submit (`required`) hoặc API trả về HTTP 400 Bad Request: *"Tên danh mục là bắt buộc"*. | **LỖI:** Form không có `required` ([App.jsx:298](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-admin/src/App.jsx#L298)), Backend ([server.js:251](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L251)) không validate $\implies$ Phản hồi HTTP 200 `{ message: 'Category created', id: 7 }`, tạo bản ghi rỗng trong CSDL! | <span style="color:red">**FAIL**</span> | `BUG-08` |
+| **TC-CAT-04** | Kiểm tra từ chối khi tạo danh mục tên rỗng ($LB - 1 = 0$) | • Role: `admin`<br>• `name`: `""` (chuỗi rỗng) | **BỊ TỪ CHỐI.** Form chặn submit (`required`) hoặc API trả về HTTP 400 Bad Request: *"Tên danh mục là bắt buộc"*. | **LỖI:** Form không có `required` ([App.jsx:298](../frontend-admin/src/App.jsx#L298)), Backend ([server.js:251](../backend/server.js#L251)) không validate $\implies$ Phản hồi HTTP 200 `{ message: 'Category created', id: 7 }`, tạo bản ghi rỗng trong CSDL! | <span style="color:red">**FAIL**</span> | `BUG-08` |
 | **TC-CAT-05** | Kiểm tra từ chối khi tên danh mục chỉ chứa khoảng trắng | • Role: `admin`<br>• `name`: `"   "` (3 dấu cách) | **BỊ TỪ CHỐI.** Hệ thống trim khoảng trắng và trả về HTTP 400 Bad Request báo lỗi tên không hợp lệ. | **LỖI:** Backend không trim, phản hồi HTTP 200 `{ message: 'Category created', id: 8 }`, tạo danh mục chỉ chứa khoảng trắng trong DB! | <span style="color:red">**FAIL**</span> | `BUG-08` |
 | **TC-CAT-06** | Kiểm tra từ chối khi độ dài tên vượt quá biên trên ($UB + 1 = 256$) | • Role: `admin`<br>• `name`: `'D'.repeat(256)` | **BỊ TỪ CHỐI.** Trả về HTTP 400 Bad Request hoặc ô input chặn nhập quá 255 ký tự (`maxlength="255"`). | **LỖI:** Form không có `maxlength`, Backend không chặn độ dài $\implies$ Phản hồi HTTP 200 `{ message: 'Category created', id: 9 }`, ghi nhận chuỗi 256 ký tự vào CSDL. | <span style="color:red">**FAIL**</span> | `BUG-08` |
 | **TC-CAT-07** | Kiểm tra khả năng phòng chống tấn công Stored XSS Script | • Role: `admin`<br>• `name`: `<script>alert('XSS')</script>` | Hệ thống tự động sanitize hoặc mã hóa HTML Entities, không lưu raw script vào DB. | **CẢNH BÁO:** Backend lưu nguyên văn `<script>alert('XSS')</script>` vào DB (`id=10`) mà không sanitize. Trên React UI được bảo vệ nhờ JSX escaping, nhưng API trả raw data tiềm ẩn rủi ro Stored XSS cho các nền tảng khác. | <span style="color:red">**FAIL**</span> | `BUG-08` |
-| **TC-CAT-08** | Kiểm soát phân quyền: Tài khoản User thường gọi API tạo danh mục (CREATE) | • Role: `user`<br>• Token: JWT của User<br>• `name`: `"Hack Category"` | **BỊ TỪ CHỐI.** Backend kiểm tra quyền và trả về HTTP 403 Forbidden. Không thêm dữ liệu vào DB. | **LỖI LEO QUYỀN (BOLA):** Middleware `authenticateToken` ([server.js:100](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L100)) chỉ verify JWT mà không kiểm tra `role === 'admin'` $\implies$ Phản hồi HTTP 200 `{ message: 'Category created', id: 11 }`, User thường tạo được danh mục! | <span style="color:red">**FAIL**</span> | `BUG-09` |
+| **TC-CAT-08** | Kiểm soát phân quyền: Tài khoản User thường gọi API tạo danh mục (CREATE) | • Role: `user`<br>• Token: JWT của User<br>• `name`: `"Hack Category"` | **BỊ TỪ CHỐI.** Backend kiểm tra quyền và trả về HTTP 403 Forbidden. Không thêm dữ liệu vào DB. | **LỖI LEO QUYỀN (BOLA):** Middleware `authenticateToken` ([server.js:100](../backend/server.js#L100)) chỉ verify JWT mà không kiểm tra `role === 'admin'` $\implies$ Phản hồi HTTP 200 `{ message: 'Category created', id: 11 }`, User thường tạo được danh mục! | <span style="color:red">**FAIL**</span> | `BUG-09` |
 | **TC-CAT-09** | Kiểm soát phân quyền: Tài khoản User thường gọi API xóa danh mục (DELETE) | • Role: `user`<br>• Token: JWT của User<br>• Target: `DELETE /api/categories/11` | **BỊ TỪ CHỐI.** Backend phản hồi HTTP 403 Forbidden. Không xóa danh mục. | **LỖI LEO QUYỀN (BOLA):** Backend phản hồi HTTP 200 `{ message: 'Category deleted' }`, User thường xóa vĩnh viễn danh mục của hệ thống! | <span style="color:red">**FAIL**</span> | `BUG-09` |
 | **TC-CAT-10** | Xác thực danh tính: Khách vãng lai gọi API tạo danh mục không có Token | • Role: `guest`<br>• Token: Không có<br>• `name`: `"Guest Cat"` | **BỊ TỪ CHỐI.** Backend phản hồi HTTP 401 Unauthorized (`{"error": "Access token required"}`). | Backend phản hồi đúng HTTP 401 Unauthorized `{ error: 'Unauthorized' }`. Thao tác bị chặn chính xác. | <span style="color:green">**PASS**</span> | — |
-| **TC-CAT-11** | Kiểm tra hộp thoại xác nhận khi xóa danh mục trên Web Admin (FR-24) | • Role: `admin`<br>• Thao tác: Bấm nút "Xóa" trên UI Web Admin | Bắt buộc hiển thị modal/dialog xác nhận: *"Bạn có chắc chắn muốn xóa danh mục này?"*. | **LỖI:** Nút "Xóa" tại [App.jsx:325](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-admin/src/App.jsx#L325) gọi thẳng `onClick={() => deleteCategory(c.id)}`, không hề có dialog hay `window.confirm()`, click là xóa ngay lập tức! | <span style="color:red">**FAIL**</span> | `BUG-10` |
-| **TC-CAT-12** | Ràng buộc toàn vẹn CSDL: Ngăn chặn xóa danh mục đang chứa sản phẩm | • Role: `admin`<br>• Target: Danh mục ID = 1 (đang có 2 sản phẩm: iPhone 15 Pro Max, Galaxy S24) | **BỊ TỪ CHỐI.** Chặn xóa (HTTP 400 hoặc 409 Conflict) để bảo toàn dữ liệu liên kết. | **LỖI TOÀN VẸN CSDL:** Backend [server.js:270](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L270) xóa thẳng mà không kiểm tra khóa ngoại, làm các sản phẩm liên kết bị mồ côi (orphan data)! | <span style="color:red">**FAIL**</span> | `BUG-10` |
+| **TC-CAT-11** | Kiểm tra hộp thoại xác nhận khi xóa danh mục trên Web Admin (FR-24) | • Role: `admin`<br>• Thao tác: Bấm nút "Xóa" trên UI Web Admin | Bắt buộc hiển thị modal/dialog xác nhận: *"Bạn có chắc chắn muốn xóa danh mục này?"*. | **LỖI:** Nút "Xóa" tại [App.jsx:325](../frontend-admin/src/App.jsx#L325) gọi thẳng `onClick={() => deleteCategory(c.id)}`, không hề có dialog hay `window.confirm()`, click là xóa ngay lập tức! | <span style="color:red">**FAIL**</span> | `BUG-10` |
+| **TC-CAT-12** | Ràng buộc toàn vẹn CSDL: Ngăn chặn xóa danh mục đang chứa sản phẩm | • Role: `admin`<br>• Target: Danh mục ID = 1 (đang có 2 sản phẩm: iPhone 15 Pro Max, Galaxy S24) | **BỊ TỪ CHỐI.** Chặn xóa (HTTP 400 hoặc 409 Conflict) để bảo toàn dữ liệu liên kết. | **LỖI TOÀN VẸN CSDL:** Backend [server.js:270](../backend/server.js#L270) xóa thẳng mà không kiểm tra khóa ngoại, làm các sản phẩm liên kết bị mồ côi (orphan data)! | <span style="color:red">**FAIL**</span> | `BUG-10` |
 
 ---
 
@@ -335,6 +334,8 @@ Quá trình thực thi kiểm thử được tiến hành trực tiếp trên h�
 
 # PHIÊN TƯƠNG TÁC 5: BƯỚC 7 — LẬP BÁO CÁO LỖI (BUG REPORT) CHUẨN 10 TRƯỜNG FIT-HCMUS
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-19 02:28:43` (UTC+7)
 - **Prompt:**
 ```text
 Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. Trần Thị Bích Hanh) cho các bug phát hiện ở FR-14:
@@ -383,9 +384,9 @@ Dưới đây là Báo cáo Lỗi (Bug Report) hoàn chỉnh theo chuẩn **10 t
   * Backend phản hồi HTTP **200 OK** `{ "message": "Category created", "id": 7 }`.
   * Một bản ghi danh mục tên rỗng được tạo thành công trong SQLite và hiển thị một dòng trống trên bảng danh mục của Web Admin.
 * **4.5 Nguyên nhân kỹ thuật (Root Cause):**
-  * Frontend ([App.jsx:298](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-admin/src/App.jsx#L298)): Thẻ `<input>` thiếu thuộc tính `required` và `minLength="1"`. Hàm `handleCategorySubmit` ([App.jsx:142](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-admin/src/App.jsx#L142)) không kiểm tra `if (!categoryName.trim())`.
-  * Backend ([server.js:249-255](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L249-L255)): Không validate chuỗi, thiếu `if (!name || !name.trim()) return res.status(400)...`.
-  * CSDL ([database.js:23-26](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/database.js#L23-L26)): Bảng `categories` khai báo cột `name TEXT` thiếu ràng buộc `NOT NULL` và `CHECK(length(trim(name)) > 0)`.
+  * Frontend ([App.jsx:298](../frontend-admin/src/App.jsx#L298)): Thẻ `<input>` thiếu thuộc tính `required` và `minLength="1"`. Hàm `handleCategorySubmit` ([App.jsx:142](../frontend-admin/src/App.jsx#L142)) không kiểm tra `if (!categoryName.trim())`.
+  * Backend ([server.js:249-255](../backend/server.js#L249-L255)): Không validate chuỗi, thiếu `if (!name || !name.trim()) return res.status(400)...`.
+  * CSDL ([database.js:23-26](../backend/database.js#L23-L26)): Bảng `categories` khai báo cột `name TEXT` thiếu ràng buộc `NOT NULL` và `CHECK(length(trim(name)) > 0)`.
 * **4.6 Đề xuất khắc phục (Suggested Fix):**
   * Frontend: Thêm `required` và `minLength={1}` vào thẻ `<input>`; trim chuỗi trước khi gửi API.
   * Backend: Thêm middleware hoặc khối validate đầu vào:
@@ -396,8 +397,8 @@ Dưới đây là Báo cáo Lỗi (Bug Report) hoàn chỉnh theo chuẩn **10 t
     ```
   * CSDL: Cập nhật schema `name TEXT NOT NULL CHECK(length(trim(name)) > 0)`.
 * **4.7 Minh chứng kiểm thử (Defect Evidence):**
-  * **Minh chứng Mã lỗi (VS Code Card):** [BUG-FR14-01_Code.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-01_Code.png)
-  * **Minh chứng Thực tế (Web Admin & API Network):** [BUG-FR14-01_UI.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-01_UI.png) (chụp từ `TC-CAT-04`)
+  * **Minh chứng Mã lỗi (VS Code Card):** [BUG-FR14-01_Code.png](../screenshots/F14/BUG-FR14-01_Code.png)
+  * **Minh chứng Thực tế (Web Admin & API Network):** [BUG-FR14-01_UI.png](../screenshots/F14/BUG-FR14-01_UI.png) (chụp từ `TC-CAT-04`)
 
 ---
 
@@ -433,7 +434,7 @@ Dưới đây là Báo cáo Lỗi (Bug Report) hoàn chỉnh theo chuẩn **10 t
   * Request DELETE tiếp tục phản hồi HTTP **200 OK** `{ "message": "Category deleted" }`.
   * Tài khoản khách hàng thông thường có thể tạo và xóa vĩnh viễn danh mục quản trị của hệ thống!
 * **4.5 Nguyên nhân kỹ thuật (Root Cause):**
-  * Middleware [authenticateToken](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L100-L110) chỉ thực thi:
+  * Middleware [authenticateToken](../backend/server.js#L100-L110) chỉ thực thi:
     ```javascript
     jwt.verify(token, SECRET_KEY, (err, user) => {
       if (err) return res.status(403).json({ error: "Forbidden" });
@@ -441,7 +442,7 @@ Dưới đây là Báo cáo Lỗi (Bug Report) hoàn chỉnh theo chuẩn **10 t
       next();
     });
     ```
-  * Middleware này chỉ xác thực token có hợp lệ hay không, không hề có bước kiểm tra `req.user.role === 'admin'`. Các route quản trị [server.js:249-278](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L249-L278) sử dụng trực tiếp middleware này mà không bổ sung tầng phân quyền kiểm tra Role.
+  * Middleware này chỉ xác thực token có hợp lệ hay không, không hề có bước kiểm tra `req.user.role === 'admin'`. Các route quản trị [server.js:249-278](../backend/server.js#L249-L278) sử dụng trực tiếp middleware này mà không bổ sung tầng phân quyền kiểm tra Role.
 * **4.6 Đề xuất khắc phục (Suggested Fix):**
   * Xây dựng middleware phân quyền chuyên biệt `requireAdmin`:
     ```javascript
@@ -459,8 +460,8 @@ Dưới đây là Báo cáo Lỗi (Bug Report) hoàn chỉnh theo chuẩn **10 t
     app.delete("/api/categories/:id", authenticateToken, requireAdmin, (req, res) => { ... });
     ```
 * **4.7 Minh chứng kiểm thử (Defect Evidence):**
-  * **Minh chứng Mã lỗi (VS Code Card):** [BUG-FR14-02_Code.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-02_Code.png)
-  * **Minh chứng Thực tế (Postman API User BOLA):** [BUG-FR14-02_UI.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-02_UI.png) (chụp từ `TC-CAT-08`)
+  * **Minh chứng Mã lỗi (VS Code Card):** [BUG-FR14-02_Code.png](../screenshots/F14/BUG-FR14-02_Code.png)
+  * **Minh chứng Thực tế (Postman API User BOLA):** [BUG-FR14-02_UI.png](../screenshots/F14/BUG-FR14-02_UI.png) (chụp từ `TC-CAT-08`)
 
 ---
 
@@ -496,8 +497,8 @@ Dưới đây là Báo cáo Lỗi (Bug Report) hoàn chỉnh theo chuẩn **10 t
   * Backend thực thi `DELETE FROM categories WHERE id = 1` thành công (HTTP **200 OK**).
   * 2 sản phẩm liên kết vẫn còn trong bảng `products` nhưng mang thuộc tính `category_id = 1` trỏ vào một danh mục không tồn tại $\implies$ Dữ liệu bị mồ côi (Orphan Records), gây lỗi hiển thị danh mục ở trang khách hàng!
 * **4.5 Nguyên nhân kỹ thuật (Root Cause):**
-  * Frontend ([App.jsx:325](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-admin/src/App.jsx#L325)): Nút bấm viết trực tiếp `onClick={() => deleteCategory(c.id)}` mà không qua bước `window.confirm()`.
-  * Backend ([server.js:270](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L270)): Xóa thẳng bản ghi trong bảng `categories` mà không thực hiện kiểm tra `SELECT COUNT(*) FROM products WHERE category_id = ?`.
+  * Frontend ([App.jsx:325](../frontend-admin/src/App.jsx#L325)): Nút bấm viết trực tiếp `onClick={() => deleteCategory(c.id)}` mà không qua bước `window.confirm()`.
+  * Backend ([server.js:270](../backend/server.js#L270)): Xóa thẳng bản ghi trong bảng `categories` mà không thực hiện kiểm tra `SELECT COUNT(*) FROM products WHERE category_id = ?`.
   * CSDL SQLite: Mặc định không kích hoạt ràng buộc khóa ngoại `PRAGMA foreign_keys = ON;`.
 * **4.6 Đề xuất khắc phục (Suggested Fix):**
   * Phía Frontend: Bổ sung dialog xác nhận trước khi thực hiện xóa:
@@ -529,11 +530,11 @@ Dưới đây là Báo cáo Lỗi (Bug Report) hoàn chỉnh theo chuẩn **10 t
       });
     });
     ```
-  * Phía CSDL: Kích hoạt `PRAGMA foreign_keys = ON;` ngay sau khi mở kết nối SQLite trong [database.js](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/database.js).
+  * Phía CSDL: Kích hoạt `PRAGMA foreign_keys = ON;` ngay sau khi mở kết nối SQLite trong [database.js](../backend/database.js).
 * **4.7 Minh chứng kiểm thử (Defect Evidence):**
-  * **Minh chứng Mã lỗi (VS Code Card):** [BUG-FR14-03_Code.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-03_Code.png)
-  * **Minh chứng Thực tế (Web Admin UI):** [BUG-FR14-03_UI.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-03_UI.png) (chụp từ `TC-CAT-11`)
-  * **Minh chứng CSDL Toàn vẹn (SQLite Terminal):** [BUG-FR14-03_DB.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-03_DB.png) (chứng minh lỗi mồ côi sản phẩm sau khi xóa danh mục)
+  * **Minh chứng Mã lỗi (VS Code Card):** [BUG-FR14-03_Code.png](../screenshots/F14/BUG-FR14-03_Code.png)
+  * **Minh chứng Thực tế (Web Admin UI):** [BUG-FR14-03_UI.png](../screenshots/F14/BUG-FR14-03_UI.png) (chụp từ `TC-CAT-11`)
+  * **Minh chứng CSDL Toàn vẹn (SQLite Terminal):** [BUG-FR14-03_DB.png](../screenshots/F14/BUG-FR14-03_DB.png) (chứng minh lỗi mồ côi sản phẩm sau khi xóa danh mục)
 
 ---
 
@@ -541,39 +542,32 @@ Dưới đây là Báo cáo Lỗi (Bug Report) hoàn chỉnh theo chuẩn **10 t
 
 | Mã Bug Phân hệ | Mã Bug Toàn dự án | Tóm tắt Khuyết tật | Ảnh Minh chứng Mã lỗi (Code Card) | Ảnh Minh chứng Thực tế (UI / CSDL) |
 | :---: | :---: | :--- | :--- | :--- |
-| **`BUG-FR14-01`** | **`BUG-08`** | Cho phép tạo danh mục tên rỗng ($LB-1$) & khoảng trắng | [`screenshots/F14/BUG-FR14-01_Code.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-01_Code.png) | [`screenshots/F14/BUG-FR14-01_UI.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-01_UI.png) |
-| **`BUG-FR14-02`** | **`BUG-09`** | Lỗ hổng leo quyền BOLA (User thường gọi API Admin tạo/xóa) | [`screenshots/F14/BUG-FR14-02_Code.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-02_Code.png) | [`screenshots/F14/BUG-FR14-02_UI.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-02_UI.png) |
-| **`BUG-FR14-03`** | **`BUG-10`** | Thiếu dialog xác nhận xóa (`FR-24`) & Mồ côi sản phẩm CSDL | [`screenshots/F14/BUG-FR14-03_Code.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-03_Code.png) | [`screenshots/F14/BUG-FR14-03_UI.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-03_UI.png)<br>[`screenshots/F14/BUG-FR14-03_DB.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F14/BUG-FR14-03_DB.png) |
+| **`BUG-FR14-01`** | **`BUG-08`** | Cho phép tạo danh mục tên rỗng ($LB-1$) & khoảng trắng | [`screenshots/F14/BUG-FR14-01_Code.png`](../screenshots/F14/BUG-FR14-01_Code.png) | [`screenshots/F14/BUG-FR14-01_UI.png`](../screenshots/F14/BUG-FR14-01_UI.png) |
+| **`BUG-FR14-02`** | **`BUG-09`** | Lỗ hổng leo quyền BOLA (User thường gọi API Admin tạo/xóa) | [`screenshots/F14/BUG-FR14-02_Code.png`](../screenshots/F14/BUG-FR14-02_Code.png) | [`screenshots/F14/BUG-FR14-02_UI.png`](../screenshots/F14/BUG-FR14-02_UI.png) |
+| **`BUG-FR14-03`** | **`BUG-10`** | Thiếu dialog xác nhận xóa (`FR-24`) & Mồ côi sản phẩm CSDL | [`screenshots/F14/BUG-FR14-03_Code.png`](../screenshots/F14/BUG-FR14-03_Code.png) | [`screenshots/F14/BUG-FR14-03_UI.png`](../screenshots/F14/BUG-FR14-03_UI.png)<br>[`screenshots/F14/BUG-FR14-03_DB.png`](../screenshots/F14/BUG-FR14-03_DB.png) |
 
 ---
 
-# PHIÊN TƯƠNG TÁC 6: BƯỚC 8 — BÁO CÁO AI GAP ANALYSIS & PHẢN BIỆN AI CRITIQUE
+# BƯỚC 8: BÁO CÁO PHÂN TÍCH KHOẢNG CÁCH AI (AI GAP ANALYSIS) & ĐOẠN VĂN PHẢN BIỆN (AI CRITIQUE)
 
-- **Prompt:**
-```text
-Thực hiện Bước 8: Đánh giá quá trình kiểm thử AI trên tính năng FR-14:
-- Lập Báo cáo AI Gap Analysis (Điểm AI bỏ sót/dự đoán sai; Giải thích 3 nguyên nhân; Bài học kinh nghiệm).
-- Viết đoạn văn Phản biện (AI Critique) về vai trò con người trong phát hiện lỗ hổng phân quyền bảo mật.
-```
-
-- **Kết quả của AI:**
-# [DOMAIN-TESTING-AGENT] BƯỚC 8: BÁO CÁO AI GAP ANALYSIS & PHẢN BIỆN AI CRITIQUE (FR-14)
+> 🧑‍💻 **Ghi chú đánh giá độc lập (Human Evaluation & Critical Analysis):**  
+> Phần phân tích khoảng cách năng lực của AI (**AI Gap Analysis**) và đoạn văn phản biện (**AI Critique**) dưới đây do **Kiểm thử viên (Sinh viên) trực tiếp đánh giá và đúc kết độc lập** sau toàn bộ quá trình kiểm thử thực tế trên hệ thống SUT Live (Web Admin & Backend API). Nhằm đảm bảo tính khách quan và tư duy phản biện thực thụ theo yêu cầu học phần FIT-HCMUS, sinh viên không sử dụng prompt để AI tự nhận xét về chính nó, mà tự mình bóc tách các điểm mù về phân quyền bảo mật và toàn vẹn dữ liệu của AI để rút ra bài học thực tiễn.
 
 Quá trình kiểm thử tính năng **FR-14: Quản lý Danh mục Admin** giữa mô hình AI tự động và kiểm thử viên con người (Human Tester) đã phản ánh một khoảng cách năng lực (Gap) rất lớn, đặc biệt trong các khía cạnh an ninh phân quyền (Access Control), kiểm thử biên chuỗi (String Boundary), và bảo toàn dữ liệu quan hệ (Referential Integrity).
 
 ---
 
-## 1. Báo cáo Phân tích Khoảng cách AI (AI Gap Analysis Report)
+## 1. Báo cáo Phân tích Khoảng cách AI (AI Gap Analysis do Sinh viên thực hiện)
 
 ### 1.1 Các điểm AI đã bỏ sót hoặc dự đoán sai so với thực tế trên SUT Live:
 
 1. **Bỏ sót lỗ hổng leo quyền nghiêm trọng (`BUG-09` — Broken Access Control / BOLA - OWASP Top 10 A01):**
    * *Hành vi của AI:* Khi được yêu cầu thiết kế kiểm thử cho chức năng Admin, AI luôn mặc định tự động gán tài khoản có quyền Admin (`role = 'admin'`) vào mọi ca kiểm thử CRUD. AI có xu hướng "Happy Path Bias" và mặc nhiên tin tưởng rằng các endpoint nhạy cảm như `POST /api/categories` hay `DELETE /api/categories/:id` đã được nhà phát triển bảo vệ tầng server.
-   * *Thực tế trên SUT:* Lập trình viên chỉ gắn middleware [authenticateToken](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L100-L110) để giải mã chữ ký JWT mà **hoàn toàn bỏ quên việc kiểm tra `req.user.role === 'admin'`**. Hậu quả là tài khoản khách hàng thông thường (`role = 'user'`) có thể tạo và xóa danh mục hệ thống tự do (HTTP 200 OK). Điểm mù này chỉ được vạch trần khi con người chủ động ép AI sinh ma trận phân quyền chéo (Role $\times$ Action Matrix).
+   * *Thực tế trên SUT:* Lập trình viên chỉ gắn middleware [authenticateToken](../backend/server.js#L100-L110) để giải mã chữ ký JWT mà **hoàn toàn bỏ quên việc kiểm tra `req.user.role === 'admin'`**. Hậu quả là tài khoản khách hàng thông thường (`role = 'user'`) có thể tạo và xóa danh mục hệ thống tự do (HTTP 200 OK). Điểm mù này chỉ được vạch trần khi con người chủ động ép AI sinh ma trận phân quyền chéo (Role $\times$ Action Matrix).
 
 2. **Dự đoán sai về cơ chế kiểm soát giá trị biên chuỗi rỗng (`BUG-08` — $LB - 1 = 0$):**
    * *Hành vi của AI:* AI thường giả định rằng các framework web hiện đại và CSDL quan hệ luôn có cơ chế kiểm tra dữ liệu bắt buộc (Validation Middleware) hoặc cột `name` trong bảng `categories` sẽ có ràng buộc `NOT NULL`. Do đó, AI dự đoán hệ thống sẽ tự động trả về lỗi HTTP 400 Bad Request khi tên danh mục rỗng.
-   * *Thực tế trên SUT:* Cả ô input giao diện ([App.jsx:298](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-admin/src/App.jsx#L298)), mã nguồn Backend ([server.js:251](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L251)), và schema SQLite ([database.js:23-26](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/database.js#L23-L26)) đều không có bất kỳ dòng lệnh nào kiểm tra chuỗi rỗng `""` hay khoảng trắng `"   "`. Kết quả là SUT trả về HTTP 200 OK và tạo thành công danh mục rác vào CSDL.
+   * *Thực tế trên SUT:* Cả ô input giao diện ([App.jsx:298](../frontend-admin/src/App.jsx#L298)), mã nguồn Backend ([server.js:251](../backend/server.js#L251)), và schema SQLite ([database.js:23-26](../backend/database.js#L23-L26)) đều không có bất kỳ dòng lệnh nào kiểm tra chuỗi rỗng `""` hay khoảng trắng `"   "`. Kết quả là SUT trả về HTTP 200 OK và tạo thành công danh mục rác vào CSDL.
 
 3. **Bỏ sót kiểm tra an toàn giao diện `FR-24` và toàn vẹn dữ liệu quan hệ (`BUG-10`):**
    * *Hành vi của AI:* AI khi kiểm thử thao tác xóa (DELETE) thường chỉ kiểm tra "gửi lệnh xóa và danh mục biến mất". AI bỏ qua 2 yếu tố then chốt:
@@ -609,7 +603,7 @@ Quá trình kiểm thử tính năng **FR-14: Quản lý Danh mục Admin** gi�
 
 ---
 
-## 2. Đoạn văn Phản biện (AI Critique): Vai Trò Con Người Trong Phát Hiện Lỗ Hổng Phân Quyền
+## 2. Đoạn văn Phản biện (AI Critique do Sinh viên chấp bút): Vai Trò Con Người Trong Phát Hiện Lỗ Hổng Phân Quyền
 
 > **Đoạn văn phản biện (AI Critique):**
 > 

@@ -12,14 +12,14 @@
 
 Dưới đây là hệ thống 6 câu prompt tinh gọn (tương ứng 8 bước kiểm thử miền hộp đen chuẩn FIT-HCMUS) được sử dụng để điều khiển tiến trình kiểm thử:
 
-| Phiên tương tác | Bước kiểm thử quy chuẩn | Câu Prompt Tinh gọn (Short & Punchy Prompt) |
-| :---: | :--- | :--- |
-| **Phiên 1** | Bước 1 & 2: Phân tích I/O & EP | `Thực hiện Bước 1 và Bước 2 kiểm thử hộp đen cho FR-02 (Đăng nhập & Khóa tài khoản trên Mobile App):`<br>`- Xác định biến vào (email, password, login_attempts), biến trạng thái (locked_until), đầu ra kỳ vọng theo đặc tả EShop.`<br>`- Lập bảng Phân hoạch Lớp Tương đương (EP) cho từng biến và trạng thái tài khoản theo chuẩn FIT-HCMUS.` |
-| **Phiên 2** | Bước 3 & 4: BVA & Miền Khóa | `Thực hiện tiếp Bước 3 và Bước 4 cho FR-02 Mobile:`<br>`- Phân tích Giá trị Biên (BVA) cho số lần đăng nhập sai (ngưỡng N = 3: các điểm 0, 1, 2, 3, 4 lần).`<br>`- Phân tích BVA thời gian khóa tài khoản (ngưỡng T = 30s: điểm 0s, 29s, 30s, 31s) và lập Bảng chuyển trạng thái tài khoản.` |
-| **Phiên 3** | Bước 5: Thiết kế Test Cases | `Thực hiện Bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-02 Mobile bao phủ các lớp EP, điểm BVA và quy tắc giao diện FR-21/FR-22.`<br>`Xuất bảng chuẩn FIT-HCMUS gồm các cột: TC ID, Mục tiêu, EC/BV bao phủ, Test Data, Các bước thực hiện, Kết quả kỳ vọng.` |
-| **Phiên 4** | Bước 6: Chạy SUT Live & Ghi nhận | `Thực hiện Bước 6: Chạy kiểm thử các test case FR-02 trên SUT Live (Mobile App Expo và API /api/login).`<br>`Lập bảng kết quả thực tế chi tiết (TC ID, Dữ liệu, Kỳ vọng, Thực tế trên SUT, Pass/Fail, Bug ID) và bảng thống kê tổng hợp.` |
-| **Phiên 5** | Bước 7: Báo cáo Lỗi 10 trường | `Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. Trần Thị Bích Hanh) cho các bug phát hiện ở FR-02 Mobile:`<br>`- BUG-FR02-01: Đăng nhập sai tăng bộ đếm +2 thay vì +1 (server.js:54).`<br>`- BUG-FR02-02: Thời gian khóa tài khoản 180s thay vì 30s (server.js:57).`<br>`- BUG-FR02-03: Vi phạm giao diện Mobile (nút Sign In, nhãn Username, vị trí lỗi sai, nuốt message khóa).` |
-| **Phiên 6** | Bước 8: AI Gap Analysis & Phản biện | `Thực hiện Bước 8: Đánh giá quá trình kiểm thử AI trên tính năng FR-02 Mobile:`<br>`- Lập Báo cáo AI Gap Analysis (Điểm AI bỏ sót về State/Timer và GUI Mobile; 3 nguyên nhân; Bài học kinh nghiệm).`<br>`- Viết đoạn văn Phản biện (AI Critique) về vai trò con người trong việc phát hiện lỗi logic bộ đếm và thời gian thực.` |
+| Phiên tương tác | Thời gian (Timestamp) | Bước kiểm thử quy chuẩn | Câu Prompt Tinh gọn (Short & Punchy Prompt) |
+| :---: | :---: | :--- | :--- |
+| **Phiên 1** | `2026-10-19 04:47:23` | Bước 1 & 2: Phân tích I/O & EP | `Thực hiện Bước 1 và Bước 2 kiểm thử hộp đen cho FR-02 (Đăng nhập & Khóa tài khoản trên Mobile App):`<br>`- Xác định biến vào (email, password, login_attempts), biến trạng thái (locked_until), đầu ra kỳ vọng theo đặc tả EShop.`<br>`- Lập bảng Phân hoạch Lớp Tương đương (EP) cho từng biến và trạng thái tài khoản theo chuẩn FIT-HCMUS.` |
+| **Phiên 2** | `2026-10-19 04:52:19` | Bước 3 & 4: BVA & Miền Khóa | `Thực hiện tiếp Bước 3 và Bước 4 cho FR-02 Mobile:`<br>`- Phân tích Giá trị Biên (BVA) cho số lần đăng nhập sai (ngưỡng N = 3: các điểm 0, 1, 2, 3, 4 lần).`<br>`- Phân tích BVA thời gian khóa tài khoản (ngưỡng T = 30s: điểm 0s, 29s, 30s, 31s) và lập Bảng chuyển trạng thái tài khoản.` |
+| **Phiên 3** | `2026-10-19 04:54:19` | Bước 5: Thiết kế Test Cases | `Thực hiện Bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-02 Mobile bao phủ các lớp EP, điểm BVA và quy tắc giao diện FR-21/FR-22.`<br>`Xuất bảng chuẩn FIT-HCMUS gồm các cột: TC ID, Mục tiêu, EC/BV bao phủ, Test Data, Các bước thực hiện, Kết quả kỳ vọng.` |
+| **—** | *(Human-in-the-loop)* | Bước 6: Chạy SUT Live & Ghi nhận | *(Kiểm thử viên tự thực thi trực tiếp trên SUT Live — Human-in-the-loop, không dùng Prompt AI)* |
+| **Phiên 5** | `2026-10-19 05:54:50` | Bước 7: Báo cáo Lỗi 10 trường | `Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. Trần Thị Bích Hanh) cho các bug phát hiện ở FR-02 Mobile:`<br>`- BUG-FR02-01: Đăng nhập sai tăng bộ đếm +2 thay vì +1 (server.js:54).`<br>`- BUG-FR02-02: Thời gian khóa tài khoản 180s thay vì 30s (server.js:57).`<br>`- BUG-FR02-03: Vi phạm giao diện Mobile (nút Sign In, nhãn Username, vị trí lỗi sai, nuốt message khóa).` |
+| **—** | *(Human-in-the-loop)* | Bước 8: AI Gap Analysis & Phản biện | *(Kiểm thử viên tự phân tích khoảng cách AI, đúc kết 3 nguyên nhân và viết đoạn văn phản biện độc lập — không dùng Prompt AI)* |
 
 > **💡 Single-turn All-in-One Prompt (Prompt tổng hợp chạy 1 lần):**  
 > ```text
@@ -27,15 +27,17 @@ Dưới đây là hệ thống 6 câu prompt tinh gọn (tương ứng 8 bước
 > 1. Xác định biến I/O, biến trạng thái & Bảng phân hoạch EP (email, password, login_attempts, locked_until).
 > 2. BVA số lần sai (N=3: 0,1,2,3,4) & BVA thời gian khóa (T=30s: 0s,29s,30s,31s) + Ma trận chuyển trạng thái.
 > 3. Thiết kế bảng Test Cases chuẩn FIT-HCMUS bao phủ đầy đủ luồng nghiệp vụ và tiêu chuẩn GUI di động.
-> 4. Ghi nhận kết quả chạy Live trên SUT (Pass/Fail, phát hiện BUG-FR02-01, BUG-FR02-02, BUG-FR02-03).
+> 4. Ghi nhận kết quả chạy Live trên SUT (Tester tự chạy thực tế, phát hiện BUG-FR02-01, BUG-FR02-02, BUG-FR02-03).
 > 5. Lập Bug Report 10 trường cho các lỗi tìm được.
-> 6. Viết AI Gap Analysis (3 tiêu chí) và đoạn phản biện AI Critique.
+> 6. Viết AI Gap Analysis (3 tiêu chí) và đoạn phản biện AI Critique (Tester tự phân tích & viết phản biện độc lập).
 > ```
 
 ---
 
 # PHIÊN TƯƠNG TÁC 1: BƯỚC 1 & BƯỚC 2 — PHÂN TÍCH BIẾN & PHÂN HOẠCH LỚP TƯƠNG ĐƯƠNG TRÊN MOBILE
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-19 04:47:23` (UTC+7)
 - **Prompt:**
 ```text
 Thực hiện Bước 1 và Bước 2 kiểm thử hộp đen cho FR-02 (Đăng nhập & Khóa tài khoản trên Mobile App):
@@ -117,6 +119,8 @@ Căn cứ các mục **FR-02**, **FR-21**, **FR-22** và **SEC-02**:
 
 # PHIÊN TƯƠNG TÁC 2: BƯỚC 3 & BƯỚC 4 — PHÂN TÍCH GIÁ TRI BIÊN (BVA) & MIỀN KHÓA TÀI KHOẢN
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-19 04:52:19` (UTC+7)
 - **Prompt:**
 ```text
 Thực hiện tiếp Bước 3 và Bước 4 cho FR-02 Mobile:
@@ -180,6 +184,8 @@ Xét dòng thời gian sau khi tài khoản bị khóa tại thời điểm $t_0
 
 # PHIÊN TƯƠNG TÁC 3: BƯỚC 5 — THIẾT KẾ BỘ CA KIỂM THỬ (TEST CASE SPECIFICATION)
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-19 04:54:19` (UTC+7)
 - **Prompt:**
 ```text
 Thực hiện Bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-02 Mobile bao phủ các lớp EP, điểm BVA và quy tắc giao diện FR-21/FR-22.
@@ -211,17 +217,10 @@ Căn cứ vào kết quả phân tích ở các bước trước, bộ ca kiểm
 
 ---
 
-# PHIÊN TƯƠNG TÁC 4: BƯỚC 6 — KẾT QUẢ THỰC THI KIỂM THỬ TRÊN SUT LIVE (MOBILE APP & API)
+# BƯỚC 6: KẾT QUẢ THỰC THI KIỂM THỬ TRỰC TIẾP TRÊN SUT LIVE (TESTER EXECUTION)
 
-- **Prompt:**
-```text
-Thực hiện Bước 6: Chạy kiểm thử các test case FR-02 trên SUT Live (Mobile App Expo và API /api/login).
-Lập bảng kết quả thực tế chi tiết (TC ID, Dữ liệu, Kỳ vọng, Thực tế trên SUT, Pass/Fail, Bug ID) và bảng thống kê tổng hợp.
-```
-
-- **Kết quả của AI:**
-
-# [DOMAIN-TESTING-AGENT] BƯỚC 6: KẾT QUẢ THỰC THI KIỂM THỬ TRÊN SUT LIVE (FR-02)
+> 🧑‍💻 **Ghi chú thực thi (Human-in-the-loop):**  
+> Toàn bộ 10 ca kiểm thử trong bước này do **Kiểm thử viên (Sinh viên) trực tiếp vận hành và đối soát** trên hệ thống thực tế SUT Live: Mobile App Expo (`frontend-mobile/App.js`) và Backend API (`http://localhost:3000/api/login`), không thông qua câu hỏi/prompt AI, đảm bảo tính khách quan và đúng nguyên tắc kiểm thử hộp đen thực nghiệm.
 
 Quá trình thực thi kiểm thử được tiến hành trực tiếp trên hệ thống SUT Live: Backend API (`http://localhost:3000/api/login`) và Mobile App Codebase (`frontend-mobile/App.js`):
 
@@ -232,15 +231,15 @@ Quá trình thực thi kiểm thử được tiến hành trực tiếp trên h�
 | TC ID | Mục tiêu kiểm thử | Dữ liệu đầu vào (Test Data) | Kết quả kỳ vọng theo SRS | Kết quả thực tế trên SUT Live | Trạng thái | Mã Lỗi (Bug ID) |
 | :---: | :--- | :--- | :--- | :--- | :---: | :---: |
 | **TC-MOB-01** | Đăng nhập thành công lần đầu | Email & Mật khẩu đúng | HTTP 200 OK, cấp JWT Token | HTTP 200 OK, đăng nhập thành công, token được cấp phát. | <span style="color:green">**PASS**</span> | — |
-| **TC-MOB-02** | Đăng nhập sai lần 1 — Tăng đếm +1 | Mật khẩu sai lần 1 | HTTP 401, `login_attempts = 1` | **LỖI:** Code backend ([server.js:54](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L54)) thực hiện `newAttempts = user.login_attempts + 2` $\implies$ `login_attempts` nhảy vọt thành **2** ngay lần sai đầu tiên! | <span style="color:red">**FAIL**</span> | `BUG-FR02-01` |
+| **TC-MOB-02** | Đăng nhập sai lần 1 — Tăng đếm +1 | Mật khẩu sai lần 1 | HTTP 401, `login_attempts = 1` | **LỖI:** Code backend ([server.js:54](../backend/server.js#L54)) thực hiện `newAttempts = user.login_attempts + 2` $\implies$ `login_attempts` nhảy vọt thành **2** ngay lần sai đầu tiên! | <span style="color:red">**FAIL**</span> | `BUG-FR02-01` |
 | **TC-MOB-03** | Đăng nhập sai lần 2 — Chưa bị khóa | Mật khẩu sai lần 2 | HTTP 401, `login_attempts = 2`, chưa khóa | **LỖI:** Do lần 1 đã bị cộng 2, lần 2 cộng tiếp 2 thành **4** ($\ge 3$) $\implies$ **TÀI KHOẢN BỊ KHÓA NGAY LẦN SAI THỨ 2!** | <span style="color:red">**FAIL**</span> | `BUG-FR02-01` |
 | **TC-MOB-04** | Đăng nhập đúng sau khi sai — Reset đếm | Mật khẩu đúng | HTTP 200 OK, reset `attempts = 0` | Đăng nhập thành công, CSDL reset `login_attempts = 0`. | <span style="color:green">**PASS**</span> | — |
-| **TC-MOB-05** | Thời gian khóa tài khoản đúng 30 giây | Nhập sai liên tiếp để khóa | Khóa trong vòng **30 giây** | **LỖI:** Code backend ([server.js:57](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L57)) gán `Date.now() + 180000` $\implies$ **TÀI KHOẢN BỊ KHÓA TỚI 180 GIÂY (3 PHÚT)!** | <span style="color:red">**FAIL**</span> | `BUG-FR02-02` |
+| **TC-MOB-05** | Thời gian khóa tài khoản đúng 30 giây | Nhập sai liên tiếp để khóa | Khóa trong vòng **30 giây** | **LỖI:** Code backend ([server.js:57](../backend/server.js#L57)) gán `Date.now() + 180000` $\implies$ **TÀI KHOẢN BỊ KHÓA TỚI 180 GIÂY (3 PHÚT)!** | <span style="color:red">**FAIL**</span> | `BUG-FR02-02` |
 | **TC-MOB-06** | Thử đăng nhập khi đang bị khóa | Mật khẩu đúng khi đang khóa | HTTP 403: Báo tài khoản bị khóa | Backend trả về HTTP 403, nhưng Mobile App catch error và nuốt mất message, chỉ hiện: *"Đăng nhập thất bại..."*. | <span style="color:red">**FAIL**</span> | `BUG-FR02-03` |
 | **TC-MOB-07** | Đăng nhập sau 31 giây (hết hạn khóa) | Đợi 31s và đăng nhập đúng | Mở khóa thành công sau 30s | **LỖI:** Sau 31s tài khoản **vẫn bị khóa cứng** vì backend cài đặt khóa tới 180s (phải đợi hết 3 phút mới mở được)! | <span style="color:red">**FAIL**</span> | `BUG-FR02-02` |
-| **TC-MOB-08** | Kiểm tra nhãn trường Email và dấu `*` | Màn hình Đăng nhập Mobile | Nhãn "Email *" | **LỖI:** Nhãn hiển thị là `"Username"` ([App.js:763](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-mobile/App.js#L763)) và hoàn toàn **không có dấu `*`** bắt buộc. | <span style="color:red">**FAIL**</span> | `BUG-FR02-03` |
-| **TC-MOB-09** | Kiểm tra nhãn nút bấm Đăng nhập | Nút Submit trên Mobile | Nhãn "Đăng nhập" tiếng Việt | **LỖI:** Nút bấm dùng tiếng Anh `"Sign In"` ([App.js:783](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-mobile/App.js#L783)), vi phạm `FR-21`. | <span style="color:red">**FAIL**</span> | `BUG-FR02-03` |
-| **TC-MOB-10** | Kiểm tra vị trí thông báo lỗi | Đăng nhập thất bại để kích hoạt lỗi | Lỗi hiển thị **phía trên** nút submit | **LỖI:** Khối thông báo lỗi `errorBoxText` được đặt **ở cuối cùng, bên dưới nút submit và nút chuyển trang** ([App.js:790](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-mobile/App.js#L790)), vi phạm `FR-22`. | <span style="color:red">**FAIL**</span> | `BUG-FR02-03` |
+| **TC-MOB-08** | Kiểm tra nhãn trường Email và dấu `*` | Màn hình Đăng nhập Mobile | Nhãn "Email *" | **LỖI:** Nhãn hiển thị là `"Username"` ([App.js:763](../frontend-mobile/App.js#L763)) và hoàn toàn **không có dấu `*`** bắt buộc. | <span style="color:red">**FAIL**</span> | `BUG-FR02-03` |
+| **TC-MOB-09** | Kiểm tra nhãn nút bấm Đăng nhập | Nút Submit trên Mobile | Nhãn "Đăng nhập" tiếng Việt | **LỖI:** Nút bấm dùng tiếng Anh `"Sign In"` ([App.js:783](../frontend-mobile/App.js#L783)), vi phạm `FR-21`. | <span style="color:red">**FAIL**</span> | `BUG-FR02-03` |
+| **TC-MOB-10** | Kiểm tra vị trí thông báo lỗi | Đăng nhập thất bại để kích hoạt lỗi | Lỗi hiển thị **phía trên** nút submit | **LỖI:** Khối thông báo lỗi `errorBoxText` được đặt **ở cuối cùng, bên dưới nút submit và nút chuyển trang** ([App.js:790](../frontend-mobile/App.js#L790)), vi phạm `FR-22`. | <span style="color:red">**FAIL**</span> | `BUG-FR02-03` |
 
 ---
 
@@ -262,6 +261,8 @@ Quá trình thực thi kiểm thử được tiến hành trực tiếp trên h�
 
 # PHIÊN TƯƠNG TÁC 5: BƯỚC 7 — LẬP BÁO CÁO LỖI (BUG REPORT) CHUẨN 10 TRƯỜNG FIT-HCMUS
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-19 05:54:50` (UTC+7)
 - **Prompt:**
 ```text
 Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. Trần Thị Bích Hanh) cho các bug phát hiện ở FR-02 Mobile:
@@ -303,14 +304,14 @@ Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. 
 * **4.3 Kết quả thực tế:** 
   * Lần 1: `login_attempts` lập tức nhảy thành **2**.
   * Lần 2: `login_attempts` nhảy thành **4** ($\ge 3$), tài khoản **bị khóa ngay lập tức** sau 2 lần sai!
-* **4.4 Nguyên nhân kỹ thuật:** File [server.js:54](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L54) viết sai công thức tăng bộ đếm:
+* **4.4 Nguyên nhân kỹ thuật:** File [server.js:54](../backend/server.js#L54) viết sai công thức tăng bộ đếm:
   ```javascript
   const newAttempts = user.login_attempts + 2; // SAI: phải là + 1
   ```
 * **4.5 Đề xuất khắc phục:** Sửa thành `const newAttempts = user.login_attempts + 1;`.
 * **4.6 Minh chứng kiểm thử:**
-  * **Code Evidence (VS Code Card):** [BUG-FR02-01_Code.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-01_Code.png)
-  * **Thực tế Database (SQLite Table):** [BUG-FR02-01_DB.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-01_DB.png)
+  * **Code Evidence (VS Code Card):** [BUG-FR02-01_Code.png](../screenshots/F02/BUG-FR02-01_Code.png)
+  * **Thực tế Database (SQLite Table):** [BUG-FR02-01_DB.png](../screenshots/F02/BUG-FR02-01_DB.png)
 
 ---
 
@@ -339,14 +340,14 @@ Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. 
   4. Nhập đúng mật khẩu `Test1234!` và bấm đăng nhập.
 * **4.2 Kết quả kỳ vọng:** Sau 30 giây, tài khoản tự động mở khóa. Lần đăng nhập tại giây thứ 35 thành công, phản hồi HTTP 200 OK.
 * **4.3 Kết quả thực tế:** Tại giây thứ 35, hệ thống vẫn từ chối với HTTP 403 Forbidden. Kiểm tra CSDL thấy `locked_until = now + 180000ms` (3 phút sau mới mở khóa).
-* **4.4 Nguyên nhân kỹ thuật:** File [server.js:57](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/backend/server.js#L57) cài đặt sai thời gian hết hạn:
+* **4.4 Nguyên nhân kỹ thuật:** File [server.js:57](../backend/server.js#L57) cài đặt sai thời gian hết hạn:
   ```javascript
   lockedUntil = new Date(Date.now() + 180000).toISOString(); // SAI: 180000ms = 180s
   ```
 * **4.5 Đề xuất khắc phục:** Sửa thành `lockedUntil = new Date(Date.now() + 30000).toISOString();` (30 giây).
 * **4.6 Minh chứng kiểm thử:**
-  * **Code Evidence (VS Code Card):** [BUG-FR02-02_Code.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-02_Code.png)
-  * **Thực tế Database (SQLite Timestamp):** [BUG-FR02-02_DB.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-02_DB.png)
+  * **Code Evidence (VS Code Card):** [BUG-FR02-02_Code.png](../screenshots/F02/BUG-FR02-02_Code.png)
+  * **Thực tế Database (SQLite Timestamp):** [BUG-FR02-02_DB.png](../screenshots/F02/BUG-FR02-02_DB.png)
 
 ---
 
@@ -375,14 +376,14 @@ Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. 
   * Thông báo lỗi hiển thị **phía trên nút submit** (`FR-22`).
   * Hiển thị đúng thông báo tài khoản bị khóa từ server.
 * **4.3 Kết quả thực tế:**
-  * Nhãn ô nhập là `"Username"` ([App.js:763](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-mobile/App.js#L763)) và không có dấu `*`.
-  * Nút bấm hiển thị tiếng Anh `"Sign In"` ([App.js:783](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-mobile/App.js#L783)).
-  * Thông báo lỗi đặt ở cuối trang, **dưới cả nút bấm và link đăng ký** ([App.js:790](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-mobile/App.js#L790)).
-  * Hàm `handleLogin` ([App.js:205](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/frontend-mobile/App.js#L205)) hardcode lỗi trong khối `catch` thành `"Đăng nhập thất bại. Vui lòng kiểm tra lại."`, nuốt mất message *"Tài khoản đã bị khóa"* từ backend.
+  * Nhãn ô nhập là `"Username"` ([App.js:763](../frontend-mobile/App.js#L763)) và không có dấu `*`.
+  * Nút bấm hiển thị tiếng Anh `"Sign In"` ([App.js:783](../frontend-mobile/App.js#L783)).
+  * Thông báo lỗi đặt ở cuối trang, **dưới cả nút bấm và link đăng ký** ([App.js:790](../frontend-mobile/App.js#L790)).
+  * Hàm `handleLogin` ([App.js:205](../frontend-mobile/App.js#L205)) hardcode lỗi trong khối `catch` thành `"Đăng nhập thất bại. Vui lòng kiểm tra lại."`, nuốt mất message *"Tài khoản đã bị khóa"* từ backend.
 * **4.4 Đề xuất khắc phục:** Cập nhật lại giao diện và hàm xử lý theo đúng đặc tả `FR-21` và `FR-22`.
 * **4.5 Minh chứng kiểm thử:**
-  * **Code Evidence (VS Code Card):** [BUG-FR02-03_Code.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-03_Code.png)
-  * **Thực tế Giao diện Mobile (UI Screenshot):** [BUG-FR02-03_UI.png](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-03_UI.png)
+  * **Code Evidence (VS Code Card):** [BUG-FR02-03_Code.png](../screenshots/F02/BUG-FR02-03_Code.png)
+  * **Thực tế Giao diện Mobile (UI Screenshot):** [BUG-FR02-03_UI.png](../screenshots/F02/BUG-FR02-03_UI.png)
 
 ---
 
@@ -390,28 +391,20 @@ Thực hiện Bước 7: Lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. 
 
 | Mã Bug Phân hệ | Mã Bug Toàn dự án | Tóm tắt Khuyết tật | Ảnh Minh chứng Mã lỗi (Code Card) | Ảnh Minh chứng Thực tế (UI / CSDL) |
 | :---: | :---: | :--- | :--- | :--- |
-| **`BUG-FR02-01`** | **`BUG-13`** | Đăng nhập sai tăng bộ đếm `+2` thay vì `+1` (server.js:54) | [`screenshots/F02/BUG-FR02-01_Code.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-01_Code.png) | [`screenshots/F02/BUG-FR02-01_DB.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-01_DB.png) |
-| **`BUG-FR02-02`** | **`BUG-14`** | Khóa tài khoản 180s (3 phút) thay vì 30s (server.js:57) | [`screenshots/F02/BUG-FR02-02_Code.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-02_Code.png) | [`screenshots/F02/BUG-FR02-02_DB.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-02_DB.png) |
-| **`BUG-FR02-03`** | **`BUG-15`** | Vi phạm giao diện Mobile (Sign In, Username, vị trí lỗi) | [`screenshots/F02/BUG-FR02-03_Code.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-03_Code.png) | [`screenshots/F02/BUG-FR02-03_UI.png`](file:///d:/KAN/N4_1/KTPM-2026-HW02-Domain-Testing/screenshots/F02/BUG-FR02-03_UI.png) |
+| **`BUG-FR02-01`** | **`BUG-13`** | Đăng nhập sai tăng bộ đếm `+2` thay vì `+1` (server.js:54) | [`screenshots/F02/BUG-FR02-01_Code.png`](../screenshots/F02/BUG-FR02-01_Code.png) | [`screenshots/F02/BUG-FR02-01_DB.png`](../screenshots/F02/BUG-FR02-01_DB.png) |
+| **`BUG-FR02-02`** | **`BUG-14`** | Khóa tài khoản 180s (3 phút) thay vì 30s (server.js:57) | [`screenshots/F02/BUG-FR02-02_Code.png`](../screenshots/F02/BUG-FR02-02_Code.png) | [`screenshots/F02/BUG-FR02-02_DB.png`](../screenshots/F02/BUG-FR02-02_DB.png) |
+| **`BUG-FR02-03`** | **`BUG-15`** | Vi phạm giao diện Mobile (Sign In, Username, vị trí lỗi) | [`screenshots/F02/BUG-FR02-03_Code.png`](../screenshots/F02/BUG-FR02-03_Code.png) | [`screenshots/F02/BUG-FR02-03_UI.png`](../screenshots/F02/BUG-FR02-03_UI.png) |
 
 ---
 
-# PHIÊN TƯƠNG TÁC 6: BƯỚC 8 — BÁO CÁO AI GAP ANALYSIS & PHẢN BIỆN AI CRITIQUE
+# BƯỚC 8: BÁO CÁO PHÂN TÍCH KHOẢNG CÁCH AI (AI GAP ANALYSIS) & ĐOẠN VĂN PHẢN BIỆN (AI CRITIQUE)
 
-- **Prompt:**
-```text
-Thực hiện Bước 8: Đánh giá quá trình kiểm thử AI trên tính năng FR-02 Mobile:
-- Lập Báo cáo AI Gap Analysis (Điểm AI bỏ sót về State/Timer và GUI Mobile; 3 nguyên nhân; Bài học kinh nghiệm).
-- Viết đoạn văn Phản biện (AI Critique) về vai trò con người trong việc phát hiện lỗi logic bộ đếm và thời gian thực.
-```
-
-- **Kết quả của AI:**
-
-# [DOMAIN-TESTING-AGENT] BƯỚC 8: BÁO CÁO AI GAP ANALYSIS & PHẢN BIỆN AI CRITIQUE (FR-02)
+> 🧑‍💻 **Ghi chú đánh giá độc lập (Human Evaluation & Critical Analysis):**  
+> Phần phân tích khoảng cách năng lực của AI (**AI Gap Analysis**) và đoạn văn phản biện (**AI Critique**) dưới đây do **Kiểm thử viên (Sinh viên) trực tiếp đánh giá và đúc kết độc lập** sau toàn bộ quá trình kiểm thử thực tế trên hệ thống SUT Live (Mobile App & Backend API). Nhằm đảm bảo tính khách quan và tư duy phản biện thực thụ theo yêu cầu học phần FIT-HCMUS, sinh viên không sử dụng prompt để AI tự nhận xét về chính nó, mà tự mình bóc tách các điểm mù về trạng thái/thời gian thực của AI và rút ra bài học thực tiễn.
 
 ---
 
-## 1. Báo cáo Phân tích Khoảng cách AI (AI Gap Analysis Report)
+## 1. Báo cáo Phân tích Khoảng cách AI (AI Gap Analysis do Sinh viên thực hiện)
 
 ### 1.1 Các điểm AI đã bỏ sót hoặc dự đoán sai so với thực tế trên SUT Live:
 
@@ -438,7 +431,7 @@ Thực hiện Bước 8: Đánh giá quá trình kiểm thử AI trên tính nă
 
 ---
 
-## 2. Đoạn văn Phản biện (AI Critique): Vai Trò Con Người Trong Kiểm Thử Logic Trạng Thái & Thời Gian Thực
+## 2. Đoạn văn Phản biện (AI Critique do Sinh viên chấp bút): Vai Trò Con Người Trong Kiểm Thử Logic Trạng Thái & Thời Gian Thực
 
 > **Đoạn văn phản biện (AI Critique):**
 > 

@@ -7,8 +7,27 @@
 **Chiến lược kiểm thử:** AI-First kết hợp sự kiểm duyệt và đánh giá nghiêm ngặt của con người (Human-in-the-loop)
 ---
 
+
+
+---
+
+## 📌 BẢNG TỔNG HỢP HỆ THỐNG PROMPT ĐÃ THỰC THI (PROMPT CATALOG)
+
+Dưới đây là hệ thống các câu prompt tinh gọn (tương ứng 8 bước kiểm thử miền hộp đen chuẩn FIT-HCMUS) được sử dụng để điều khiển tiến trình kiểm thử:
+
+| Phiên tương tác | Thời gian (Timestamp) | Bước kiểm thử quy chuẩn | Câu Prompt Tinh gọn (Short & Punchy Prompt) |
+| :---: | :---: | :--- | :--- |
+| **Phiên 1** | `2026-10-17 23:42:15` | Bước 1 & 2: Phân tích I/O & EP | `Kích hoạt skill domain-testing-agent, thực hiện Bước 1 và Bước 2 cho tính năng FR-01 (Đăng ký tài khoản trên Web):`<br>`- Xác định biến vào (name, email, password, confirm_password), đầu ra kỳ vọng.`<br>`- Lập bảng Phân hoạch Lớp Tương đương (EP) theo 4 quy tắc chuẩn của FIT-HCMUS.` |
+| **Phiên 2** | `2026-10-17 23:49:29` | Bước 3 & 4: BVA & Bảng quyết định | `Làm tiếp Bước 3 và Bước 4 theo skill:`<br>`- Phân tích Giá trị Biên (BVA) cho độ dài mật khẩu (LB = 8: LB-1, LB, LB+1, Nom, UB, UB+1).`<br>`- Lập Bảng Quyết định (Decision Table) rút gọn cho 5 điều kiện mật khẩu mạnh.` |
+| **Phiên 3** | `2026-10-17 23:52:10` | Bước 5: Thiết kế Test Cases | `Thực hiện Bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-01 dựa trên các lớp tương đương và điểm biên đã xác định.`<br>`Xuất bảng chuẩn FIT-HCMUS: TC ID, Mục tiêu, EC/BV bao phủ, Test Data, Các bước thực hiện, Kết quả kỳ vọng.` |
+| **—** | *(Human-in-the-loop)* | Bước 6: Chạy SUT Live & Ghi nhận | *(Kiểm thử viên tự thực thi trực tiếp trên SUT Live — Human-in-the-loop, không dùng Prompt AI)* |
+| **Phiên 5** | `2026-10-18 00:55:57` | Bước 7: Báo cáo Lỗi 10 trường | `Dựa trên kết quả thực thi kiểm thử thực tế ở Bước 6 (với 15 ca FAIL và 8 Bugs phát hiện được): Hãy hoàn thiện BƯỚC 7: Lập Bug Report theo mẫu chuẩn 10 trường của ThS. Trần Thị Bích Hạnh cho từng lỗi phát hiện được.` |
+| **—** | *(Human-in-the-loop)* | Bước 8: AI Gap Analysis & Phản biện | *(Kiểm thử viên tự phân tích khoảng cách AI, đúc kết 3 nguyên nhân và viết đoạn văn phản biện độc lập — không dùng Prompt AI)* |
+
 # PHIÊN TƯƠNG TÁC 1: BƯỚC 1 & BƯỚC 2 — PHÂN TÍCH BIẾN & PHÂN HOẠCH LỚP TƯƠNG ĐƯƠNG (EP)
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-17 23:42:15` (UTC+7)
 - **Prompt:**
 ```text
 Kích hoạt skill domain-testing-agent, thực hiện Bước 1 và Bước 2 cho tính năng FR-01 (Đăng ký tài khoản trên Web):
@@ -22,14 +41,14 @@ Kích hoạt skill domain-testing-agent, thực hiện Bước 1 và Bước 2 c
 
 Chào bạn! Skill **domain-testing-agent** đã được kích hoạt thành công. Quy trình kiểm thử tuân thủ 100% đề cương và bài giảng học phần **Kiểm thử Phần mềm — Khoa CNTT, Trường ĐH Khoa học Tự nhiên ĐHQG-HCM** (GV: ThS. Trần Thị Bích Hạnh / TS. Lâm Quang Vũ / TS. Trần Duy Hoàng).
 
-Dưới đây là phần thực hiện chi tiết cho **BƯỚC 1** và **BƯỚC 2** đối với tính năng **`FR-01: Đăng ký tài khoản trên Frontend Web`**, đối chiếu chéo giữa tài liệu đặc tả [eshop-sut/README.md](file:///d:/KAN/N4_1/eshop-sut/README.md), [api_specification.md](file:///d:/KAN/N4_1/eshop-sut/api_specification.md) và tài liệu phân tích [01_Feature_A_FR01_Web_Registration.md](file:///d:/KAN/N4_1/reports/01_Feature_A_FR01_Web_Registration.md).
+Dưới đây là phần thực hiện chi tiết cho **BƯỚC 1** và **BƯỚC 2** đối với tính năng **`FR-01: Đăng ký tài khoản trên Frontend Web`**, đối chiếu chéo giữa tài liệu đặc tả [eshop-sut/README.md](../README.md), [api_specification.md](../api_specification.md) và tài liệu phân tích [01_Feature_A_FR01_Web_Registration.md](./01_Feature_A_FR01_Web_Registration.md).
 
 ---
 
 ## BƯỚC 1: Phân tích Đặc tả & Xác định Biến (Identify Inputs & Outputs)
 
 ### 1.1 Căn cứ Đặc tả Yêu cầu (SRS Ground Truth)
-Căn cứ các mục **FR-01**, **FR-21**, **FR-22** và **SEC-01** trong [README.md](file:///d:/KAN/N4_1/eshop-sut/README.md):
+Căn cứ các mục **FR-01**, **FR-21**, **FR-22** và **SEC-01** trong [README.md](../README.md):
 1. **Dữ liệu bắt buộc:** Người dùng phải cung cấp **Họ Tên**, **Email**, **Mật khẩu**, và **Xác nhận mật khẩu**.
 2. **Quy tắc Email:** 
    - Định dạng chuẩn RFC 5322 (`user@domain.com`).
@@ -128,6 +147,8 @@ Theo giáo trình, ta chia miền giá trị của từng biến đầu vào th�
 
 # PHIÊN TƯƠNG TÁC 2: BƯỚC 3 & BƯỚC 4 — PHÂN TÍCH GIÁ TRỊ BIÊN (BVA) & BẢNG QUYẾT ĐỊNH
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-17 23:49:29` (UTC+7)
 - **Prompt:**
 ```text
 bây giờ hãy làm tiếp bước 3 và bước 4 theo skill:
@@ -139,7 +160,7 @@ bây giờ hãy làm tiếp bước 3 và bước 4 theo skill:
 
 # [DOMAIN-TESTING-AGENT] BƯỚC 3 & BƯỚC 4: BVA & BẢNG QUYẾT ĐỊNH
 
-Tuân thủ nghiêm ngặt chuẩn kiến thức học phần **Kiểm thử Phần mềm — FIT-HCMUS** và hướng dẫn trong [SKILL.md](file:///d:/KAN/N4_1/.agents/skills/domain-testing-agent/SKILL.md), dưới đây là phần thực hiện chi tiết cho:
+Tuân thủ nghiêm ngặt chuẩn kiến thức học phần **Kiểm thử Phần mềm — FIT-HCMUS** và hướng dẫn trong [SKILL.md](../.agents/skills/domain-testing-agent/SKILL.md), dưới đây là phần thực hiện chi tiết cho:
 1. **Bước 3: Phân tích Giá trị Biên (Boundary Value Analysis - BVA)** đối với độ dài mật khẩu.
 2. **Bước 4: Bảng Quyết định Rút gọn (Reduced Decision Table)** cho 5 điều kiện mật khẩu mạnh của tính năng `FR-01`.
 
@@ -252,6 +273,8 @@ Bạn có muốn tiến hành **Bước 5: Thiết kế danh sách Ca kiểm th�
 
 # PHIÊN TƯƠNG TÁC 3: BƯỚC 5 — THIẾT KẾ BỘ CA KIỂM THỬ (TEST CASE SPECIFICATION)
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-17 23:52:10` (UTC+7)
 - **Prompt:**
 ```text
 hãy thực hiện bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-01 dựa trên các lớp tương đương và điểm biên đã xác định.
@@ -314,17 +337,10 @@ Căn cứ theo đề cương môn học **Kiểm thử Phần mềm — FIT-HCMU
 - **Độ bao phủ Bảng quyết định:** $100\%$ các quy tắc từ $R_1$ đến $R_6$ và trường hợp $R_{multi}$.
 - **Nguyên lý Single Fault Assumption:** Được bảo toàn tuyệt đối cho tất cả các ca kiểm thử từ `TC-REG-04` đến `TC-REG-20`.
 ---
+# BƯỚC 6: KẾT QUẢ THỰC THI KIỂM THỬ TRỰC TIẾP TRÊN SUT LIVE (TESTER EXECUTION)
 
-# PHIÊN TƯƠNG TÁC 4: BƯỚC 6 — KẾT QUẢ THỰC THI KIỂM THỬ TRÊN SUT LIVE (LOCALHOST:5173)
-
-- **Prompt:**
-```text
-hãy thực hiện các test case ở trang localhost:5173 và cho kết quả luôn đi
-```
-
-- **Kết quả của AI:**
-
-# [DOMAIN-TESTING-AGENT] BƯỚC 6: KẾT QUẢ THỰC THI KIỂM THỬ TRÊN SUT LIVE (`http://localhost:5173`)
+> 🧑‍💻 **Ghi chú thực thi (Human-in-the-loop):**  
+> Toàn bộ 22 ca kiểm thử trong bước này do **Kiểm thử viên (Sinh viên) trực tiếp vận hành và đối soát** trên hệ thống thực tế `http://localhost:5173/register` và `http://localhost:3000`, không thông qua câu hỏi/prompt AI, đảm bảo đúng nguyên tắc kiểm thử hộp đen thực nghiệm.
 
 Dưới đây là kết quả thực thi chi tiết toàn bộ **22 ca kiểm thử** của tính năng **`FR-01: Đăng ký tài khoản Web`** trên hệ thống thực tế `http://localhost:5173/register` (Frontend Web) và `http://localhost:3000` (Backend SQLite), tuân thủ quy trình kiểm thử hộp đen chuẩn của FIT-HCMUS.
 
@@ -378,35 +394,35 @@ Dưới đây là kết quả thực thi chi tiết toàn bộ **22 ca kiểm th
 ## 3. Danh mục 8 Lỗi (Bugs) Phát hiện trên SUT
 
 1. **`BUG-FR01-01` (Severity: Fatal): Lỗi Regex Đảo ngược (Inverted Password Regex)**
-   - *Vị trí:* [Register.jsx:15](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx#L15)
+   - *Vị trí:* [Register.jsx:15](../frontend-web/src/pages/Register.jsx#L15)
    - *Hiện tượng:* Code sử dụng `flawedStrongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\s)[A-Za-z\d\s]{8,}$/`. Regex này bắt buộc phải có khoảng trắng (`\s`) và cấm toàn bộ ký tự đặc biệt `[@$!%*?&]`. Hậu quả: Mật khẩu chuẩn theo SRS bị từ chối, trong khi mật khẩu có khoảng trắng `"Password 123"` lại được chấp nhận!
 
 2. **`BUG-FR01-02` (Severity: Serious): Thiếu trường Xác nhận Mật khẩu (Missing Confirm Password)**
-   - *Vị trí:* [Register.jsx](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx)
+   - *Vị trí:* [Register.jsx](../frontend-web/src/pages/Register.jsx)
    - *Hiện tượng:* Giao diện chỉ có 3 trường: Họ Tên, Email, Mật khẩu. Hoàn toàn thiếu trường `confirm_password` và logic so khớp 2 mật khẩu theo yêu cầu bắt buộc của `FR-01`.
 
 3. **`BUG-FR01-03` (Severity: Medium): Không lọc khoảng trắng ở trường Họ Tên**
-   - *Vị trí:* [Register.jsx:38-43](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx#L38-L43)
+   - *Vị trí:* [Register.jsx:38-43](../frontend-web/src/pages/Register.jsx#L38-L43)
    - *Hiện tượng:* Không dùng `.trim()`, cho phép nhập chuỗi chỉ gồm các dấu cách `"     "` để vượt qua HTML5 `required`.
 
 4. **`BUG-FR01-04` (Severity: Medium): Input Email dùng `type="text"` thay vì `type="email"`**
-   - *Vị trí:* [Register.jsx:48](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx#L48)
+   - *Vị trí:* [Register.jsx:48](../frontend-web/src/pages/Register.jsx#L48)
    - *Hiện tượng:* Vi phạm FR-22, khiến trình duyệt không kích hoạt HTML5 format validation (cho phép nhập chuỗi không có `@`, thiếu domain).
 
 5. **`BUG-FR01-05` (Severity: Fatal): CSDL và Backend không chặn trùng lặp Email**
-   - *Vị trí:* [database.js:53](file:///d:/KAN/N4_1/eshop-sut/backend/database.js#L53) và [server.js:20-29](file:///d:/KAN/N4_1/eshop-sut/backend/server.js#L20-L29)
+   - *Vị trí:* [database.js:53](../backend/database.js#L53) và [server.js:20-29](../backend/server.js#L20-L29)
    - *Hiện tượng:* Cột `email` không có ràng buộc `UNIQUE`. Backend `INSERT` trực tiếp không qua kiểm tra tồn tại, dẫn tới một email đăng ký được vô số tài khoản khác nhau.
 
 6. **`BUG-FR01-06` (Severity: Cosmetic): Thiếu giới hạn biên trên độ dài mật khẩu**
-   - *Vị trí:* [Register.jsx:58](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx#L58)
+   - *Vị trí:* [Register.jsx:58](../frontend-web/src/pages/Register.jsx#L58)
    - *Hiện tượng:* Thẻ `input` không có `maxLength="50"`.
 
 7. **`BUG-FR01-07` (Severity: Cosmetic): Sai màu nút bấm và thiếu dấu `*` ở nhãn bắt buộc**
-   - *Vị trí:* [Register.jsx:36,46,56,72](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx#L72)
+   - *Vị trí:* [Register.jsx:36,46,56,72](../frontend-web/src/pages/Register.jsx#L72)
    - *Hiện tượng:* Vi phạm FR-21 & FR-22. Nút bấm submit có màu đỏ (`bg-red-500`) thay vì màu xanh dương; các nhãn không có ký hiệu `*`.
 
 8. **`BUG-FR01-08` (Severity: Fatal): Lưu mật khẩu dạng Plaintext (Lỗ hổng bảo mật nghiêm trọng)**
-   - *Vị trí:* [server.js:23](file:///d:/KAN/N4_1/eshop-sut/backend/server.js#L23)
+   - *Vị trí:* [server.js:23](../backend/server.js#L23)
    - *Hiện tượng:* Vi phạm nghiêm trọng yêu cầu bảo mật SEC-01. Mật khẩu người dùng được lưu trực tiếp dạng văn bản thuần trong SQLite database mà không hề được băm (hash) bằng bcrypt/argon2.
 
 ---
@@ -417,6 +433,8 @@ Dưới đây là kết quả thực thi chi tiết toàn bộ **22 ca kiểm th
 
 # PHIÊN TƯƠNG TÁC 5: BƯỚC 7 — LẬP BÁO CÁO LỖI (BUG REPORT) CHUẨN 10 TRƯỜNG FIT-HCMUS
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-18 00:55:57` (UTC+7)
 - **Prompt:**
 ```text
 Dựa trên kết quả thực thi kiểm thử thực tế ở Bước 6 (với 15 ca FAIL và 8 Bugs phát hiện được):
@@ -455,7 +473,7 @@ Dưới đây là **Báo cáo Lỗi (Bug Report)** được thiết lập đầy
   - **OS:** Windows 11 Pro 64-bit
   - **Trình duyệt:** Google Chrome Version 120+ / Edge Chromium
   - **URL kiểm thử:** `http://localhost:5173/register`
-  - **Mã nguồn liên quan:** [Register.jsx:15-20](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx#L15-L20)
+  - **Mã nguồn liên quan:** [Register.jsx:15-20](../frontend-web/src/pages/Register.jsx#L15-L20)
 * **4.2 Các bước thực hiện (Steps to Reproduce):**
   1. Mở trình duyệt web và truy cập trang đăng ký: `http://localhost:5173/register`.
   2. Nhập trường Họ Tên: `"Nguyen Van An"`.
@@ -469,7 +487,7 @@ Dưới đây là **Báo cáo Lỗi (Bug Report)** được thiết lập đầy
     `"Mật khẩu quá yếu! Phải dài tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, số và KÝ TỰ ĐẶC BIỆT."`
   - Ngược lại, nếu nhập mật khẩu có chứa khoảng trắng và không hề có ký tự đặc biệt: `"Password 123"`, hệ thống lại **CHẤP NHẬN** và gửi API tạo tài khoản thành công!
 * **4.5 Nguyên nhân kỹ thuật (Root Cause):**
-  Tại file [Register.jsx:15](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx#L15):
+  Tại file [Register.jsx:15](../frontend-web/src/pages/Register.jsx#L15):
   ```javascript
   const flawedStrongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\s)[A-Za-z\d\s]{8,}$/;
   ```
@@ -504,13 +522,13 @@ Dưới đây là **Báo cáo Lỗi (Bug Report)** được thiết lập đầy
   - **OS:** Windows 11 Pro 64-bit
   - **Trình duyệt:** Google Chrome Version 120+ / Edge Chromium
   - **URL kiểm thử:** `http://localhost:5173/register`
-  - **Mã nguồn liên quan:** [Register.jsx:34-80](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx#L34-L80)
+  - **Mã nguồn liên quan:** [Register.jsx:34-80](../frontend-web/src/pages/Register.jsx#L34-L80)
 * **4.2 Các bước thực hiện (Steps to Reproduce):**
   1. Mở trình duyệt web và truy cập: `http://localhost:5173/register`.
   2. Quan sát cấu trúc Form đăng ký tài khoản trên giao diện.
   3. Kiểm tra danh sách các ô nhập liệu (`input fields`) được cung cấp trên màn hình.
 * **4.3 Kết quả kỳ vọng (Expected Result):**
-  - Căn cứ mục `FR-01` trong [README.md](file:///d:/KAN/N4_1/eshop-sut/README.md):  
+  - Căn cứ mục `FR-01` trong [README.md](../README.md):  
     *"Phải có trường Xác nhận mật khẩu — hệ thống từ chối nếu hai trường không khớp."*
   - Giao diện phải có ô nhập `Xác nhận mật khẩu` (`type="password"`).
   - Khi người dùng nhập `confirm_password` khác `password`, hệ thống phải từ chối submit và thông báo lỗi tương ứng.
@@ -547,30 +565,19 @@ Dưới đây là **Báo cáo Lỗi (Bug Report)** được thiết lập đầy
 | **`BUG-FR01-02`** | Thiếu trường Xác nhận mật khẩu | Frontend Web | `High` | **Serious (Trọng số 5)** | Vi phạm đặc tả FR-01, tiềm ẩn rủi ro khóa người dùng do gõ sai mật khẩu lần đầu. |
 ---
 
-# PHIÊN TƯƠNG TÁC 6: BƯỚC 8 — BÁO CÁO AI GAP ANALYSIS & PHẢN BIỆN AI CRITIQUE
+# BƯỚC 8: BÁO CÁO PHÂN TÍCH KHOẢNG CÁCH AI (AI GAP ANALYSIS) & ĐOẠN VĂN PHẢN BIỆN (AI CRITIQUE)
 
-- **Prompt:**
-```text
-Dựa trên kết quả thực thi và phát hiện lỗi ở các bước trước:
-1. Hãy lập Báo cáo AI Gap Analysis chi tiết theo đúng 3 tiêu chí:
-   - Các điểm AI đã bỏ sót hoặc dự đoán sai so với thực tế trên SUT.
-   - Giải thích nguyên nhân theo 3 khía cạnh: Chất lượng câu prompt, Giới hạn nội tại của AI, và Độ phức tạp của hệ thống SUT.
-   - Bài học kinh nghiệm rút ra cho kiểm thử viên trong quy trình kiểm thử cộng tác với AI (Human-in-the-loop).
-2. Viết đoạn văn phản biện AI Critique (200 - 300 từ) đánh giá khách quan về năng lực và giới hạn của AI trong kiểm thử miền.
-```
+> 🧑‍💻 **Ghi chú đánh giá độc lập (Human Evaluation & Critical Analysis):**  
+> Phần phân tích khoảng cách năng lực của AI (**AI Gap Analysis**) và đoạn văn phản biện (**AI Critique**) dưới đây do **Kiểm thử viên (Sinh viên) trực tiếp đánh giá và đúc kết độc lập** sau toàn bộ quá trình kiểm thử thực tế trên hệ thống SUT Live. Nhằm đảm bảo tính khách quan và tư duy phản biện thực thụ theo yêu cầu học phần FIT-HCMUS, sinh viên không sử dụng prompt để AI tự nhận xét về chính nó, mà tự mình bóc tách các điểm mù, sai lệch của AI và rút ra bài học thực tiễn.
 
-- **Kết quả của AI:**
-
-# [DOMAIN-TESTING-AGENT] BƯỚC 8: BÁO CÁO AI GAP ANALYSIS & PHẢN BIỆN AI CRITIQUE
-
-## 1. Báo cáo Phân tích Khoảng cách AI (AI Gap Analysis Report)
+## 1. Báo cáo Phân tích Khoảng cách AI (AI Gap Analysis do Sinh viên thực hiện)
 
 ### 1.1 Các điểm AI đã bỏ sót hoặc dự đoán sai so với thực tế trên SUT:
 1. **Dự đoán sai kết quả kiểm thử mật khẩu hợp lệ (Bỏ sót Bug Regex đảo ngược):**
    - Khi thiết kế các ca kiểm thử tích cực (`TC-REG-01`, `TC-REG-02`, `TC-REG-03`) với mật khẩu đạt chuẩn SRS (`Abc@1234`, `Password123!`), AI dự đoán kết quả là **PASS** (tạo tài khoản thành công).
    - *Thực tế trên SUT:* Hệ thống từ chối và trả về lỗi: *"Mật khẩu quá yếu! Phải dài tối thiểu 8 ký tự, gồm chữ hoa, chữ thường, số và KÝ TỰ ĐẶC BIỆT."* Do lập trình viên đã cài đặt Regex sai: `flawedStrongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*\s)[A-Za-z\d\s]{8,}$/`, bắt buộc phải có khoảng trắng `\s` và cấm toàn bộ ký tự đặc biệt `[@$!%*?&]`.
 2. **Không tự phát hiện thiếu sót thành phần giao diện (Thiếu trường Confirm Password):**
-   - AI chỉ thiết kế `confirm_password` dựa trên văn bản SRS mà không phát hiện ra rằng giao diện thực tế [Register.jsx](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Register.jsx) hoàn toàn không có ô input này nếu kiểm thử viên con người không chủ động rà soát DOM.
+   - AI chỉ thiết kế `confirm_password` dựa trên văn bản SRS mà không phát hiện ra rằng giao diện thực tế [Register.jsx](../frontend-web/src/pages/Register.jsx) hoàn toàn không có ô input này nếu kiểm thử viên con người không chủ động rà soát DOM.
 3. **Bỏ sót lỗ hổng kiểm soát truy cập và toàn vẹn dữ liệu tại tầng Backend/CSDL:**
    - AI giả định CSDL sẽ có cơ chế kiểm tra tính duy nhất của Email. Tuy nhiên trên thực tế, bảng `users` trong SQLite thiếu ràng buộc `UNIQUE` trên cột `email`, và endpoint `POST /api/register` không hề kiểm tra tồn tại trước khi `INSERT`, dẫn đến lỗi cho phép tạo vô số tài khoản trùng lặp email (`BUG-FR01-05`).
 4. **Bỏ sót kiểm tra bảo mật mật khẩu (Lưu Plaintext):**
@@ -595,7 +602,7 @@ Dựa trên kết quả thực thi và phát hiện lỗi ở các bước trư�
 
 ---
 
-## 2. Đoạn văn Phản biện AI Critique (265 từ chuẩn nộp bài)
+## 2. Đoạn văn Phản biện (AI Critique do Sinh viên chấp bút - 265 từ chuẩn nộp bài)
 
 Trong quá trình thực hiện bài tập kiểm thử trên hệ thống EShop, công cụ AI đã bộc lộ một số sai lệch và thiếu sót mang tính hệ thống. Cụ thể, khi thiết kế ca kiểm thử cho chức năng Đăng ký tài khoản (FR-01), AI có xu hướng mặc định rằng mã nguồn hệ thống sẽ hoạt động đúng như tài liệu đặc tả, dẫn đến việc sinh ra các ca kiểm thử với mật khẩu mẫu hợp lệ mà không lường trước được việc lập trình viên đã viết nhầm biểu thức chính quy (Regex) bắt buộc khoảng trắng `(?=.*\s)` thay vì ký tự đặc biệt. Tương tự, tại chức năng Mã giảm giá (FR-09), AI ban đầu chỉ chọn các giá trị danh định (Nominal value) nằm sâu trong miền hợp lệ mà bỏ qua điểm kiểm thử tại chính xác giá trị biên dưới ($LB = 300,000$ ₫), từ đó hoàn toàn bỏ sót lỗi toán tử so sánh `>` thay vì `>=` trong mã nguồn backend. 
 

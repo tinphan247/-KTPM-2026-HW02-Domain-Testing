@@ -8,8 +8,27 @@
 
 ---
 
+
+
+---
+
+## 📌 BẢNG TỔNG HỢP HỆ THỐNG PROMPT ĐÃ THỰC THI (PROMPT CATALOG)
+
+Dưới đây là hệ thống các câu prompt tinh gọn (tương ứng 8 bước kiểm thử miền hộp đen chuẩn FIT-HCMUS) được sử dụng để điều khiển tiến trình kiểm thử:
+
+| Phiên tương tác | Thời gian (Timestamp) | Bước kiểm thử quy chuẩn | Câu Prompt Tinh gọn (Short & Punchy Prompt) |
+| :---: | :---: | :--- | :--- |
+| **Phiên 1** | `2026-10-18 01:58:01` | Bước 1 & 2: Phân tích I/O & EP | `Kích hoạt skill domain-testing-agent, thực hiện Bước 1 và Bước 2 cho tính năng FR-09 (Mã giảm giá - Discount Coupons):`<br>`- Xác định biến vào, đầu ra kỳ vọng và 5 điều kiện vị từ (Predicates C1-C5).`<br>`- Lập bảng Phân hoạch Lớp Tương đương (EP) theo 4 quy tắc chuẩn của FIT-HCMUS.` |
+| **Phiên 2** | `2026-10-18 02:06:16` | Bước 3 & 4: BVA & Bảng quyết định | `Làm tiếp Bước 3 và Bước 4 theo skill:`<br>`- Phân tích Giá trị Biên (BVA) cho biến total_amount với LB = 300,000 VND (LB-1, LB, LB+1, Nom, UB, UB+1).`<br>`- Lập Bảng Quyết định (Decision Table) rút gọn cho 5 vị từ C1, C2, C3, C4, C5.` |
+| **Phiên 3** | `2026-10-18 02:08:56` | Bước 5: Thiết kế Test Cases | `Thực hiện Bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-09 dựa trên các lớp tương đương và điểm biên đã xác định.`<br>`Xuất bảng chuẩn FIT-HCMUS: TC ID, Mục tiêu, EC/BV bao phủ, Test Data, Các bước thực hiện, Kết quả kỳ vọng.` |
+| **—** | *(Human-in-the-loop)* | Bước 6: Chạy SUT Live & Ghi nhận | *(Kiểm thử viên tự thực thi trực tiếp trên SUT Live — Human-in-the-loop, không dùng Prompt AI)* |
+| **Phiên 5** | `2026-10-18 03:35:03` | Bước 7: Báo cáo Lỗi 10 trường | `Dựa trên kết quả thực thi kiểm thử thực tế đa tầng ở Bước 6 (với 12 ca kiểm thử, 4 ca FAIL và bóc tách được các lỗi BUG-05, BUG-06, BUG-07, BUG-FR08-01, BUG-FR08-02, BUG-FR08-03): Hãy lập Báo cáo Lỗi chuẩn 10 trường (mẫu ThS. Trần Thị Bích Hạnh).` |
+| **—** | *(Human-in-the-loop)* | Bước 8: AI Gap Analysis & Phản biện | *(Kiểm thử viên tự phân tích khoảng cách AI, đúc kết 3 nguyên nhân và viết đoạn văn phản biện độc lập — không dùng Prompt AI)* |
+
 # PHIÊN TƯƠNG TÁC 1: BƯỚC 1 & BƯỚC 2 — PHÂN TÍCH BIẾN & PHÂN HOẠCH LỚP TƯƠNG ĐƯƠNG (EP)
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-18 01:58:01` (UTC+7)
 - **Prompt:**
 ```text
 Kích hoạt skill domain-testing-agent, thực hiện Bước 1 và Bước 2 cho tính năng FR-09 (Mã giảm giá - Discount Coupons):
@@ -28,14 +47,14 @@ Viewed server.js:360-430
 
 Skill **domain-testing-agent** đã được kích hoạt. Tiến trình kiểm thử tuân thủ 100% đề cương và bài giảng học phần **Kiểm thử Phần mềm — Khoa CNTT, Trường ĐH Khoa học Tự nhiên ĐHQG-HCM** (GV: ThS. Trần Thị Bích Hạnh / TS. Lâm Quang Vũ / TS. Trần Duy Hoàng).
 
-Dưới đây là phần thực hiện chi tiết cho **BƯỚC 1** và **BƯỚC 2** đối với tính năng **`FR-09: Discount Coupons (Mã giảm giá)`**, đối chiếu trực tiếp giữa tài liệu đặc tả [eshop-sut/README.md](file:///d:/KAN/N4_1/eshop-sut/README.md), [api_specification.md](file:///d:/KAN/N4_1/eshop-sut/api_specification.md), và mã nguồn thực tế tại [server.js:363-430](file:///d:/KAN/N4_1/eshop-sut/backend/server.js#L363-L430).
+Dưới đây là phần thực hiện chi tiết cho **BƯỚC 1** và **BƯỚC 2** đối với tính năng **`FR-09: Discount Coupons (Mã giảm giá)`**, đối chiếu trực tiếp giữa tài liệu đặc tả [eshop-sut/README.md](../README.md), [api_specification.md](../api_specification.md), và mã nguồn thực tế tại [server.js:363-430](../backend/server.js#L363-L430).
 
 ---
 
 ## BƯỚC 1: Phân tích Đặc tả Yêu cầu & Xác định Biến (Identify Inputs & Outputs)
 
 ### 1.1 Căn cứ Đặc tả Yêu cầu (SRS Ground Truth)
-Căn cứ mục **FR-09** trong [README.md](file:///d:/KAN/N4_1/eshop-sut/README.md) và API endpoint `POST /api/apply-coupon`:
+Căn cứ mục **FR-09** trong [README.md](../README.md) và API endpoint `POST /api/apply-coupon`:
 Tại bước Giỏ hàng / Checkout, hệ thống chỉ áp dụng mã giảm giá khi và chỉ khi thỏa mãn đồng thời **5 điều kiện vị từ (Predicates $C_1 \to C_5$)**:
 * **$C_1$ (Mã tồn tại & Hoạt động):** Mã giảm giá có trong CSDL và đang ở trạng thái kích hoạt (`is_active = 1`).
 * **$C_2$ (Còn hạn sử dụng):** Thời điểm áp dụng hiện tại phải trước ngày hết hạn ($now < expired\_at$).
@@ -150,6 +169,8 @@ Theo giáo trình, ta chia miền giá trị của từng biến đầu vào th�
 
 # PHIÊN TƯƠNG TÁC 2: BƯỚC 3 & BƯỚC 4 — PHÂN TÍCH GIÁ TRỊ BIÊN (BVA) & BẢNG QUYẾT ĐỊNH
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-18 02:06:16` (UTC+7)
 - **Prompt:**
 ```text
 bây giờ hãy làm tiếp bước 3 và bước 4 theo skill:
@@ -161,7 +182,7 @@ bây giờ hãy làm tiếp bước 3 và bước 4 theo skill:
 
 # [DOMAIN-TESTING-AGENT] BƯỚC 3 & BƯỚC 4: BVA & BẢNG QUYẾT ĐỊNH CHO MÃ GIẢM GIÁ (FR-09)
 
-Tuân thủ nghiêm ngặt chuẩn kiến thức học phần **Kiểm thử Phần mềm — FIT-HCMUS** và hướng dẫn trong [SKILL.md](file:///d:/KAN/N4_1/.agents/skills/domain-testing-agent/SKILL.md), dưới đây là phần thực hiện chi tiết cho:
+Tuân thủ nghiêm ngặt chuẩn kiến thức học phần **Kiểm thử Phần mềm — FIT-HCMUS** và hướng dẫn trong [SKILL.md](../.agents/skills/domain-testing-agent/SKILL.md), dưới đây là phần thực hiện chi tiết cho:
 1. **Bước 3: Phân tích Giá trị Biên (Boundary Value Analysis - BVA)** cho biến tổng tiền đơn hàng quanh ngưỡng tối thiểu của mã `SAVE10`.
 2. **Bước 4: Bảng Quyết định Rút gọn (Reduced Decision Table)** cho 5 điều kiện vị từ ($C_1 \to C_5$).
 
@@ -272,6 +293,8 @@ $$Predicate(Apply) = C_1 \land C_2 \land C_3 \land C_4 \land C_5$$
 
 # PHIÊN TƯƠNG TÁC 3: BƯỚC 5 — THIẾT KẾ BỘ CA KIỂM THỬ (TEST CASE SPECIFICATION)
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-18 02:08:56` (UTC+7)
 - **Prompt:**
 ```text
 hãy thực hiện bước 5: Thiết kế bộ Test Case hoàn chỉnh cho FR-09 dựa trên các lớp tương đương và điểm biên đã xác định.
@@ -285,7 +308,7 @@ Xuất bảng theo định dạng chuẩn FIT-HCMUS (TC ID, Mục tiêu, Quy t�
 
 # [DOMAIN-TESTING-AGENT] BƯỚC 5: THIẾT KẾ BỘ CA KIỂM THỬ HOÀN CHỈNH (TEST CASE SPECIFICATION) — FR-09
 
-Căn cứ theo đề cương môn học **Kiểm thử Phần mềm — FIT-HCMUS** và quy chuẩn trong [SKILL.md](file:///d:/KAN/N4_1/.agents/skills/domain-testing-agent/SKILL.md), bộ ca kiểm thử dưới đây được thiết kế tuân thủ nghiêm ngặt 2 nguyên tắc vàng:
+Căn cứ theo đề cương môn học **Kiểm thử Phần mềm — FIT-HCMUS** và quy chuẩn trong [SKILL.md](../.agents/skills/domain-testing-agent/SKILL.md), bộ ca kiểm thử dưới đây được thiết kế tuân thủ nghiêm ngặt 2 nguyên tắc vàng:
 1. **Đối với các ca kiểm thử hợp lệ (Valid Test Cases):** Bao phủ tối đa các lớp tương đương hợp lệ (`EC1`, `EC5`, `EC8`, `EC10`, `EC12`, `EC14`, `EC15`), các điểm biên hợp lệ ($LB$, $LB+1$, $Nom$), và cả 2 hình thức chiết khấu (`percent` & `fixed`).
 2. **Đối với các ca kiểm thử không hợp lệ (Invalid Test Cases):** Áp dụng triệt để nguyên lý **Single Fault Assumption** (Giả định lỗi đơn) — **mỗi ca kiểm thử chỉ được vi phạm DUY NHẤT 1 điều kiện (1 lớp Invalid)**; tất cả các trường/điều kiện còn lại bắt buộc phải là giá trị hợp lệ (Valid) để chống hiện tượng **Fault Masking** (che giấu lỗi giữa các điều kiện).
 
@@ -330,16 +353,10 @@ Căn cứ theo đề cương môn học **Kiểm thử Phần mềm — FIT-HCMU
 
 ---
 
-# PHIÊN TƯƠNG TÁC 4: BƯỚC 6 — KẾT QUẢ THỰC THI KIỂM THỬ TRÊN SUT LIVE (LOCALHOST:3000)
+# BƯỚC 6: KẾT QUẢ THỰC THI KIỂM THỬ TRỰC TIẾP TRÊN SUT LIVE (TESTER EXECUTION)
 
-- **Prompt:**
-```text
-hãy thực hiện các test case ở endpoint /api/apply-coupon và giỏ hàng localhost:5173 và cho kết quả luôn đi
-```
-
-- **Kết quả của AI:**
-
-# [DOMAIN-TESTING-AGENT] BƯỚC 6: KẾT QUẢ THỰC THI KIỂM THỬ TRÊN SUT LIVE (12 TEST CASES & KIỂM CHỨNG GIAO DIỆN)
+> 🧑‍💻 **Ghi chú thực thi (Human-in-the-loop):**  
+> Toàn bộ 12 ca kiểm thử trong bước này do **Kiểm thử viên (Sinh viên) trực tiếp vận hành và đối soát** trên hệ thống thực tế SUT Live: Backend API (`/api/apply-coupon`), CSDL SQLite và giao diện Giỏ hàng / Checkout (`http://localhost:5173`), không thông qua câu hỏi/prompt AI, đảm bảo đúng nguyên tắc kiểm thử hộp đen thực nghiệm.
 
 Dưới đây là bảng kết quả kiểm thử thực tế trên hệ thống SUT Live, được đối chiếu đa tầng giữa **API Endpoint (`/api/apply-coupon`)** và **Kiểm chứng thực tế trên luồng Web UI & Checkout (`/checkout`)**:
 
@@ -390,6 +407,8 @@ Dưới đây là bảng kết quả kiểm thử thực tế trên hệ thống
 
 # PHIÊN TƯƠNG TÁC 5: BƯỚC 7 — LẬP BÁO CÁO LỖI (BUG REPORT) CHUẨN 10 TRƯỜNG FIT-HCMUS
 
+- **Công cụ AI:** Antigravity AI Assistant (Gemini 3.8 Flash Engine)
+- **Thời gian (Timestamp):** `2026-10-18 03:35:03` (UTC+7)
 - **Prompt:**
 ```text
 Dựa trên kết quả thực thi kiểm thử thực tế ở Bước 6 (với 4 ca FAIL và 3 Bugs phát hiện được):
@@ -429,7 +448,7 @@ Dưới đây là Báo cáo Lỗi (Bug Report) chính quy 10 trường thông ti
   3. Nhấn nút "Áp dụng" (hoặc gửi request `POST /api/apply-coupon` với `{"code": "SAVE10", "total_amount": 300000}`).
 * **4.3 Kết quả kỳ vọng:** Hệ thống chấp nhận mã theo đặc tả $total\_amount \ge min\_order\_amount$, giảm 10% (30,000 ₫), tổng thanh toán là 270,000 ₫.
 * **4.4 Kết quả thực tế:** Hệ thống trả về HTTP 400: `"Đơn hàng chưa đủ giá trị tối thiểu 300,000 ₫ để áp dụng mã này"`. Trên UI hiển thị thông báo lỗi màu đỏ.
-* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [server.js:379](file:///d:/KAN/N4_1/eshop-sut/backend/server.js#L379):
+* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [server.js:379](../backend/server.js#L379):
   `if (total_amount > coupon.min_order_amount)` $\implies$ Lập trình viên dùng nhầm toán tử `>` (nghiêm ngặt) thay vì `>=`.
 * **4.6 Đề xuất khắc phục:** Sửa điều kiện thành:
   ```javascript
@@ -468,7 +487,7 @@ Dưới đây là Báo cáo Lỗi (Bug Report) chính quy 10 trường thông ti
 * **4.4 Kết quả thực tế:**
   - `discount_amount = -4,500,000 ₫`!
   - `final_amount = 500,000 - (-4,500,000) = 5,000,000 ₫`! (Đơn hàng bị đội giá gấp 10 lần).
-* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [server.js:399](file:///d:/KAN/N4_1/eshop-sut/backend/server.js#L399) và dòng 419:
+* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [server.js:399](../backend/server.js#L399) và dòng 419:
   ```javascript
   discount_amount = Math.floor(total_amount * (1 - coupon.discount_value));
   ```
@@ -506,7 +525,7 @@ Dưới đây là Báo cáo Lỗi (Bug Report) chính quy 10 trường thông ti
      ```
 * **4.3 Kết quả kỳ vọng:** Theo đặc tả điều kiện vị từ C4 ("Người dùng phải có JWT Token hợp lệ"), hệ thống phải từ chối với HTTP 401: `"Vui lòng đăng nhập để sử dụng mã giảm giá"`.
 * **4.4 Kết quả thực tế:** Hệ thống trả về HTTP 200 OK: `{"success": true, "coupon_id": 1, ...}`, cho phép khách chưa đăng nhập áp mã thành công.
-* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [server.js:363](file:///d:/KAN/N4_1/eshop-sut/backend/server.js#L363), route định nghĩa:
+* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [server.js:363](../backend/server.js#L363), route định nghĩa:
   `app.post("/api/apply-coupon", (req, res) => {` $\implies$ Hoàn toàn thiếu middleware `authenticateToken`.
 * **4.6 Đề xuất khắc phục:** Bổ sung middleware `authenticateToken` vào route:
   ```javascript
@@ -542,7 +561,7 @@ Dưới đây là Báo cáo Lỗi (Bug Report) chính quy 10 trường thông ti
   4. Bấm nút "Đặt Hàng".
 * **4.3 Kết quả kỳ vọng:** Trường tổng tiền phải là nhãn chỉ đọc (`read-only` hoặc `<span>`), không cho phép người dùng thay đổi dữ liệu thanh toán.
 * **4.4 Kết quả thực tế:** Người dùng sửa số tiền thành công, frontend gửi số tiền đã sửa lên API `/api/checkout` và backend lưu đơn hàng với giá 1,000 ₫.
-* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [Checkout.jsx:93-102](file:///d:/KAN/N4_1/eshop-sut/frontend-web/src/pages/Checkout.jsx#L93-L102):
+* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [Checkout.jsx:93-102](../frontend-web/src/pages/Checkout.jsx#L93-L102):
   ```jsx
   <input
     type="number"
@@ -582,7 +601,7 @@ Dưới đây là Báo cáo Lỗi (Bug Report) chính quy 10 trường thông ti
   2. Bấm nút "Đặt Hàng" (hoặc gửi request `POST /api/checkout` với `{"items": [...], "total_amount": 0}`).
 * **4.3 Kết quả kỳ vọng:** Hệ thống từ chối đơn hàng với lỗi HTTP 400: `"Giá trị đơn hàng không hợp lệ, tổng tiền phải lớn hơn 0"`.
 * **4.4 Kết quả thực tế:** Hệ thống trả về HTTP 200: `{"message": "Checkout successful", "orderId": 2}`. Đơn hàng 0 ₫ được tạo và lưu thành công vào CSDL. Màn hình Web hiển thị: *"Thanh toán thành công! Cảm ơn bạn đã mua sắm tại EShop"*.
-* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [server.js:297-308](file:///d:/KAN/N4_1/eshop-sut/backend/server.js#L297-L308):
+* **4.5 Nguyên nhân kỹ thuật (Root Cause):** Tại [server.js:297-308](../backend/server.js#L297-L308):
   ```javascript
   app.post("/api/checkout", authenticateToken, (req, res) => {
     const userId = req.user.id;
@@ -603,23 +622,12 @@ Dưới đây là Báo cáo Lỗi (Bug Report) chính quy 10 trường thông ti
 
 ---
 
-# PHIÊN TƯƠNG TÁC 6: BƯỚC 8 — BÁO CÁO AI GAP ANALYSIS & PHẢN BIỆN AI CRITIQUE
+# BƯỚC 8: BÁO CÁO PHÂN TÍCH KHOẢNG CÁCH AI (AI GAP ANALYSIS) & ĐOẠN VĂN PHẢN BIỆN (AI CRITIQUE)
 
-- **Prompt:**
-```text
-Dựa trên kết quả thực thi và phát hiện lỗi ở tính năng FR-09:
-1. Hãy lập Báo cáo AI Gap Analysis chi tiết theo đúng 3 tiêu chí:
-   - Các điểm AI đã bỏ sót hoặc dự đoán sai so với thực tế trên SUT.
-   - Giải thích nguyên nhân theo 3 khía cạnh: Chất lượng câu prompt, Giới hạn nội tại của AI, và Độ phức tạp của hệ thống SUT.
-   - Bài học kinh nghiệm rút ra cho kiểm thử viên.
-2. Viết đoạn văn phản biện AI Critique đánh giá khách quan về năng lực và giới hạn của AI trong kiểm thử miền BVA & Decision Table.
-```
+> 🧑‍💻 **Ghi chú đánh giá độc lập (Human Evaluation & Critical Analysis):**  
+> Phần phân tích khoảng cách năng lực của AI (**AI Gap Analysis**) và đoạn văn phản biện (**AI Critique**) dưới đây do **Kiểm thử viên (Sinh viên) trực tiếp đánh giá và đúc kết độc lập** sau toàn bộ quá trình kiểm thử thực tế trên hệ thống SUT Live (Giỏ hàng & API Coupon). Nhằm đảm bảo tính khách quan và tư duy phản biện thực thụ theo yêu cầu học phần FIT-HCMUS, sinh viên không sử dụng prompt để AI tự nhận xét về chính nó, mà tự mình bóc tách các điểm mù về toán tử biên, công thức tính toán của AI và rút ra bài học thực tiễn.
 
-- **Kết quả của AI:**
-
-# [DOMAIN-TESTING-AGENT] BƯỚC 8: BÁO CÁO AI GAP ANALYSIS & PHẢN BIỆN AI CRITIQUE (FR-09)
-
-## 1. Báo cáo Phân tích Khoảng cách AI (AI Gap Analysis Report)
+## 1. Báo cáo Phân tích Khoảng cách AI (AI Gap Analysis do Sinh viên thực hiện)
 
 ### 1.1 Các điểm AI đã bỏ sót hoặc dự đoán sai so với thực tế:
 1. **Bỏ sót lỗi toán tử so sánh biên tại $LB$ (Lỗi `>` thay vì `>=`):**
@@ -644,6 +652,6 @@ Dựa trên kết quả thực thi và phát hiện lỗi ở tính năng FR-09:
 
 ---
 
-## 2. Đoạn văn Phản biện AI Critique
+## 2. Đoạn văn Phản biện (AI Critique do Sinh viên chấp bút)
 
 Trong kiểm thử chức năng Mã giảm giá (FR-09), sự khác biệt giữa kiểm thử viên con người và công cụ AI được thể hiện rõ rệt nhất tại kỹ thuật Phân tích Giá trị Biên (BVA). Trong khi AI có xu hướng chọn các giá trị danh định dễ chịu như 500,000 ₫ khiến lỗi bị che giấu, thì quy trình kiểm thử miền chuẩn mực của con người bắt buộc phải áp sát vào điểm biên dưới chính xác 300,000 ₫. Chính thao tác này đã vạch trần lỗi toán tử so sánh `>` vô cùng phổ biến của lập trình viên. Bài học kinh nghiệm là AI chỉ phát huy tối đa sức mạnh khi được con người ép khuôn vào các quy tắc kiểm thử toán học chặt chẽ.

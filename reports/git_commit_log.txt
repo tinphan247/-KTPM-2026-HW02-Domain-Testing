@@ -1,0 +1,35 @@
+commit c0f9f2f14574d3ab996b0f71377dd87265bca0f8
+Author: Kan Nguyen <minpro111@gmail.com>
+Date:   Mon Oct 19 08:58:46 2026 +0700
+
+    test(feature-d): design domain test cases, live execution, and unified defect cards for FR-02
+
+commit 08890ab0e42e11a3a73514986e5d23edd6066ea2
+Author: Kan Nguyen <minpro111@gmail.com>
+Date:   Mon Oct 19 08:56:00 2026 +0700
+
+    test(feature-c): design domain test cases, live execution, and unified defect cards for FR-14
+
+commit affc8d6edb17901441d94bf19c7a2dd16c095379
+Author: Kan Nguyen <minpro111@gmail.com>
+Date:   Mon Oct 19 00:16:36 2026 +0700
+
+    test(feature-b): design domain test cases, live execution, and unified defect cards for FR-09
+
+commit efcbf38834104cccc7d9d2b9df1fcecaf48e8e42
+Author: Kan Nguyen <minpro111@gmail.com>
+Date:   Sun Oct 18 23:47:38 2026 +0700
+
+    test(feature-a): design domain test cases, live execution, and unified defect cards for FR-01
+
+commit 9ceaf458618268ef109f468149fdb6202b717e98
+Author: Kan Nguyen <minpro111@gmail.com>
+Date:   Sun Oct 18 04:12:07 2026 +0700
+
+    feat(base): initialize eshop-sut project environment and domain-testing-agent skill
+
+commit 5b1e5c76de1cf8282802aee6e4a001b28b69fee8
+Author: 23120372 <23120372@student.hcmus.edu.vn>
+Date:   Fri Oct 16 12:12:11 2026 +0700
+
+    hw02: evidence screenshots for 38 issue reports
