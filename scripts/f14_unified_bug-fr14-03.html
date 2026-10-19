@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BUG-FR14-03 Code Evidence</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0b0f19;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .vscode-window {
+    width: 100%;
+    max-width: 1040px;
+    background: #1e1e1e;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    border: 1px solid #333333;
+  }
+  .titlebar {
+    background: #323233;
+    color: #cccccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid #252526;
+  }
+  .traffic-lights { display: flex; gap: 8px; }
+  .traffic-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .dot-red { background: #ff5f56; }
+  .dot-yellow { background: #ffbd2e; }
+  .dot-green { background: #27c93f; }
+  .title-center { color: #cccccc; font-weight: 500; font-family: monospace; }
+  .bug-tag {
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+  }
+  .tabbar {
+    background: #252526;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #1e1e1e;
+  }
+  .tab {
+    background: #1e1e1e;
+    color: #ffffff;
+    padding: 8px 18px;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: monospace;
+    border-top: 2px solid #007acc;
+  }
+  .tab .icon-jsx { color: #61dafb; font-weight: bold; }
+  .tab .icon-js { color: #f7df1e; font-weight: bold; }
+  .tab-path { color: #858585; font-size: 11.5px; margin-left: 14px; font-family: monospace; }
+  .editor {
+    display: flex;
+    background: #1e1e1e;
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 16px 0;
+  }
+  .line-numbers {
+    width: 50px;
+    text-align: right;
+    padding-right: 16px;
+    color: #6e7681;
+    user-select: none;
+    font-size: 12px;
+  }
+  .code-content {
+    flex: 1;
+    padding-right: 24px;
+    color: #d4d4d4;
+  }
+  .kw { color: #c586c0; font-weight: 600; }
+  .fn { color: #dcdcaa; }
+  .var { color: #9cdcfe; }
+  .str { color: #ce9178; }
+  .tag { color: #569cd6; }
+  .attr { color: #9cdcfe; }
+  .regex { color: #d16969; font-weight: 600; }
+  .comment { color: #6a9955; font-style: italic; }
+  .num { color: #b5cea8; }
+  .highlight-line {
+    background: rgba(239, 68, 68, 0.15);
+    border-left: 3px solid #ef4444;
+    padding: 1px 6px;
+    display: block;
+    margin: 2px 0;
+  }
+  .callout-box {
+    margin: 14px 0 16px 0;
+    background: #2b1111;
+    border: 1px solid #dc2626;
+    border-left: 4px solid #ef4444;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .callout-title {
+    color: #fca5a5;
+    font-weight: 700;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .callout-desc {
+    color: #fecaca;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .fix-box {
+    margin: 14px 0 6px 0;
+    background: #062b16;
+    border: 1px solid #16a34a;
+    border-left: 4px solid #22c55e;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .fix-title {
+    color: #86efac;
+    font-weight: 700;
+    font-size: 12.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .fix-code {
+    font-family: "Cascadia Code", Consolas, monospace;
+    color: #bbf7d0;
+    font-size: 12px;
+    background: #021a0c;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin-top: 6px;
+    border: 1px solid #14532d;
+    line-height: 1.5;
+  }
+  .statusbar {
+    background: #007acc;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 16px;
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<div class="vscode-window">
+  <div class="titlebar">
+    <div class="traffic-lights">
+      <span class="traffic-dot dot-red"></span>
+      <span class="traffic-dot dot-yellow"></span>
+      <span class="traffic-dot dot-green"></span>
+    </div>
+    <div class="title-center">EShop SUT — App.jsx & server.js [Visual Studio Code]</div>
+    <div class="bug-tag">BUG-FR14-03: Thiếu Xác Nhận Xóa (FR-24) & Vi Phạm Toàn Vẹn Khóa Ngoại</div>
+  </div>
+
+  <div class="tabbar">
+    <div class="tab">
+      <span class="icon-jsx">JSX</span>
+      <span>App.jsx & server.js</span>
+    </div>
+    <div class="tab-path">frontend-admin/src/App.jsx:323-329 & backend/server.js:269-278</div>
+  </div>
+
+  <div class="editor">
+    <div class="line-numbers">
+      <div>320</div><div>321</div><div>322</div><div>323</div><div>324</div><div>325</div><div>326</div><div>327</div><div>328</div><div>329</div><div>330</div><div>331</div><div>332</div><div>333</div><div>334</div>
+    </div>
+    <div class="code-content">
+      <div><span class="comment">// frontend-admin/src/App.jsx:323-329 — Nút xóa trên Web Admin</span></div><div><span class="tag">&lt;button</span> <span class="attr">className</span>=<span class="str">"bg-red-500 text-white px-2 py-1 rounded text-sm"</span></div><div><span class="highlight-line">&nbsp;&nbsp;<span class="attr">onClick</span>={() =&gt; <span class="fn">deleteCategory</span>(<span class="var">c</span>.<span class="var">id</span>)} <span class="comment">/* LỖ HỔNG UI: Không có confirm dialog, bấm là xóa ngay! */</span></span></div><div><span class="tag">&gt;</span></div><div>&nbsp;&nbsp;Xóa</div><div><span class="tag">&lt;/button&gt;</span></div><div></div><div><span class="comment">// backend/server.js:269-278 — Xóa danh mục không kiểm tra khóa ngoại</span></div><div><span class="var">app</span>.<span class="fn">delete</span>(<span class="str">"/api/categories/:id"</span>, <span class="var">authenticateToken</span>, (<span class="var">req</span>, <span class="var">res</span>) =&gt; {</div><div><span class="highlight-line">&nbsp;&nbsp;<span class="comment">// LỖ HỔNG CSDL: Xóa trực tiếp mà không kiểm tra sản phẩm thuộc danh mục (products WHERE category_id = ?)</span></span></div><div><span class="highlight-line">&nbsp;&nbsp;<span class="var">db</span>.<span class="fn">run</span>(<span class="str">"DELETE FROM categories WHERE id = ?"</span>, [<span class="var">req</span>.<span class="var">params</span>.<span class="var">id</span>], <span class="kw">function</span> (<span class="var">err</span>) {</span></div><div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> (<span class="var">err</span>) <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">500</span>).<span class="fn">json</span>({ <span class="attr">error</span>: <span class="var">err</span>.<span class="var">message</span> });</div><div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="var">res</span>.<span class="fn">json</span>({ <span class="attr">message</span>: <span class="str">"Category deleted"</span> });</div><div>&nbsp;&nbsp;});</div><div>});</div>
+
+      <div class="callout-box">
+        <div class="callout-title">⚠️ ROOT CAUSE ANALYSIS — BUG-FR14-03</div>
+        <div class="callout-desc">Vi phạm đồng thời hai nguyên lý an toàn: 1) Phía Frontend: Hành động xóa dữ liệu nguy hiểm không có modal/confirm dialog cảnh báo (vi phạm yêu cầu FR-24); 2) Phía Backend & CSDL: Không kiểm tra ràng buộc toàn vẹn quan hệ. Khi xóa danh mục đang chứa sản phẩm, danh mục biến mất nhưng các sản phẩm liên kết vẫn còn tồn tại với category_id không hợp lệ, biến chúng thành dữ liệu mồ côi (orphan records).</div>
+      </div>
+
+      <div class="fix-box">
+        <div class="fix-title">✓ RECOMMENDED FIX (PATCH)</div>
+        <div class="fix-code"><span class="comment">// Frontend: Bổ sung xác nhận trước khi xóa</span><br><span class="kw">if</span> (!<span class="var">window</span>.<span class="fn">confirm</span>(<span class="str">"Bạn có chắc chắn muốn xóa danh mục này? Thao tác không thể hoàn tác!"</span>)) <span class="kw">return</span>;<br><br><span class="comment">// Backend: Kiểm tra và chặn xóa danh mục đang có sản phẩm</span><br><span class="var">db</span>.<span class="fn">get</span>(<span class="str">"SELECT COUNT(*) AS count FROM products WHERE category_id = ?"</span>, [<span class="var">req</span>.<span class="var">params</span>.<span class="var">id</span>], (<span class="var">err</span>, <span class="var">row</span>) =&gt; {<br>&nbsp;&nbsp;<span class="kw">if</span> (<span class="var">row</span> &amp;&amp; <span class="var">row</span>.<span class="var">count</span> &gt; <span class="num">0</span>) <span class="kw">return</span> <span class="var">res</span>.<span class="fn">status</span>(<span class="num">400</span>).<span class="fn">json</span>({ <span class="attr">error</span>: <span class="str">`Không thể xóa danh mục đang chứa ${row.count} sản phẩm!`</span> });<br>&nbsp;&nbsp;<span class="var">db</span>.<span class="fn">run</span>(<span class="str">"DELETE FROM categories WHERE id = ?"</span>, [<span class="var">req</span>.<span class="var">params</span>.<span class="var">id</span>], ...);<br>});</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div>⎇ hw02-n4_1 &nbsp; | &nbsp; UTF-8 &nbsp; | &nbsp; React / Node.js Express</div>
+    <div>FIT-HCMUS Software Testing • HW02 Domain Testing Defect Evidence</div>
+  </div>
+</div>
+
+</body>
+</html>
