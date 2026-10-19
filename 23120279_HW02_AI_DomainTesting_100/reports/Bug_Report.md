@@ -52,6 +52,7 @@
 
 #### BUG REPORT 01: `BUG-01` (`BUG-FR01-01`)
 * **1. Bug ID:** `BUG-01` (`BUG-FR01-01`)
+* **GitHub Issue:** [#73 - BUG-FR01-01](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/73)
 * **2. Function Name:** `FR-01: Account Registration (Frontend Web)`
 * **3. Problem Summary:** Mật khẩu hợp lệ theo đặc tả SRS (`Password123!`) bị từ chối với lỗi "Mật khẩu quá yếu", trong khi mật khẩu chứa dấu cách (`Password 123`) lại được chấp nhận.
 * **4. How to Reproduce:**
@@ -74,6 +75,7 @@
 
 #### BUG REPORT 02: `BUG-02` (`BUG-FR01-02`)
 * **1. Bug ID:** `BUG-02` (`BUG-FR01-02`)
+* **GitHub Issue:** [#74 - BUG-FR01-02](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/74)
 * **2. Function Name:** `FR-01: Account Registration (Form Spec)`
 * **3. Problem Summary:** Màn hình đăng ký hoàn toàn thiếu trường "Xác nhận mật khẩu" (Confirm Password) và logic so khớp theo quy định bắt buộc của FR-01.
 * **4. How to Reproduce:**
@@ -94,6 +96,7 @@
 
 #### BUG REPORT 03: `BUG-03` (`BUG-FR01-03`)
 * **1. Bug ID:** `BUG-03` (`BUG-FR01-03`)
+* **GitHub Issue:** [#75 - BUG-FR01-03](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/75)
 * **2. Function Name:** `FR-01: Form Validation`
 * **3. Problem Summary:** Trường Họ Tên không lọc khoảng trắng (không gọi `.trim()`), cho phép nhập chuỗi chỉ chứa toàn dấu cách `"   "` để vượt qua kiểm tra bắt buộc.
 * **4. How to Reproduce:**
@@ -115,6 +118,7 @@
 
 #### BUG REPORT 04: `BUG-04` (`BUG-FR01-04`)
 * **1. Bug ID:** `BUG-04` (`BUG-FR01-04`)
+* **GitHub Issue:** [#76 - BUG-FR01-04](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/76)
 * **2. Function Name:** `FR-22: Form Standards`
 * **3. Problem Summary:** Trường Email dùng `type="text"` thay vì `type="email"`, vi phạm quy chuẩn FR-22 và làm mất tính năng format validation tự động của trình duyệt HTML5.
 * **4. How to Reproduce:**
@@ -136,6 +140,7 @@
 
 #### BUG REPORT 05: `BUG-05` (`BUG-FR01-05`)
 * **1. Bug ID:** `BUG-05` (`BUG-FR01-05`)
+* **GitHub Issue:** [#77 - BUG-FR01-05](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/77)
 * **2. Function Name:** `FR-01: Backend API & Database Integrity`
 * **3. Problem Summary:** CSDL SQLite không có ràng buộc `UNIQUE` cho cột `email` và Backend không kiểm tra email đã tồn tại trước khi thêm mới, cho phép đăng ký trùng lặp nhiều tài khoản cùng một email.
 * **4. How to Reproduce:**
@@ -156,6 +161,7 @@
 
 #### BUG REPORT 06: `BUG-06` (`BUG-FR01-06`)
 * **1. Bug ID:** `BUG-06` (`BUG-FR01-06`)
+* **GitHub Issue:** [#78 - BUG-FR01-06](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/78)
 * **2. Function Name:** `FR-01: Boundary Constraints`
 * **3. Problem Summary:** Ô nhập mật khẩu không giới hạn cận trên ($UB = 50$), cho phép gửi mật khẩu dài hàng nghìn ký tự lên máy chủ.
 * **4. How to Reproduce:**
@@ -176,6 +182,7 @@
 
 #### BUG REPORT 07: `BUG-07` (`BUG-FR01-07`)
 * **1. Bug ID:** `BUG-07` (`BUG-FR01-07`)
+* **GitHub Issue:** [#79 - BUG-FR01-07](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/79)
 * **2. Function Name:** `FR-21 / FR-22: GUI Standards`
 * **3. Problem Summary:** Nút hành động tích cực Submit dùng màu đỏ nguy hiểm (`bg-red-500`) thay vì màu xanh dương, đồng thời các trường bắt buộc thiếu ký hiệu `*` bên cạnh nhãn.
 * **4. How to Reproduce:**
@@ -196,6 +203,7 @@
 
 #### BUG REPORT 08: `BUG-08` (`BUG-FR01-08`)
 * **1. Bug ID:** `BUG-08` (`BUG-FR01-08`)
+* **GitHub Issue:** [#80 - BUG-FR01-08](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/80)
 * **2. Function Name:** `FR-01 / SEC-01: Information Security`
 * **3. Problem Summary:** Mật khẩu người dùng được lưu trực tiếp dạng văn bản rõ (Plaintext 100%) vào CSDL SQLite mà không hề được băm (hash) bảo mật.
 * **4. How to Reproduce:**
@@ -218,6 +226,7 @@
 
 #### BUG REPORT 09: `BUG-09` (`BUG-FR09-01`)
 * **1. Bug ID:** `BUG-09` (`BUG-FR09-01`)
+* **GitHub Issue:** [#81 - BUG-FR09-01](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/81)
 * **2. Function Name:** `FR-09: Discount Coupons (Predicate Logic)`
 * **3. Problem Summary:** Cài đặt sai toán tử so sánh biên: Điều kiện $total \ge min\_order\_amount$ bị viết nhầm thành $total > min\_order\_amount$, dẫn tới từ chối áp dụng mã giảm giá khi tổng tiền bằng đúng ngưỡng tối thiểu ($LB = 300,000$ ₫).
 * **4. How to Reproduce:**
@@ -239,6 +248,7 @@
 
 #### BUG REPORT 10: `BUG-10` (`BUG-FR09-02`)
 * **1. Bug ID:** `BUG-10` (`BUG-FR09-02`)
+* **GitHub Issue:** [#82 - BUG-FR09-02](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/82)
 * **2. Function Name:** `FR-09: Calculation Formula`
 * **3. Problem Summary:** Tính sai công thức giảm giá phần trăm: `discount_amount` bị tính ra số âm, làm tổng thanh toán bị đội lên gấp nhiều lần giá trị thực.
 * **4. How to Reproduce:**
@@ -258,6 +268,7 @@
 
 #### BUG REPORT 11: `BUG-11` (`BUG-FR09-03`)
 * **1. Bug ID:** `BUG-11` (`BUG-FR09-03`)
+* **GitHub Issue:** [#83 - BUG-FR09-03](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/83)
 * **2. Function Name:** `FR-09: Access Control`
 * **3. Problem Summary:** Endpoint `/api/apply-coupon` thiếu middleware xác thực JWT, cho phép khách vãng lai (chưa đăng nhập) gọi API áp dụng coupon tự do, vi phạm điều kiện C4.
 * **4. How to Reproduce:**
@@ -277,6 +288,7 @@
 
 #### BUG REPORT 12: `BUG-12` (`BUG-FR08-01`)
 * **1. Bug ID:** `BUG-12` (`BUG-FR08-01`)
+* **GitHub Issue:** [#84 - BUG-FR08-01](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/84)
 * **2. Function Name:** `FR-08: Shopping Cart & Checkout (Web UI)`
 * **3. Problem Summary:** Ô "Tổng tiền thanh toán" được thiết kế bằng thẻ `<input type="number">`, cho phép người mua tự ý gõ sửa số tiền thanh toán (kể cả 0đ hoặc 1.000đ) để đặt hàng.
 * **4. How to Reproduce:**
@@ -298,6 +310,7 @@
 
 #### BUG REPORT 13: `BUG-13` (`BUG-FR08-02`)
 * **1. Bug ID:** `BUG-13` (`BUG-FR08-02`)
+* **GitHub Issue:** [#85 - BUG-FR08-02](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/85)
 * **2. Function Name:** `FR-08: Order Checkout (Backend API)`
 * **3. Problem Summary:** Endpoint `/api/checkout` không kiểm tra $total\_amount > 0$ và không tính lại tổng tiền từ giỏ hàng, cho phép thanh toán thành công đơn hàng giá trị 0 ₫.
 * **4. How to Reproduce:**
@@ -317,6 +330,7 @@
 
 #### BUG REPORT 14: `BUG-14` (`BUG-FR08-03`)
 * **1. Bug ID:** `BUG-14` (`BUG-FR08-03`)
+* **GitHub Issue:** [#86 - BUG-FR08-03](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/86)
 * **2. Function Name:** `FR-08 / FR-09: Shopping Cart UI`
 * **3. Problem Summary:** Khi ô mã giảm giá rỗng, người dùng bấm nút "Áp dụng" nhưng giao diện hoàn toàn im lặng, không hiển thị thông báo lỗi yêu cầu nhập mã.
 * **4. How to Reproduce:**
@@ -339,6 +353,7 @@
 
 #### BUG REPORT 15: `BUG-15` (`BUG-FR14-01`)
 * **1. Bug ID:** `BUG-15` (`BUG-FR14-01`)
+* **GitHub Issue:** [#87 - BUG-FR14-01](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/87)
 * **2. Function Name:** `FR-14: Category CRUD`
 * **3. Problem Summary:** Cho phép tạo danh mục có tên rỗng `""` hoặc toàn khoảng trắng ($LB - 1 = 0$), vi phạm quy định bắt buộc "Tên danh mục không được để trống".
 * **4. How to Reproduce:**
@@ -359,6 +374,7 @@
 
 #### BUG REPORT 16: `BUG-16` (`BUG-FR14-02`)
 * **1. Bug ID:** `BUG-16` (`BUG-FR14-02`)
+* **GitHub Issue:** [#88 - BUG-FR14-02](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/88)
 * **2. Function Name:** `FR-14 / FR-12 / SEC-03: Access Control & Authorization`
 * **3. Problem Summary:** Lỗ hổng Broken Access Control (BOLA / OWASP A01): Middleware `authenticateToken` chỉ kiểm tra chữ ký Token mà không kiểm tra thuộc tính quyền `role === 'admin'`, cho phép tài khoản người dùng thường (`role = 'user'`) gọi API tạo và xóa danh mục quản trị.
 * **4. How to Reproduce:**
@@ -380,6 +396,7 @@
 
 #### BUG REPORT 17: `BUG-17` (`BUG-FR14-03`)
 * **1. Bug ID:** `BUG-17` (`BUG-FR14-03`)
+* **GitHub Issue:** [#89 - BUG-FR14-03](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/89)
 * **2. Function Name:** `FR-14 / FR-24: Category CRUD UI & Data Integrity`
 * **3. Problem Summary:** Nút xóa danh mục không có dialog/modal xác nhận nguy hiểm theo chuẩn FR-24; đồng thời xóa danh mục đang chứa sản phẩm không bị chặn, làm mồ côi dữ liệu sản phẩm trong CSDL.
 * **4. How to Reproduce:**
@@ -401,6 +418,7 @@
 
 #### BUG REPORT 18: `BUG-18` (`BUG-FR02-01`)
 * **1. Bug ID:** `BUG-18` (`BUG-FR02-01`)
+* **GitHub Issue:** [#90 - BUG-FR02-01](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/90)
 * **2. Function Name:** `FR-02: Login and Account Lockout Policy`
 * **3. Problem Summary:** Bộ đếm đăng nhập sai nhảy vọt +2 mỗi lần thay vì +1, khiến tài khoản người dùng bị khóa sai chỉ sau 2 lần nhập sai (thay vì 3 lần theo đặc tả).
 * **4. How to Reproduce:**
@@ -422,6 +440,7 @@
 
 #### BUG REPORT 19: `BUG-19` (`BUG-FR02-02`)
 * **1. Bug ID:** `BUG-19` (`BUG-FR02-02`)
+* **GitHub Issue:** [#91 - BUG-FR02-02](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/91)
 * **2. Function Name:** `FR-02: Account Lockout Duration`
 * **3. Problem Summary:** Khi tài khoản bị khóa, backend thiết lập thời gian hết hạn khóa là 180 giây (180,000ms), gấp 6 lần thời gian quy định trong đặc tả môi trường demo (30 giây).
 * **4. How to Reproduce:**
@@ -443,6 +462,7 @@
 
 #### BUG REPORT 20: `BUG-20` (`BUG-FR02-03`)
 * **1. Bug ID:** `BUG-20` (`BUG-FR02-03`)
+* **GitHub Issue:** [#92 - BUG-FR02-03](https://github.com/tinphan247/-KTPM-2026-HW02-Domain-Testing/issues/92)
 * **2. Function Name:** `FR-02 / FR-20 / FR-21 / FR-22: Mobile Login GUI Standards`
 * **3. Problem Summary:** Màn hình đăng nhập Mobile vi phạm các tiêu chuẩn giao diện di động: nhãn dùng từ tiếng Anh "Username" thay vì "Email", thiếu dấu `*` bắt buộc, nút submit dùng tiếng Anh "Sign In", và hộp thông báo lỗi đặt ở cuối trang (dưới cả nút bấm).
 * **4. How to Reproduce:**
