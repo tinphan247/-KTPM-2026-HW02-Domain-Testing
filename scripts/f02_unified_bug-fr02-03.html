@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BUG-FR02-03 Code Evidence</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0b0f19;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .vscode-window {
+    background: #1e1e1e;
+    border-radius: 8px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    width: 100%;
+    max-width: 1040px;
+    overflow: hidden;
+    border: 1px solid #333333;
+  }
+  .title-bar {
+    background: #323233;
+    padding: 9px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #252526;
+  }
+  .traffic-lights {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot.red { background: #ff5f56; }
+  .dot.yellow { background: #ffbd2e; }
+  .dot.green { background: #27c93f; }
+  .title-text {
+    color: #cccccc;
+    font-size: 12px;
+    font-family: monospace;
+    margin-left: 10px;
+  }
+  .bug-tag {
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+  }
+  .tab-bar {
+    background: #252526;
+    display: flex;
+    border-bottom: 1px solid #1e1e1e;
+  }
+  .tab {
+    background: #1e1e1e;
+    color: #ffffff;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-family: monospace;
+    border-top: 2px solid #007acc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .editor {
+    display: flex;
+    padding: 16px 0;
+    background: #1e1e1e;
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #d4d4d4;
+  }
+  .line-numbers {
+    width: 50px;
+    text-align: right;
+    padding-right: 16px;
+    color: #858585;
+    user-select: none;
+    border-right: 1px solid #2d2d2d;
+  }
+  .code-area {
+    padding-left: 16px;
+    flex: 1;
+    overflow-x: auto;
+  }
+  .kw { color: #569cd6; font-weight: bold; }
+  .str { color: #ce9178; }
+  .fn { color: #dcdcaa; }
+  .var { color: #9cdcfe; }
+  .prop { color: #9cdcfe; }
+  .num { color: #b5cea8; }
+  .cm { color: #6a9955; font-style: italic; }
+  .op { color: #d4d4d4; }
+  .hl-bug {
+    background: rgba(220, 38, 38, 0.28);
+    display: block;
+    width: 100%;
+    border-left: 4px solid #ef4444;
+    padding-left: 4px;
+    margin-left: -8px;
+  }
+  .callout-box {
+    margin: 16px 20px;
+    background: #2d1515;
+    border-left: 4px solid #ef4444;
+    padding: 12px 16px;
+    border-radius: 4px;
+    border: 1px solid #551d1d;
+  }
+  .callout-title {
+    color: #fca5a5;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .callout-desc {
+    color: #fecaca;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .fix-box {
+    margin: 16px 20px 20px 20px;
+    background: #14291e;
+    border-left: 4px solid #10b981;
+    padding: 12px 16px;
+    border-radius: 4px;
+    border: 1px solid #1e4d35;
+  }
+  .fix-title {
+    color: #6ee7b7;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .fix-code {
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 12px;
+    color: #a7f3d0;
+    background: #0d1e16;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid #19402c;
+  }
+  .statusbar {
+    background: #007acc;
+    color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 12px;
+    font-size: 11px;
+    font-family: sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<div class="vscode-window">
+  <div class="title-bar">
+    <div class="traffic-lights">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+      <span class="title-text">d:/KAN/N4_1/eshop-sut/frontend-mobile/App.js — EShop SUT</span>
+    </div>
+    <div class="bug-tag">BUG-FR02-03: Vi Phạm Chuẩn Giao Diện Mobile FR-21 / FR-22 (App.js)</div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab">
+      <span>📱</span>
+      <span>App.js</span>
+    </div>
+  </div>
+
+  <div class="editor">
+    <div class="line-numbers">
+      <div>761</div><div>762</div><div>763</div><div>764</div><div>765</div><div>766</div><div>767</div><div>768</div><div>769</div><div>770</div>
+    </div>
+    <div class="code-area">
+      <div>      &lt;<span class="kw">ScrollView</span> <span class="prop">contentContainerStyle</span>={styles.formContainer}&gt;</div><div>        &lt;<span class="kw">Text</span> <span class="prop">style</span>={styles.headerCenter}&gt;Đăng Nhập&lt;/<span class="kw">Text</span>&gt;</div><div>        <span class="hl-bug">&lt;<span class="kw">Text</span> <span class="prop">style</span>={styles.label}&gt;Username&lt;/<span class="kw">Text</span>&gt; <span class="cm">// LỖI: Nhãn Username thay vì Email, thiếu dấu *</span></span></div><div>        &lt;<span class="kw">TextInput</span> <span class="prop">style</span>={styles.textInput} <span class="prop">placeholder</span>=<span class="str">"Email"</span> <span class="prop">value</span>={email} <span class="prop">onChangeText</span>={setEmail} /&gt;</div><div>        &lt;<span class="kw">Text</span> <span class="prop">style</span>={styles.label}&gt;Mật khẩu&lt;/<span class="kw">Text</span>&gt; <span class="cm">// LỖI: Thiếu dấu * trường bắt buộc</span></div><div>        &lt;<span class="kw">TextInput</span> <span class="prop">style</span>={styles.textInput} <span class="prop">placeholder</span>=<span class="str">"Mật khẩu"</span> <span class="prop">value</span>={password} <span class="prop">secureTextEntry</span> /&gt;</div><div>        &lt;<span class="kw">TouchableOpacity</span> <span class="prop">style</span>={styles.button} <span class="prop">onPress</span>={handleLogin}&gt;</div><div>          <span class="hl-bug">&lt;<span class="kw">Text</span> <span class="prop">style</span>={styles.buttonText}&gt;Sign In&lt;/<span class="kw">Text</span>&gt; <span class="cm">// LỖI FR-21: Dùng tiếng Anh "Sign In" thay vì "Đăng nhập"</span></span></div><div>        &lt;/<span class="kw">TouchableOpacity</span>&gt;</div><div>        <span class="hl-bug">{!!loginError &amp;&amp; &lt;<span class="kw">Text</span> <span class="prop">style</span>={styles.errorBoxText}&gt;{loginError}&lt;/<span class="kw">Text</span>&gt;} <span class="cm">// LỖI FR-22: Lỗi đặt DƯỚI nút submit</span></span></div>
+    </div>
+  </div>
+
+  <div class="callout-box">
+    <div class="callout-title">⚠️ ROOT CAUSE ANALYSIS (PHÂN TÍCH NGUYÊN NHÂN GỐC)</div>
+    <div class="callout-desc">File <code>frontend-mobile/App.js</code> vi phạm hàng loạt tiêu chuẩn giao diện của SRS: <b>(1) FR-21:</b> Nút submit dùng tiếng Anh "Sign In" thay vì "Đăng nhập"; <b>(2) FR-22:</b> Nhãn dùng từ "Username" thay vì "Email", thiếu ký hiệu <code>*</code> cạnh nhãn bắt buộc; <b>(3) FR-22:</b> Khối hiển thị thông báo lỗi <code>loginError</code> nằm bên dưới nút submit; <b>(4)</b> Hàm <code>handleLogin</code> nuốt mất thông báo tài khoản bị khóa từ server.</div>
+  </div>
+
+  <div class="fix-box">
+    <div class="fix-title">✅ RECOMMENDED FIX (GIẢI PHÁP ĐỀ XUẤT)</div>
+    <div class="fix-code">// Chuyển nhãn thành "Email *", nút thành "Đăng nhập", và di chuyển {loginError} lên trên nút submit</div>
+  </div>
+
+  <div class="statusbar">
+    <div><span>Git: hw02-23120279*</span> | <span>UTF-8</span> | <span>JavaScript</span></div>
+    <div><span>Nguyen Le Quang Kan (23120279)</span></div>
+  </div>
+</div>
+
+</body>
+</html>

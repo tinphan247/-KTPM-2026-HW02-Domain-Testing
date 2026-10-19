@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>BUG-FR02-03_UI Mobile GUI Evidence</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  body { background: #0b0f19; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 24px; }
+  .window { background: #1e293b; border-radius: 8px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); width: 100%; max-width: 1040px; overflow: hidden; border: 1px solid #334155; }
+  .title-bar { background: #0f172a; padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; }
+  .traffic-lights { display: flex; gap: 8px; align-items: center; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .dot.red { background: #ef4444; }
+  .dot.yellow { background: #f59e0b; }
+  .dot.green { background: #10b981; }
+  .title-text { color: #94a3b8; font-size: 12.5px; font-family: monospace; font-weight: 600; margin-left: 10px; }
+  .bug-tag { background: #dc2626; color: #ffffff; font-size: 11px; font-weight: 700; padding: 2px 10px; border-radius: 4px; font-family: monospace; }
+  .content { display: flex; padding: 24px; gap: 30px; align-items: flex-start; justify-content: center; }
+  .phone-mockup { width: 340px; background: #ffffff; border-radius: 36px; padding: 16px; border: 10px solid #0f172a; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+  .notch { width: 120px; height: 18px; background: #0f172a; margin: 0 auto 16px auto; border-radius: 0 0 12px 12px; }
+  .app-header { font-size: 20px; font-weight: 700; text-align: center; color: #1e293b; margin-bottom: 20px; }
+  .field-group { margin-bottom: 14px; }
+  .label { font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .label-bad { color: #ef4444; font-weight: bold; }
+  .input { width: 100%; border: 1.5px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #1e293b; }
+  .forgot-link { color: #0284c7; font-size: 12px; text-align: right; margin-bottom: 16px; font-weight: 500; }
+  .btn-submit { background: #0284c7; border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 14px; }
+  .btn-text { color: #ffffff; font-size: 14px; font-weight: 700; }
+  .switch-link { text-align: center; font-size: 12px; color: #64748b; margin-bottom: 14px; }
+  .error-box-bad { background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 10px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; }
+  .notes { flex: 1; color: #cbd5e1; font-size: 13px; line-height: 1.6; }
+  .note-item { background: #0f172a; border-left: 4px solid #ef4444; padding: 12px 16px; border-radius: 6px; margin-bottom: 12px; border: 1px solid #334155; }
+  .note-item h4 { color: #fca5a5; font-size: 13.5px; margin-bottom: 4px; }
+  .note-item p { color: #94a3b8; font-size: 12px; }
+  .statusbar { background: #0284c7; color: #ffffff; display: flex; justify-content: space-between; padding: 4px 16px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <div class="title-bar">
+    <div class="traffic-lights">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+      <span class="title-text">Expo Mobile Simulator — frontend-mobile/App.js (Login Screen)</span>
+    </div>
+    <div class="bug-tag">BUG-FR02-03_UI: Vi Phạm Tiêu Chuẩn Giao Diện Mobile FR-21 / FR-22</div>
+  </div>
+
+  <div class="content">
+    <!-- Phone Mockup -->
+    <div class="phone-mockup">
+      <div class="notch"></div>
+      <div class="app-header">Đăng Nhập</div>
+
+      <div class="field-group">
+        <div class="label">
+          <span>Username</span>
+          <span class="label-bad">❌ Thiếu dấu *, sai nhãn Email</span>
+        </div>
+        <input class="input" value="test@eshop.com" readonly />
+      </div>
+
+      <div class="field-group">
+        <div class="label">
+          <span>Mật khẩu</span>
+          <span class="label-bad">❌ Thiếu dấu * bắt buộc</span>
+        </div>
+        <input class="input" type="password" value="••••••••" readonly />
+      </div>
+
+      <div class="forgot-link">Quên mật khẩu?</div>
+
+      <div class="btn-submit">
+        <div class="btn-text">Sign In</div>
+      </div>
+      <div style="font-size: 11px; color: #ef4444; font-weight: bold; text-align: center; margin-top: -8px; margin-bottom: 10px;">
+        ❌ Lỗi FR-21: Dùng tiếng Anh "Sign In" thay vì "Đăng nhập"
+      </div>
+
+      <div class="switch-link">Chưa có tài khoản? <span style="color: #0284c7; font-weight: 600;">Đăng ký ngay</span></div>
+
+      <div class="error-box-bad">
+        Đăng nhập thất bại. Vui lòng kiểm tra lại.
+      </div>
+      <div style="font-size: 11px; color: #ef4444; font-weight: bold; text-align: center; margin-top: 4px;">
+        ❌ Lỗi FR-22: Hộp lỗi nằm DƯỚI nút submit và nuốt message khóa tài khoản
+      </div>
+    </div>
+
+    <!-- Notes Breakdown -->
+    <div class="notes">
+      <h3 style="color: #f8fafc; font-size: 16px; margin-bottom: 14px;">BẢNG ĐỐI CHIẾU VI PHẠM GIAO DIỆN (GUI AUDIT)</h3>
+
+      <div class="note-item">
+        <h4>1. Vi phạm Nhãn & Dấu bắt buộc (FR-22)</h4>
+        <p>Thẻ label tại dòng 763 hiển thị <code>Username</code> thay vì <code>Email *</code>. Cả hai trường Email và Mật khẩu đều thiếu dấu <code>*</code> cạnh nhãn theo điều khoản FR-22.</p>
+      </div>
+
+      <div class="note-item">
+        <h4>2. Vi phạm Ngôn ngữ Tiếng Việt (FR-21)</h4>
+        <p>Nút submit tại dòng 783 hiển thị <code>Sign In</code> bằng tiếng Anh, vi phạm nguyên tắc nhất quán ngôn ngữ tiếng Việt toàn hệ thống.</p>
+      </div>
+
+      <div class="note-item">
+        <h4>3. Vi phạm Vị trí Thông báo Lỗi (FR-22)</h4>
+        <p>Hộp thông báo <code>loginError</code> được render ở cuối cùng (dòng 790), nằm dưới cả nút submit và link chuyển trang. FR-22 quy định: <i>"Thông báo lỗi phải xuất hiện TRÊN nút submit, không phải bên dưới"</i>.</p>
+      </div>
+
+      <div class="note-item">
+        <h4>4. Nuốt Thông báo Lỗi Chi tiết từ Server (API Error Masking)</h4>
+        <p>Hàm <code>handleLogin</code> (dòng 205) catch error và hardcode <code>setLoginError("Đăng nhập thất bại...")</code>, che giấu hoàn toàn phản hồi <code>"Tài khoản đã bị khóa. Vui lòng thử lại sau."</code> từ backend.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="statusbar">
+    <div>Mobile Screen Resolution: 1080x720 | Expo SDK 51</div>
+    <div>Nguyen Le Quang Kan (23120279)</div>
+  </div>
+</div>
+
+</body>
+</html>
